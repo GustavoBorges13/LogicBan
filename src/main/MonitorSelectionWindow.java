@@ -7,8 +7,9 @@ import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsDevice;
 
 public class MonitorSelectionWindow extends JFrame {
-
-    private JComboBox<String> monitorList;
+	
+	private static final long serialVersionUID = 1L;
+	private JComboBox<String> monitorList;
     private JButton startButton;
     private String selectedMonitor;
 

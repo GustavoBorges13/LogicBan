@@ -1,23 +1,17 @@
 package main;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
 import button.Button_Creditos;
 import button.Button_Fechar;
 import button.Button_NovoJogo;
@@ -162,9 +156,6 @@ public class GamePanel extends JPanel implements Runnable {
 		 * // GET FULL SCREEN WIDTH AND HEIGTH screenWidth2 = Main.window.getWidth();
 		 * screenHeight2 = Main.window.getHeight();
 		 */
-
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		GraphicsDevice[] screens = ge.getScreenDevices();
 
 		// Garantir que estamos pegando o mesmo monitor onde a janela foi posicionada
 		Rectangle bounds = Main.window.getGraphicsConfiguration().getBounds();

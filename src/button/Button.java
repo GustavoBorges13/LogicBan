@@ -2,11 +2,8 @@ package button;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-
 import javax.imageio.ImageIO;
-
 import main.GamePanel;
-import main.UtilityTool;
 
 public class Button {
 

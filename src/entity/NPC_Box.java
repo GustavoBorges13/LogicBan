@@ -3,10 +3,7 @@ package entity;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Random;
-
 import main.GamePanel;
-import object.OBJ_Door;
 import object.OBJ_Door_Iron;
 import tile_interactive.IT_MetalPlate;
 import tile_interactive.InteractiveTile;

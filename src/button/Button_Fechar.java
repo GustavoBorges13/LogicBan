@@ -1,10 +1,7 @@
 package button;
 
 import java.awt.Graphics2D;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 import main.GamePanel;
 
 public class Button_Fechar extends Button {
