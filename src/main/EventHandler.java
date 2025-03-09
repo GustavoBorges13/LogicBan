@@ -41,6 +41,7 @@ public class EventHandler {
 		carregarEventos();
 	}
 
+	// Aqui onde fica eventos de teleporte, TP inicial X TP final
 	private void carregarEventos() {
 		teleportEvents.add(new TeleportEvent(0, 29, 6, "right", 1, 2, 2, "right")); // fase1 -> fase2
 		teleportEvents.add(new TeleportEvent(0, 29, 7, "right", 1, 2, 2, "right"));
@@ -132,7 +133,9 @@ public class EventHandler {
 			// gp.currentMap = targetMapIndex; // Opcional, depende do fluxo
 		}
 	}
-
+	
+	
+	// Os teleporte agora são desenhado de azul na tela caso use ferramenta debug !
 	public void draw(Graphics2D g2) {
 	    if (debugModeOn && eventRect != null) {
 	        g2.setColor(Color.CYAN);
