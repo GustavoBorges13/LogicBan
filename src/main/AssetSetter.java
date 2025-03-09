@@ -2,6 +2,7 @@ package main;
 
 import entity.NPC_Box;
 import entity.NPC_OldMan;
+import entity.NPC_OldPlayer;
 import object.OBJ_Boots;
 import object.OBJ_Chest;
 import object.OBJ_Door;
@@ -72,6 +73,11 @@ public class AssetSetter {
 		gp.npc[mapNum][i].worldX = 6 * gp.tileSize;
 		gp.npc[mapNum][i].worldY = 3 * gp.tileSize;
 		i++;
+		gp.npc[mapNum][i] = new NPC_OldPlayer(gp);
+		gp.npc[mapNum][i].worldX = 2 * gp.tileSize;
+		gp.npc[mapNum][i].worldY = 10 * gp.tileSize;
+		i++;
+		
 		gp.npc[mapNum][i] = new NPC_Box(gp);
 		gp.npc[mapNum][i].worldX = 2 * gp.tileSize;
 		gp.npc[mapNum][i].worldY = 3 * gp.tileSize;
