@@ -1,8 +1,9 @@
 package main;
 
-import com.formdev.flatlaf.FlatDarkLaf; // Ou FlatLightLaf para o tema claro
-
 import javax.swing.*;
+
+import com.formdev.flatlaf.FlatDarkLaf;
+
 import java.awt.*;
 
 public class Main {

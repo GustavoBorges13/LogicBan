@@ -70,14 +70,14 @@ public class Config {
 			// Music volume
 			s = br.readLine();
 			gp.music.volumeScale = Integer.parseInt(s);
-			
+
 			// SFX volume
 			s = br.readLine();
 			gp.sfx.volumeScale = Integer.parseInt(s);
-	
+
 			// Walk Type
 			s = br.readLine();
-			gp.player.walkType = s.toString(); //npc herda do player
+			gp.player.walkType = s.toString(); // npc herda do player
 
 			br.close();
 
@@ -85,15 +85,21 @@ public class Config {
 			System.out.println("Arquivo de configuração não encontrado! Criando um novo com valores padrão...");
 
 			// Definir configurações padrão antes de salvar
+			// Definir configurações padrão antes de salvar
 			gp.FullScreenOn = false;
-			gp.music.volumeScale = 3;  // Volume padrão
-			gp.sfx.volumeScale = 3;    // Volume padrão
+			defaultSoundValues();
 			gp.player.walkType = "Smooth-Walk"; // Tipo de caminhada padrão
 			gp.update();
 			saveConfig(); // Criar o arquivo com as configurações padrão
-		
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+	public void defaultSoundValues() {
+		gp.music.volumeScale = 3; // Volume padrão
+		gp.sfx.volumeScale = 3; // Volume padrão
+	}
+
 }
