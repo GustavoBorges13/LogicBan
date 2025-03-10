@@ -6,6 +6,14 @@
 	<artifactId>LogicBan</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub OWNER Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/GustavoBorges13/LogicBan</url>
+		</repository>
+	</distributionManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.formdev</groupId>
