@@ -1,0 +1,64 @@
+package br.ufcat.logicban.data;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import br.ufcat.logicban.ui.GamePanel;
+
+public class SaveLoad {
+
+	GamePanel gp;
+	public int saveAntigo;
+	public boolean precisaSalvar = true;
+
+	public SaveLoad(GamePanel gp) {
+
+		this.gp = gp;
+	}
+
+	public void save() {
+	    try {
+	        // Caminho relativo para salvar o arquivo "save.dat"
+	        String path = System.getProperty("user.dir");
+	        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(path, "save.dat")));
+	        
+	        DataStorage ds = new DataStorage();
+	        ds.highestUnlockedFase = gp.highestUnlockedFase; // Salva a fase mais alta
+	        oos.writeObject(ds);
+	        System.out.println("HighestUnlockedFase SAVE: " + gp.highestUnlockedFase);
+	        oos.close();
+
+	    } catch (Exception e) {
+	        System.out.println("Save Exception!");
+	    }
+	}
+
+
+	public void load() {
+	    try {
+	        // Caminho relativo para carregar o arquivo "save.dat"
+	        String path = System.getProperty("user.dir");
+	        File saveFile = new File(path, "save.dat");
+
+	        if (saveFile.exists()) {
+	            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(saveFile));
+	            DataStorage ds = (DataStorage) ois.readObject();
+	            gp.highestUnlockedFase = ds.highestUnlockedFase;
+	            ois.close();
+	        } else {
+	            // Primeira execução - inicializa com fase 0
+	            gp.highestUnlockedFase = 0;
+	        }
+	        System.out.println("HighestUnlockedFase LOAD: " + gp.highestUnlockedFase);
+
+	    } catch (Exception e) {
+	        System.out.println("Load Exception! Initializing new save.");
+	        gp.highestUnlockedFase = 0;
+	    }
+	}
+
+
+}

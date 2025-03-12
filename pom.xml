@@ -1,46 +1,156 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>LogicBan</groupId>
-	<artifactId>LogicBan</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+<!DOCTYPE xml>
+<project xmlns="https://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>br.ufcat.logicban</groupId>
+  <artifactId>LogicBan</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
 
-	<distributionManagement>
-		<repository>
-			<id>github</id>
-			<name>GitHub OWNER Apache Maven Packages</name>
-			<url>https://maven.pkg.github.com/GustavoBorges13/LogicBan</url>
-		</repository>
-	</distributionManagement>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>16</maven.compiler.source>
+    <maven.compiler.target>16</maven.compiler.target>
+    <java.version>16</java.version>
+    <app.name>LogicBan</app.name>
+    <app.version>0.0.1</app.version>
+    <vendor.name>Bug Hunters</vendor.name>
+    <copyright>Copyright (C) 2025</copyright>
+  </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.formdev</groupId>
-			<artifactId>flatlaf</artifactId>
-			<version>3.5.4</version>
-		</dependency>
-	</dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>com.formdev</groupId>
+      <artifactId>flatlaf</artifactId>
+      <version>3.5.4</version>
+    </dependency>
+  </dependencies>
 
-	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>res</directory>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</resource>
-		</resources>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<release>21</release>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  <build>
+  <finalName>logicban-${app.version}</finalName>
+  <plugins>
+    <!-- Maven Resources Plugin -->
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-resources-plugin</artifactId>
+      <version>3.2.0</version>
+      <executions>
+        <execution>
+          <phase>process-resources</phase>
+          <goals>
+            <goal>copy-resources</goal>
+          </goals>
+          <configuration>
+            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+            <resources>
+              <resource>
+                <directory>src/resources</directory>
+              </resource>
+            </resources>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
 
+    <!-- Maven Compiler Plugin -->
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <version>3.11.0</version>
+      <configuration>
+        <source>${maven.compiler.source}</source>
+        <target>${maven.compiler.source}</target>
+      </configuration>
+    </plugin>
+
+    <!-- Maven Shade Plugin -->
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-shade-plugin</artifactId>
+      <version>3.2.1</version>
+      <executions>
+        <execution>
+          <phase>package</phase>
+          <goals>
+            <goal>shade</goal>
+          </goals>
+          <configuration>
+            <finalName>logicban-${app.version}-jar-with-dependencies</finalName>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+
+    <!-- exec-maven-plugin for jlink and jpackage -->
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>exec-maven-plugin</artifactId>
+      <version>3.5.0</version>
+      <executions>
+        <execution>
+          <id>create-runtime-image</id>
+          <phase>package</phase>
+          <goals>
+            <goal>exec</goal>
+          </goals>
+          <configuration>
+            <executable>C:\Program Files\Java\jdk-23\bin\jlink.exe</executable>
+            <arguments>
+              <argument>--module-path</argument>
+              <argument>${project.build.directory}/libs</argument>
+              <argument>--add-modules</argument>
+              <argument>java.base,java.desktop</argument>
+              <argument>--output</argument>
+              <argument>${project.build.directory}/runtime-image</argument>
+            </arguments>
+          </configuration>
+        </execution>
+        <execution>
+          <id>package-exe</id>
+          <phase>package</phase>
+          <goals>
+            <goal>exec</goal>
+          </goals>
+          <configuration>
+            <executable>C:\Program Files\Java\jdk-23\bin\jpackage.exe</executable>
+            <arguments>
+              <argument>--dest</argument>
+              <argument>${project.build.directory}/jpackage</argument>
+              <argument>--type</argument>
+              <argument>exe</argument>
+              <argument>--app-version</argument>
+              <argument>0.0.1</argument>
+              <argument>--copyright</argument>
+              <argument>Copyright (C) 2025</argument>
+              <argument>--name</argument>
+              <argument>LogicBan</argument>
+              <argument>--vendor</argument>
+              <argument>Bug Hunters</argument>
+              <argument>--icon</argument>
+              <argument>${project.basedir}/src/resources/assets/logos/icone.ico</argument>
+              <argument>--input</argument>
+              <argument>${project.build.directory}</argument>
+              <argument>--main-jar</argument>
+              <argument>logicban-0.0.1-jar-with-dependencies.jar</argument>
+              <argument>--main-class</argument>
+              <argument>br.ufcat.logicban.ui.Main</argument>
+              
+              <argument>--win-menu</argument>
+              <argument>--about-url</argument>
+              <argument>https://github.com/GustavoBorges13/LogicBan</argument>
+              <argument>--win-help-url</argument>
+              <argument>https://github.com/GustavoBorges13/LogicBan</argument>
+              <argument>--win-update-url</argument>
+              <argument>https://github.com/GustavoBorges13/LogicBan</argument>
+              <argument>--win-shortcut-prompt</argument>
+              <argument>--runtime-image</argument>
+              <argument>${project.build.directory}/runtime-image</argument>
+              <argument>--win-per-user-install</argument>
+            </arguments>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
 </project>
