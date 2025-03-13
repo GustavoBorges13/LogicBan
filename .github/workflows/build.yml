@@ -23,21 +23,21 @@ jobs:
 
       - name: Package with jpackage (Windows)
         run: |
-          jpackage --type exe \
-                   --input target \
-                   --main-jar logicban-1.0.0.jar \
-                   --main-class br.ufcat.logicban.ui.Main \
-                   --dest target/jpackage \
-                   --app-version 1.0.0 \
-                   --name LogicBan \
-                   --vendor "Bug Hunters" \
-                   --copyright "Copyright (C) 2025" \
-                   --icon src/resources/assets/logos/icone.ico \
-                   --win-menu \
-                   --win-shortcut \
-                   --win-per-user-install \
-                   --win-update-url "https://github.com/GustavoBorges13/LogicBan" \
-                   --win-help-url "https://github.com/GustavoBorges13/LogicBan" \
+          jpackage --type exe ^
+                   --input target ^
+                   --main-jar logicban-1.0.0.jar ^
+                   --main-class br.ufcat.logicban.ui.Main ^
+                   --dest target/jpackage ^
+                   --app-version 1.0.0 ^
+                   --name LogicBan ^
+                   --vendor "Bug Hunters" ^
+                   --copyright "Copyright (C) 2025" ^
+                   --icon src/resources/assets/logos/icone.ico ^
+                   --win-menu ^
+                   --win-shortcut ^
+                   --win-per-user-install ^
+                   --win-update-url "https://github.com/GustavoBorges13/LogicBan" ^
+                   --win-help-url "https://github.com/GustavoBorges13/LogicBan" ^
                    --win-update-url "https://github.com/GustavoBorges13/LogicBan"
 
       - name: Upload Windows artifact
@@ -72,7 +72,7 @@ jobs:
                    --name LogicBan \
                    --vendor "Bug Hunters" \
                    --copyright "Copyright (C) 2025" \
-                   --icon src/resources/assets/logos/icone.png
+                   --icon src/resources/assets/logos/icone.ico
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
@@ -106,7 +106,7 @@ jobs:
                    --name LogicBan \
                    --vendor "Bug Hunters" \
                    --copyright "Copyright (C) 2025" \
-                   --icon src/resources/assets/logos/icone.icns
+                   --icon src/resources/assets/logos/icone.ico
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
