@@ -907,10 +907,10 @@ public class UI {
 
 	public void options_fullScreenNotification(int frameX, int frameY) {
 
-		int textX = frameX + gp.tileSize;
+		int textX = frameX + gp.tileSize-4;
 		int textY = frameY + gp.tileSize * 3;
 		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
-		currentDialogue = "The change will take \neffect after restarting \nthe game.";
+		currentDialogue = "A alteração entrará em vigor\n depois de reiniciar o jogo.";
 
 		for (String line : currentDialogue.split("\n")) {
 			g2.drawString(line, textX, textY);
@@ -919,9 +919,9 @@ public class UI {
 
 		// BACK
 		textY = frameY + gp.tileSize * 9;
-		g2.drawString("Back", textX, textY);
+		g2.drawString("Back", textX+4, textY);
 		if (commandNum == 0) {
-			g2.drawString(">", textX - 25, textY);
+			g2.drawString(">", textX - 22, textY);
 			if (gp.keyH.enterPressed == true) {
 				subState = 0;
 			}
