@@ -29,7 +29,7 @@ Categories=Utility;
 EOF
 
 # Copy the icon
-cp src/resources/assets/logos/icone.png AppDir/usr/share/icons/hicolor/256x256/apps/logicban.png
+cp src/resources/assets/logos/icone.ico AppDir/usr/share/icons/hicolor/256x256/apps/logicban.ico
 
 # Extract AppImageTool (to avoid FUSE dependency)
 ./appimagetool-x86_64.AppImage --appimage-extract
