@@ -29,7 +29,11 @@ Categories=Utility;
 EOF
 
 # Copy the icon
-cp src/resources/assets/logos/icone.ico AppDir/usr/share/icons/hicolor/256x256/apps/logicban.png
+cp src/resources/assets/logos/icone.png AppDir/usr/share/icons/hicolor/256x256/apps/logicban.png
 
-# Create the AppImage
-./appimagetool-x86_64.AppImage AppDir LogicBan.AppImage
+# Extract AppImageTool (to avoid FUSE dependency)
+./appimagetool-x86_64.AppImage --appimage-extract
+mv squashfs-root appimagetool
+
+# Create the AppImage using the extracted AppImageTool
+./appimagetool/AppRun AppDir LogicBan.AppImage
