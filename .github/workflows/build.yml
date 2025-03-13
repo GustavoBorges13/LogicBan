@@ -32,7 +32,7 @@ jobs:
           name: logicban-windows
           path: target/jpackage/*.exe
 
-  build-appimage:
+  build-linux:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -44,24 +44,33 @@ jobs:
           java-version: '23'
           distribution: 'temurin'
 
+      - name: Build with Maven
+        run: mvn package
+
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick
 
-      - name: Build with Maven
-        run: mvn package
-
-      - name: Create AppImage
+      - name: Package with jpackage (Linux)
         run: |
-          chmod +x create-appimage.sh
-          ./create-appimage.sh
+          jpackage --type deb \
+                   --input target \
+                   --main-jar logicban-1.0.0.jar \
+                   --main-class br.ufcat.logicban.ui.Main \
+                   --dest target/jpackage \
+                   --app-version 1.0.0 \
+                   --name LogicBan \
+                   --vendor "Bug Hunters" \
+                   --copyright "Copyright (C) 2025" \
+                   --icon src/resources/assets/logos/icone.png \
+                   --linux-package-deps "libasound2t64"
 
-      - name: Upload AppImage artifact
+      - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
-          name: logicban-appimage
-          path: LogicBan.AppImage
+          name: logicban-linux
+          path: target/jpackage/*.deb
 
   build-macos:
     runs-on: macos-latest
