@@ -50,17 +50,16 @@ jobs:
       - name: Package with jpackage (Linux)
         run: |
           jpackage --type deb \
-                  --input target \
-                  --main-jar logicban-1.0.0.jar \
-                  --main-class br.ufcat.logicban.ui.Main \
-                  --dest target/jpackage \
-                  --app-version 1.0.0 \
-                  --name LogicBan \
-                  --vendor "Bug Hunters" \
-                  --copyright "Copyright (C) 2025" \
-                  --icon src/resources/assets/logos/icone.png \
-                  --linux-package-deps "libasound2t64" \
-                  --resource-dir path/to/additional/resources
+                   --input target \
+                   --main-jar logicban-1.0.0.jar \
+                   --main-class br.ufcat.logicban.ui.Main \
+                   --dest target/jpackage \
+                   --app-version 1.0.0 \
+                   --name LogicBan \
+                   --vendor "Bug Hunters" \
+                   --copyright "Copyright (C) 2025" \
+                   --icon src/resources/assets/logos/icone.png \
+                   --linux-package-deps "libasound2t64"
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
