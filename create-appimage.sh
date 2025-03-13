@@ -28,8 +28,13 @@ Type=Application
 Categories=Utility;
 EOF
 
-# Copy the icon
-cp src/resources/assets/logos/icone.ico AppDir/usr/share/icons/hicolor/256x256/apps/logicban.ico
+# Copy the icon (convert .ico to .png if necessary)
+if [ -f src/resources/assets/logos/icone.ico ]; then
+  convert src/resources/assets/logos/icone.ico AppDir/usr/share/icons/hicolor/256x256/apps/logicban.png
+else
+  echo "Ícone .ico não encontrado. Usando ícone padrão."
+  cp src/resources/assets/logos/icone.png AppDir/usr/share/icons/hicolor/256x256/apps/logicban.png
+fi
 
 # Extract AppImageTool (to avoid FUSE dependency)
 ./appimagetool-x86_64.AppImage --appimage-extract
