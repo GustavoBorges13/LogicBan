@@ -47,30 +47,16 @@ jobs:
       - name: Build with Maven
         run: mvn package
 
-      - name: Package with jpackage (Linux)
+      - name: Create AppImage
         run: |
-          jlink --module-path $JAVA_HOME/jmods \
-                --add-modules java.base,java.desktop \
-                --output target/runtime-image
-      
-          jpackage --type deb \
-                   --input target \
-                   --main-jar logicban-1.0.0.jar \
-                   --main-class br.ufcat.logicban.ui.Main \
-                   --dest target/jpackage \
-                   --app-version 1.0.0 \
-                   --name LogicBan \
-                   --vendor "Bug Hunters" \
-                   --copyright "Copyright (C) 2025" \
-                   --icon src/resources/assets/logos/icone.png \
-                   --runtime-image target/runtime-image \
-                   --linux-package-deps "libasound2t64,libasound2,libx11-6"
+          chmod +x create-appimage.sh
+          ./create-appimage.sh
 
-      - name: Upload Linux artifact
+      - name: Upload AppImage artifact
         uses: actions/upload-artifact@v4
         with:
-          name: logicban-linux
-          path: target/jpackage/*.deb
+          name: logicban-appimage
+          path: LogicBan.AppImage
 
   build-macos:
     runs-on: macos-latest
