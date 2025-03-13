@@ -75,7 +75,6 @@ public class Config {
 	        br.close();
 
 	    } catch (FileNotFoundException e) {
-	        System.out.println("Arquivo de configuração não encontrado! Criando um novo com valores padrão...");
 	        gp.FullScreenOn = false;
 	        defaultSoundValues();
 	        gp.player.walkType = "Smooth-Walk"; // Tipo de caminhada padrão
