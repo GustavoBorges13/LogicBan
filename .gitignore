@@ -1,3 +1,5 @@
 /bin/
 /target/
 .m2/settings.xml
+src/resources/savefile/save.dat
+src/resources/config/config.txt
