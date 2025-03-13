@@ -14,13 +14,13 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '16'
+          java-version: '23'  # Mantenha a versão 23 para consistência
           distribution: 'temurin'
       - name: Build with Maven
         run: mvn package
       - name: Package with jpackage
         run: |
-          jpackage --type exe --input target --main-jar logicban-1.0.0.jar --main-class br.ufcat.logicban.ui.Main
+          jpackage --type exe --input target --main-jar logicban-1.0.0.jar --main-class br.ufcat.logicban.ui.Main --dest target/jpackage
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -35,13 +35,13 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '16'
+          java-version: '23'  # Altere para 23 para consistência
           distribution: 'temurin'
       - name: Build with Maven
         run: mvn package
       - name: Package with jpackage
         run: |
-          jpackage --type deb --input target --main-jar logicban-1.0.0.jar --main-class br.ufcat.logicban.ui.Main
+          jpackage --type deb --input target --main-jar logicban-1.0.0.jar --main-class br.ufcat.logicban.ui.Main --dest target/jpackage
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -56,13 +56,13 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '16'
+          java-version: '23'  # Mantenha a versão 23 para consistência
           distribution: 'temurin'
       - name: Build with Maven
         run: mvn package
       - name: Package with jpackage
         run: |
-          jpackage --type dmg --input target --main-jar logicban-1.0.0.jar --main-class br.ufcat.logicban.ui.Main
+          jpackage --type dmg --input target --main-jar logicban-1.0.0.jar --main-class br.ufcat.logicban.ui.Main --dest target/jpackage
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

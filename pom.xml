@@ -9,9 +9,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>16</maven.compiler.source>
-    <maven.compiler.target>16</maven.compiler.target>
-    <java.version>16</java.version>
+	<maven.compiler.source>23</maven.compiler.source>
+	<maven.compiler.target>23</maven.compiler.target>
+	<java.version>23</java.version>
     <app.name>LogicBan</app.name>
     <app.version>${project.version}</app.version>
     <vendor.name>Bug Hunters</vendor.name>
@@ -100,7 +100,7 @@
               <goal>exec</goal>
             </goals>
             <configuration>
-              <executable>C:\Program Files\Java\jdk-23\bin\jlink.exe</executable>
+              <executable>jlink</executable>
               <arguments>
                 <argument>--module-path</argument>
                 <argument>${project.build.directory}/libs</argument>
@@ -120,7 +120,7 @@
               <goal>exec</goal>
             </goals>
             <configuration>
-              <executable>C:\Program Files\Java\jdk-23\bin\jpackage.exe</executable>
+              <executable>jpackage</executable>
               <arguments>
                 <argument>--dest</argument>
                 <argument>${project.build.directory}/jpackage</argument>
