@@ -20,7 +20,8 @@ public class Config {
 	    try {
 	        // Caminho relativo baseado no diretório atual de execução
 	        String path = System.getProperty("user.dir");
-	        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path, "config.txt")));
+	        System.out.println(path);
+	        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path, "/src/resources/config/config.txt")));
 
 	        // Full screen
 	        bw.write(gp.FullScreenOn ? "On" : "Off");
@@ -48,7 +49,7 @@ public class Config {
 	public void loadConfig() {
 	    try {
 	        String path = System.getProperty("user.dir");
-	        BufferedReader br = new BufferedReader(new FileReader(new File(path, "config.txt")));
+	        BufferedReader br = new BufferedReader(new FileReader(new File(path, "/src/resources/config/config.txt")));
 	        
 	        String s = br.readLine();
 

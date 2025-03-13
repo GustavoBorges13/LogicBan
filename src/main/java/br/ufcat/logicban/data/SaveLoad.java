@@ -23,7 +23,7 @@ public class SaveLoad {
 	    try {
 	        // Caminho relativo para salvar o arquivo "save.dat"
 	        String path = System.getProperty("user.dir");
-	        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(path, "save.dat")));
+	        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(path, "/src/resources/savefile/save.dat")));
 	        
 	        DataStorage ds = new DataStorage();
 	        ds.highestUnlockedFase = gp.highestUnlockedFase; // Salva a fase mais alta
@@ -41,7 +41,7 @@ public class SaveLoad {
 	    try {
 	        // Caminho relativo para carregar o arquivo "save.dat"
 	        String path = System.getProperty("user.dir");
-	        File saveFile = new File(path, "save.dat");
+	        File saveFile = new File(path, "/src/resources/savefile/save.dat");
 
 	        if (saveFile.exists()) {
 	            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(saveFile));
