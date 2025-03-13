@@ -8,8 +8,7 @@ public class Main {
 
     public static JFrame window;
     private static GamePanel gamePanel;
-    private static final String CURRENT_VERSION = "0.0.1"; // Defina a versão atual do seu aplicativo
-    
+
     public static void main(String[] args) {
         // Configurar o Look and Feel FlatLaf
         try {
@@ -20,7 +19,7 @@ public class Main {
         }
         
         // Verificar atualizações
-        UpdateChecker.checkForUpdates(CURRENT_VERSION);
+        UpdateChecker.checkForUpdates();
 
         // Exibir a janela de seleção de monitor
         SwingUtilities.invokeLater(new Runnable() {

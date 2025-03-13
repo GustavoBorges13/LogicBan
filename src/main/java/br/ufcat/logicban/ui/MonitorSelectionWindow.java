@@ -3,8 +3,6 @@ package br.ufcat.logicban.ui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.GraphicsEnvironment;
-import java.awt.GraphicsDevice;
 
 public class MonitorSelectionWindow extends JFrame {
 	
@@ -42,6 +40,10 @@ public class MonitorSelectionWindow extends JFrame {
 
         // Botão para iniciar o jogo
         startButton = new JButton("Iniciar Jogo");
+        // Estilização do botão "Ignorar" (fundo azul e texto branco)
+        startButton.setBackground(new Color(0, 120, 215)); // Azul
+        startButton.setForeground(Color.WHITE); // Texto branco
+        startButton.setFocusPainted(false); // Remove o contorno de foco
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Passando a seleção para o jogo
@@ -55,7 +57,6 @@ public class MonitorSelectionWindow extends JFrame {
         add(startButton);
 
         SwingUtilities.invokeLater(() -> startButton.requestFocusInWindow());
-
 
         setLocationRelativeTo(null); // Centraliza a janela
         
