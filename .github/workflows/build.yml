@@ -1,0 +1,70 @@
+name: Build and Package
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '16'
+          distribution: 'temurin'
+      - name: Build with Maven
+        run: mvn package
+      - name: Package with jpackage
+        run: |
+          jpackage --type exe --input target --main-jar logicban-1.0.0.jar --main-class br.ufcat.logicban.ui.Main
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: logicban-windows
+          path: target/jpackage/*.exe
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '16'
+          distribution: 'temurin'
+      - name: Build with Maven
+        run: mvn package
+      - name: Package with jpackage
+        run: |
+          jpackage --type deb --input target --main-jar logicban-1.0.0.jar --main-class br.ufcat.logicban.ui.Main
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: logicban-linux
+          path: target/jpackage/*.deb
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '16'
+          distribution: 'temurin'
+      - name: Build with Maven
+        run: mvn package
+      - name: Package with jpackage
+        run: |
+          jpackage --type dmg --input target --main-jar logicban-1.0.0.jar --main-class br.ufcat.logicban.ui.Main
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: logicban-macos
+          path: target/jpackage/*.dmg
