@@ -11,17 +11,36 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '23'  # Mantenha a versão 23 para consistência
+          java-version: '23'
           distribution: 'temurin'
+
       - name: Build with Maven
         run: mvn package
-      - name: Package with jpackage
+
+      - name: Package with jpackage (Windows)
         run: |
-          jpackage --type exe --input target --main-jar logicban-1.0.0.jar --main-class br.ufcat.logicban.ui.Main --dest target/jpackage
-      - name: Upload artifact
+          jpackage --type exe \
+                   --input target \
+                   --main-jar logicban-1.0.0.jar \
+                   --main-class br.ufcat.logicban.ui.Main \
+                   --dest target/jpackage \
+                   --app-version 1.0.0 \
+                   --name LogicBan \
+                   --vendor "Bug Hunters" \
+                   --copyright "Copyright (C) 2025" \
+                   --icon src/resources/assets/logos/icone.ico \
+                   --win-menu \
+                   --win-shortcut \
+                   --win-per-user-install \
+                   --win-update-url "https://github.com/GustavoBorges13/LogicBan" \
+                   --win-help-url "https://github.com/GustavoBorges13/LogicBan" \
+                   --win-update-url "https://github.com/GustavoBorges13/LogicBan"
+
+      - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: logicban-windows
@@ -32,17 +51,30 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '23'  # Altere para 23 para consistência
+          java-version: '23'
           distribution: 'temurin'
+
       - name: Build with Maven
         run: mvn package
-      - name: Package with jpackage
+
+      - name: Package with jpackage (Linux)
         run: |
-          jpackage --type deb --input target --main-jar logicban-1.0.0.jar --main-class br.ufcat.logicban.ui.Main --dest target/jpackage
-      - name: Upload artifact
+          jpackage --type deb \
+                   --input target \
+                   --main-jar logicban-1.0.0.jar \
+                   --main-class br.ufcat.logicban.ui.Main \
+                   --dest target/jpackage \
+                   --app-version 1.0.0 \
+                   --name LogicBan \
+                   --vendor "Bug Hunters" \
+                   --copyright "Copyright (C) 2025" \
+                   --icon src/resources/assets/logos/icone.png
+
+      - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
           name: logicban-linux
@@ -53,17 +85,30 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '23'  # Mantenha a versão 23 para consistência
+          java-version: '23'
           distribution: 'temurin'
+
       - name: Build with Maven
         run: mvn package
-      - name: Package with jpackage
+
+      - name: Package with jpackage (macOS)
         run: |
-          jpackage --type dmg --input target --main-jar logicban-1.0.0.jar --main-class br.ufcat.logicban.ui.Main --dest target/jpackage
-      - name: Upload artifact
+          jpackage --type dmg \
+                   --input target \
+                   --main-jar logicban-1.0.0.jar \
+                   --main-class br.ufcat.logicban.ui.Main \
+                   --dest target/jpackage \
+                   --app-version 1.0.0 \
+                   --name LogicBan \
+                   --vendor "Bug Hunters" \
+                   --copyright "Copyright (C) 2025" \
+                   --icon src/resources/assets/logos/icone.icns
+
+      - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
           name: logicban-macos

@@ -1,4 +1,3 @@
-<!DOCTYPE xml>
 <project xmlns="https://maven.apache.org/POM/4.0.0"
          xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -9,9 +8,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<maven.compiler.source>23</maven.compiler.source>
-	<maven.compiler.target>23</maven.compiler.target>
-	<java.version>23</java.version>
+    <maven.compiler.source>23</maven.compiler.source>
+    <maven.compiler.target>23</maven.compiler.target>
+    <java.version>23</java.version>
     <app.name>LogicBan</app.name>
     <app.version>${project.version}</app.version>
     <vendor.name>Bug Hunters</vendor.name>
@@ -81,87 +80,6 @@
                   <mainClass>br.ufcat.logicban.ui.Main</mainClass>
                 </transformer>
               </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- exec-maven-plugin for jlink and jpackage -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>3.5.0</version>
-        <executions>
-          <!-- Cria a imagem do runtime com jlink -->
-          <execution>
-            <id>create-runtime-image</id>
-            <phase>package</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>jlink</executable>
-              <arguments>
-                <argument>--module-path</argument>
-                <argument>${project.build.directory}/libs</argument>
-                <argument>--add-modules</argument>
-                <argument>java.base,java.desktop</argument>
-                <argument>--output</argument>
-                <argument>${project.build.directory}/runtime-image</argument>
-              </arguments>
-            </configuration>
-          </execution>
-
-          <!-- Cria o instalador usando jpackage -->
-          <execution>
-            <id>package-exe</id>
-            <phase>package</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>jpackage</executable>
-              <arguments>
-                <argument>--dest</argument>
-                <argument>${project.build.directory}/jpackage</argument>
-                <argument>--type</argument>
-                <argument>exe</argument>
-                <argument>--app-version</argument>
-                <argument>${app.version}</argument>
-                <argument>--copyright</argument>
-                <argument>Copyright (C) 2025</argument>
-                <argument>--name</argument>
-                <argument>${app.name}</argument>
-                <argument>--vendor</argument>
-                <argument>Bug Hunters</argument>
-                <argument>--icon</argument>
-                <argument>${project.basedir}/src/resources/assets/logos/icone.ico</argument>
-                <argument>--input</argument>
-                <argument>${project.build.directory}</argument>
-                <argument>--main-jar</argument>
-                <argument>${build.finalname}</argument>
-                <argument>--main-class</argument>
-                <argument>br.ufcat.logicban.ui.Main</argument>
-                <argument>--win-menu</argument>
-                <argument>--about-url</argument>
-                <argument>https://github.com/GustavoBorges13/LogicBan</argument>
-                <argument>--win-help-url</argument>
-                <argument>https://github.com/GustavoBorges13/LogicBan</argument>
-                <argument>--win-update-url</argument>
-                <argument>https://github.com/GustavoBorges13/LogicBan</argument>
-                <argument>--win-shortcut-prompt</argument>
-                <argument>--runtime-image</argument>
-                <argument>${project.build.directory}/runtime-image</argument>
-                <argument>--java-options</argument>
-                <argument>-Xms256m</argument>
-                <argument>--java-options</argument>
-                <argument>-Xmx1024m</argument>
-                <argument>--install-dir</argument>
-                <argument>LogicBan</argument>
-                 <argument>--name</argument>
-                <argument>LogicBan</argument>
-                <argument>--win-per-user-install</argument>
-              </arguments>
             </configuration>
           </execution>
         </executions>
