@@ -3,6 +3,7 @@ package br.ufcat.logicban.data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -13,6 +14,7 @@ public class SaveLoad {
 	GamePanel gp;
 	public int saveAntigo;
 	public boolean precisaSalvar = true;
+	private static final String SAVE_PATH = "src/resources/savefile/save.dat";
 
 	public SaveLoad(GamePanel gp) {
 
@@ -20,45 +22,33 @@ public class SaveLoad {
 	}
 
 	public void save() {
-	    try {
-	        // Caminho relativo para salvar o arquivo "save.dat"
-	        String path = System.getProperty("user.dir");
-	        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(path, "/src/resources/savefile/save.dat")));
-	        
-	        DataStorage ds = new DataStorage();
-	        ds.highestUnlockedFase = gp.highestUnlockedFase; // Salva a fase mais alta
-	        oos.writeObject(ds);
-	        System.out.println("HighestUnlockedFase SAVE: " + gp.highestUnlockedFase);
-	        oos.close();
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(SAVE_PATH))) {
+			DataStorage ds = new DataStorage();
+			ds.highestUnlockedFase = gp.highestUnlockedFase; // Salva a fase mais alta
+			oos.writeObject(ds);
+			System.out.println("HighestUnlockedFase SAVE: " + gp.highestUnlockedFase);
 
-	    } catch (Exception e) {
-	        System.out.println("Save Exception!");
-	    }
+		} catch (Exception e) {
+			System.out.println("Save Exception!");
+		}
 	}
-
 
 	public void load() {
-	    try {
-	        // Caminho relativo para carregar o arquivo "save.dat"
-	        String path = System.getProperty("user.dir");
-	        File saveFile = new File(path, "/src/resources/savefile/save.dat");
+		File saveFile = new File(SAVE_PATH);
 
-	        if (saveFile.exists()) {
-	            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(saveFile));
-	            DataStorage ds = (DataStorage) ois.readObject();
-	            gp.highestUnlockedFase = ds.highestUnlockedFase;
-	            ois.close();
-	        } else {
-	            // Primeira execução - inicializa com fase 0
-	            gp.highestUnlockedFase = 0;
-	        }
-	        System.out.println("HighestUnlockedFase LOAD: " + gp.highestUnlockedFase);
-
-	    } catch (Exception e) {
-	        System.out.println("Load Exception! Initializing new save.");
-	        gp.highestUnlockedFase = 0;
-	    }
+		if (saveFile.exists()) {
+			try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(saveFile))) {
+				DataStorage ds = (DataStorage) ois.readObject();
+				gp.highestUnlockedFase = ds.highestUnlockedFase;
+				System.out.println("HighestUnlockedFase LOAD: " + gp.highestUnlockedFase);
+			} catch (IOException | ClassNotFoundException e) {
+				System.err.println("Erro ao carregar o jogo: " + e.getMessage());
+				gp.highestUnlockedFase = 0; // Inicia do zero se falhar
+			}
+		} else {
+			System.out.println("Nenhum save encontrado. Criando novo.");
+			gp.highestUnlockedFase = 0;
+		}
 	}
-
 
 }

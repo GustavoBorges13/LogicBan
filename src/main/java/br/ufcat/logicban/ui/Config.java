@@ -11,85 +11,79 @@ import java.io.IOException;
 public class Config {
 
 	GamePanel gp;
-
+	private static final String CONFIG_PATH = "src/resources/config/config.txt";
+			
 	public Config(GamePanel gp) {
 		this.gp = gp;
 	}
 
 	public void saveConfig() {
-	    try {
-	        // Caminho relativo baseado no diretório atual de execução
-	        String path = System.getProperty("user.dir");
-	        System.out.println(path);
-	        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path, "/src/resources/config/config.txt")));
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(CONFIG_PATH))) {
 
-	        // Full screen
-	        bw.write(gp.FullScreenOn ? "On" : "Off");
-	        bw.newLine();
+            // Full screen
+            bw.write(gp.FullScreenOn ? "On" : "Off");
+            bw.newLine();
 
-	        // Music volume
-	        bw.write(String.valueOf(gp.music.volumeScale));
-	        bw.newLine();
+            // Music volume
+            bw.write(String.valueOf(gp.music.volumeScale));
+            bw.newLine();
 
-	        // SFX volume
-	        bw.write(String.valueOf(gp.sfx.volumeScale));
-	        bw.newLine();
+            // SFX volume
+            bw.write(String.valueOf(gp.sfx.volumeScale));
+            bw.newLine();
 
-	        // Walk Type
-	        bw.write(String.valueOf(gp.player.walkType));
-	        bw.newLine();
+            // Walk Type
+            bw.write(gp.player.walkType);
+            bw.newLine();
 
-	        bw.close();
+            //System.out.println("Configuração salva com sucesso.");
 
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
-	}
+        } catch (IOException e) {
+            System.err.println("Erro ao salvar configuração: " + e.getMessage());
+        }
+    }
 
-	public void loadConfig() {
-	    try {
-	        String path = System.getProperty("user.dir");
-	        BufferedReader br = new BufferedReader(new FileReader(new File(path, "/src/resources/config/config.txt")));
-	        
-	        String s = br.readLine();
+    public void loadConfig() {
+        File configFile = new File(CONFIG_PATH);
 
-	        // Full screen
-	        if (s.equals("On")) {
-	            gp.FullScreenOn = true;
-	        } else if (s.equals("Off")) {
-	            gp.FullScreenOn = false;
-	        }
+        if (!configFile.exists()) {
+            System.out.println("Arquivo de configuração não encontrado. Criando novo com valores padrão.");
+            setDefaultValues();
+            saveConfig(); // Cria o arquivo com valores padrão
+            return;
+        }
 
-	        // Music volume
-	        s = br.readLine();
-	        gp.music.volumeScale = Integer.parseInt(s);
+        try (BufferedReader br = new BufferedReader(new FileReader(configFile))) {
+            String s = br.readLine();
 
-	        // SFX volume
-	        s = br.readLine();
-	        gp.sfx.volumeScale = Integer.parseInt(s);
+            // Full screen
+            gp.FullScreenOn = "On".equals(s);
 
-	        // Walk Type
-	        s = br.readLine();
-	        gp.player.walkType = s;
+            // Music volume
+            s = br.readLine();
+            gp.music.volumeScale = Integer.parseInt(s);
 
-	        br.close();
+            // SFX volume
+            s = br.readLine();
+            gp.sfx.volumeScale = Integer.parseInt(s);
 
-	    } catch (FileNotFoundException e) {
-	        gp.FullScreenOn = false;
-	        defaultSoundValues();
-	        gp.player.walkType = "Smooth-Walk"; // Tipo de caminhada padrão
-	        gp.update();
-	        saveConfig(); // Criar o arquivo com as configurações padrão
+            // Walk Type
+            s = br.readLine();
+            gp.player.walkType = s;
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	}
+            //System.out.println("Configuração carregada com sucesso.");
 
+        } catch (IOException | NumberFormatException e) {
+            System.err.println("Erro ao carregar configuração: " + e.getMessage());
+            setDefaultValues();
+        }
+    }
 
-	public void defaultSoundValues() {
-		gp.music.volumeScale = 3; // Volume padrão
-		gp.sfx.volumeScale = 3; // Volume padrão
-	}
-
+    public void setDefaultValues() {
+        gp.FullScreenOn = false;
+        gp.music.volumeScale = 3; // Volume padrão
+        gp.sfx.volumeScale = 3; // Volume padrão
+        gp.player.walkType = "Smooth-Walk"; // Caminhada padrão
+        gp.update();
+    }
 }

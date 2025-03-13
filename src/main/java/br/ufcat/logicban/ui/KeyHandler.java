@@ -173,7 +173,7 @@ public class KeyHandler implements KeyListener {
 						gp.playSFX(6);
 					}
 					if ((gp.sfx.volumeScale == 0 && gp.music.volumeScale == 0) && flag == false) {
-						gp.config.defaultSoundValues();
+						gp.config.setDefaultValues();
 						gp.music.checkVolume();
 
 						gp.btnSom.state = "enable"; // Troca para 'enable'
@@ -366,7 +366,7 @@ public class KeyHandler implements KeyListener {
 						gp.playSFX(6);
 					}
 					if ((gp.sfx.volumeScale == 0 && gp.music.volumeScale == 0) && flag == false) {
-						gp.config.defaultSoundValues();
+						gp.config.setDefaultValues();
 
 						gp.music.checkVolume();
 
