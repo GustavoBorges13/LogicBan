@@ -49,6 +49,10 @@ jobs:
 
       - name: Package with jpackage (Linux)
         run: |
+          jlink --module-path $JAVA_HOME/jmods \
+                --add-modules java.base,java.desktop \
+                --output target/runtime-image
+      
           jpackage --type deb \
                    --input target \
                    --main-jar logicban-1.0.0.jar \
@@ -59,7 +63,7 @@ jobs:
                    --vendor "Bug Hunters" \
                    --copyright "Copyright (C) 2025" \
                    --icon src/resources/assets/logos/icone.png \
-                   --linux-package-deps "libasound2t64"
+                   --runtime-image target/runtime-image
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
