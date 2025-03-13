@@ -32,7 +32,7 @@ jobs:
           name: logicban-windows
           path: target/jpackage/*.exe
 
-  build-linux:
+  build-appimage:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
