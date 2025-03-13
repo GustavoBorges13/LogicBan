@@ -3,41 +3,50 @@ package br.ufcat.logicban.ui;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
 public class Config {
 
-	GamePanel gp;
-	private static final String CONFIG_PATH = "src/resources/config/config.txt";
-			
-	public Config(GamePanel gp) {
-		this.gp = gp;
-	}
+    GamePanel gp;
+    private static final String CONFIG_PATH = "config/config.txt";
+    private static final String CONFIG_DIR = "config"; // Caminho do diretório
 
-	public void saveConfig() {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(CONFIG_PATH))) {
+    public Config(GamePanel gp) {
+        this.gp = gp;
+    }
 
-            // Full screen
-            bw.write(gp.FullScreenOn ? "On" : "Off");
-            bw.newLine();
+    public void saveConfig() {
+        try {
+            // Verifica se o diretório existe e cria se não existir
+            File dir = new File(CONFIG_DIR);
+            if (!dir.exists()) {
+                dir.mkdirs(); // Cria o diretório, caso não exista
+                System.out.println("Diretório de configuração criado: " + CONFIG_DIR);
+            }
 
-            // Music volume
-            bw.write(String.valueOf(gp.music.volumeScale));
-            bw.newLine();
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(CONFIG_PATH))) {
 
-            // SFX volume
-            bw.write(String.valueOf(gp.sfx.volumeScale));
-            bw.newLine();
+                // Full screen
+                bw.write(gp.FullScreenOn ? "On" : "Off");
+                bw.newLine();
 
-            // Walk Type
-            bw.write(gp.player.walkType);
-            bw.newLine();
+                // Music volume
+                bw.write(String.valueOf(gp.music.volumeScale));
+                bw.newLine();
 
-            //System.out.println("Configuração salva com sucesso.");
+                // SFX volume
+                bw.write(String.valueOf(gp.sfx.volumeScale));
+                bw.newLine();
 
+                // Walk Type
+                bw.write(gp.player.walkType);
+                bw.newLine();
+
+                //System.out.println("Configuração salva com sucesso.");
+
+            }
         } catch (IOException e) {
             System.err.println("Erro ao salvar configuração: " + e.getMessage());
         }
