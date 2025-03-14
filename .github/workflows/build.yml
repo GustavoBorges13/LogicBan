@@ -88,6 +88,10 @@ jobs:
                    --vendor "Bug Hunters" \
                    --copyright "Copyright (C) 2025" \
                    --icon src/resources/assets/logos/icone.png 
+                   
+      - name: Copy icon to AppImage root directory
+        run: |
+          cp ./jpackage-output/LogicBan/lib/app/classes/assets/logos/icone.png ./jpackage-output/LogicBan/
 
       - name: Create .desktop file
         run: |
@@ -105,7 +109,7 @@ jobs:
 
       - name: Verify logicban bin
         run: ls -R ./jpackage-output/LogicBan
-        
+
       - name: Convert to AppImage
         run: |
           ./appimagetool ./jpackage-output/LogicBan
@@ -143,7 +147,7 @@ jobs:
                    --vendor "Bug Hunters" \
                    --copyright "Copyright (C) 2025" \
                    --icon src/resources/assets/logos/icone.ico
-
+    
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
