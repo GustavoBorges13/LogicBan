@@ -74,6 +74,11 @@ jobs:
         run: |
           mvn clean package
 
+      - name: List target directory (debug)
+        shell: pwsh
+        run: |
+          ls ./target
+
       - name: Package with jpackage (Windows)
         shell: pwsh
         run: |
@@ -87,6 +92,11 @@ jobs:
                    --copyright "Copyright (C) 2025" `
                    --win-menu `
                    --win-shortcut
+
+      - name: List dist directory (debug)
+        shell: pwsh
+        run: |
+          ls ./dist
 
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
