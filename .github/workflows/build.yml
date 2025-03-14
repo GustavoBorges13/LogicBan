@@ -76,10 +76,6 @@ jobs:
           rm -rf ./jpackage-output
           mkdir -p ./jpackage-output
 
-      - name: Verify JAR file
-        run: ls -lh target/logicban-1.0.0.jar
-      - name: Verify Logo file
-        run: ls -lh src/resources/assets/logos/icone.png
 
       - name: Package with jpackage (Linux)
         run: |
@@ -94,10 +90,16 @@ jobs:
                   --copyright "Copyright (C) 2025" \
                   --icon src/resources/assets/logos/icone.png
 
+      - name: List jpackage output
+        run: ls -lh target/jpackage
+
       - name: Convert to AppImage
         run: |
-          ./appimagetool target/jpackage/LogicBan
+          ./appimagetool ./jpackage-output/LogicBan
 
+      - name: Verify jpackage output
+        run: ls -lh ./jpackage-output/LogicBan
+        
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
