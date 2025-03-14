@@ -19,7 +19,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn package
+        run: mvn package -DincludeScope=compile
 
       - name: Package with jpackage (Windows)
         shell: pwsh
@@ -59,7 +59,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn package
+        run: mvn package -DincludeScope=compile
 
       - name: Install dependencies for AppImage
         run: |
@@ -71,18 +71,26 @@ jobs:
           wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
           chmod +x appimagetool
 
+      - name: Clean up space
+        run: |
+            sudo apt-get clean
+            sudo rm -rf /usr/local/lib/android # Exemplo: remover SDK Android se não for necessário
+            sudo rm -rf /usr/share/dotnet      # Exemplo: remover .NET SDK se não for necessário
+            df -h                              # Verificar o espaço livre
+
       - name: Package with jpackage (Linux)
         run: |
-          jpackage --type app-image \
-                   --input target \
-                   --main-jar logicban-1.0.0.jar \
-                   --main-class br.ufcat.logicban.ui.Main \
-                   --dest target/jpackage \
-                   --app-version 1.0.0 \
-                   --name LogicBan \
-                   --vendor "Bug Hunters" \
-                   --copyright "Copyright (C) 2025" \
-                   --icon src/resources/assets/logos/icone.png
+            jpackage --type app-image \
+                    --input target \
+                    --main-jar logicban-1.0.0.jar \
+                    --main-class br.ufcat.logicban.ui.Main \
+                    --dest target/jpackage \
+                    --app-version 1.0.0 \
+                    --name LogicBan \
+                    --vendor "Bug Hunters" \
+                    --copyright "Copyright (C) 2025" \
+                    --icon src/resources/assets/logos/icone.png \
+                    --strip-native-commands
 
       - name: Convert to AppImage
         run: |
@@ -107,7 +115,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn package
+        run: mvn -q package
 
       - name: Package with jpackage (macOS)
         run: |
