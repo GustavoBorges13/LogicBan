@@ -24,21 +24,21 @@ jobs:
       - name: Package with jpackage (Windows)
         shell: pwsh
         run: |
-          jpackage --type exe `
-                   --input target `
-                   --main-jar logicban-1.0.0.jar `
-                   --main-class br.ufcat.logicban.ui.Main `
-                   --dest target/jpackage `
-                   --app-version 1.0.0 `
-                   --name LogicBan `
-                   --vendor "Bug Hunters" `
-                   --copyright "Copyright (C) 2025" `
-                   --icon src/resources/assets/logos/icone.ico `
-                   --win-menu `
-                   --win-shortcut `
-                   --win-per-user-install `
-                   --win-about-url "https://github.com/GustavoBorges13/LogicBan" `
-                   --win-help-url "https://github.com/GustavoBorges13/LogicBan/wiki/Tutorial-%E2%80%90-Como-jogar" `
+          jpackage --type exe ^
+                   --input target ^
+                   --main-jar logicban-1.0.0.jar ^
+                   --main-class br.ufcat.logicban.ui.Main ^
+                   --dest target/jpackage ^
+                   --app-version 1.0.0 ^
+                   --name LogicBan ^
+                   --vendor "Bug Hunters" ^
+                   --copyright "Copyright (C) 2025" ^
+                   --icon src/resources/assets/logos/icone.ico ^
+                   --win-menu ^
+                   --win-shortcut ^
+                   --win-per-user-install ^
+                   --win-about-url "https://github.com/GustavoBorges13/LogicBan" ^
+                   --win-help-url "https://github.com/GustavoBorges13/LogicBan/wiki/Tutorial-%E2%80%90-Como-jogar" ^
                    --win-update-url "https://github.com/GustavoBorges13/LogicBan/releases/latest"
 
 
