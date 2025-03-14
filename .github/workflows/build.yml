@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Necessário para obter o histórico completo para tags
 
       - name: Set up JDK
         uses: actions/setup-java@v3
@@ -26,18 +28,25 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-
 
+      - name: Read Version from pom.xml
+        id: project_version
+        run: |
+          VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
+          echo "::set-output name=version::$VERSION"
+
       - name: Build with Maven
         run: mvn package
 
       - name: Package with jpackage (Windows)
         shell: pwsh
         run: |
+          $version = "${{ steps.project_version.outputs.version }}"
           jpackage --type exe `
                    --input target `
-                   --main-jar logicban-1.0.0.jar `
+                   --main-jar "logicban-$version.jar" `
                    --main-class br.ufcat.logicban.ui.Main `
                    --dest target/jpackage `
-                   --app-version 1.0.0 `
+                   --app-version $version `
                    --name LogicBan `
                    --vendor "Bug Hunters" `
                    --copyright "Copyright (C) 2025" `
@@ -63,6 +72,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Necessário para obter o histórico completo para tags
 
       - name: Set up JDK
         uses: actions/setup-java@v3
@@ -78,6 +89,12 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-
 
+      - name: Read Version from pom.xml
+        id: project_version
+        run: |
+          VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
+          echo "::set-output name=version::$VERSION"
+
       - name: Build with Maven
         run: mvn -q package -DincludeScope=compile
         
@@ -88,12 +105,13 @@ jobs:
 
       - name: Package with jpackage (Linux)
         run: |
+          version="${{ steps.project_version.outputs.version }}"
           jpackage --type deb \
              --input target \
-             --main-jar logicban-1.0.0.jar \
+             --main-jar "logicban-$version.jar" \
              --main-class br.ufcat.logicban.ui.Main \
              --dest ./jpackage-output \
-             --app-version 1.0.0 \
+             --app-version "$version" \
              --name LogicBan \
              --vendor "Bug Hunters" \
              --copyright "Copyright (C) 2025" \
@@ -108,8 +126,9 @@ jobs:
       - name: Clean up dependencies in control file
         run: |
           # Extraindo o conteúdo do pacote .deb
-          dpkg-deb -x ./jpackage-output/logicban_1.0.0_amd64.deb /tmp/logicban
-          dpkg-deb -e ./jpackage-output/logicban_1.0.0_amd64.deb /tmp/logicban/DEBIAN
+          version="${{ steps.project_version.outputs.version }}"
+          dpkg-deb -x ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban
+          dpkg-deb -e ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban/DEBIAN
 
           # Removendo as dependências desnecessárias do arquivo control
           sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
@@ -120,7 +139,7 @@ jobs:
           sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
 
           # Recriar o pacote .deb com o arquivo control modificado
-          dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_1.0.0_amd64.deb
+          dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_${version}_amd64.deb
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
@@ -133,6 +152,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Necessário para obter o histórico completo para tags
 
       - name: Set up JDK
         uses: actions/setup-java@v3
@@ -148,17 +169,24 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-
 
+      - name: Read Version from pom.xml
+        id: project_version
+        run: |
+          VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
+          echo "::set-output name=version::$VERSION"
+
       - name: Build with Maven
         run: mvn package
 
       - name: Package with jpackage (macOS)
         run: |
+          version="${{ steps.project_version.outputs.version }}"
           jpackage --type dmg \
                    --input target \
-                   --main-jar logicban-1.0.0.jar \
+                   --main-jar "logicban-$version.jar" \
                    --main-class br.ufcat.logicban.ui.Main \
                    --dest target/jpackage \
-                   --app-version 1.0.0 \
+                   --app-version "$version" \
                    --name LogicBan \
                    --vendor "Bug Hunters" \
                    --copyright "Copyright (C) 2025" \
@@ -189,14 +217,20 @@ jobs:
             ls -lh ./artifacts/logicban-linux-deb
             ls -lh ./artifacts/logicban-macos
 
+      - name: Read Version from pom.xml
+        id: project_version
+        run: |
+          VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
+          echo "::set-output name=version::$VERSION"
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
+          tag_name: v${{ steps.project_version.outputs.version }}
+          release_name: Release v${{ steps.project_version.outputs.version }}
           draft: false
           prerelease: false
 
@@ -206,7 +240,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-windows//LogicBan-1.0.0.exe
+          asset_path: ./artifacts/logicban-windows/LogicBan-${{ steps.project_version.outputs.version }}.exe
           asset_name: LogicBan-Windows.exe
           asset_content_type: application/octet-stream
 
@@ -216,7 +250,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-linux-deb/logicban_1.0.0_amd64.deb
+          asset_path: ./artifacts/logicban-linux-deb/logicban_${{ steps.project_version.outputs.version }}_amd64.deb
           asset_name: LogicBan-Linux.deb
           asset_content_type: application/octet-stream
 
@@ -226,6 +260,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-macos/target/jpackage/logicban_1.0.0.dmg
+          asset_path: ./artifacts/logicban-macos/target/jpackage/logicban_${{ steps.project_version.outputs.version }}.dmg
           asset_name: LogicBan-macOS.dmg
           asset_content_type: application/octet-stream

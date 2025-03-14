@@ -18,12 +18,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -36,16 +33,11 @@ public class UpdateChecker {
 	private static final String REMOTE_VERSION_URL = "https://raw.githubusercontent.com/GustavoBorges13/LogicBan/main/VERSION";
 	// Caminho do arquivo VERSION local
 	private static final String LOCAL_VERSION_PATH = "./VERSION";
-	// Versão atual do aplicativo
-	private static final String CURRENT_VERSION = "1.0.0";
 
 	public static void checkForUpdates() {
 		try {
 			// Lê a versão local
 			String localVersion = readLocalVersion();
-			// Cria o arquivo VERSION com a versão atual
-			createLocalVersionFile();
-			localVersion = CURRENT_VERSION; // Usa a versão atual como fallback
 
 			// Lê a versão remota
 			String remoteVersion = readRemoteVersion();
@@ -58,7 +50,7 @@ public class UpdateChecker {
 			// Compara as versões
 			if (!remoteVersion.equals(localVersion)) {
 				// Se a versão remota for diferente, atualiza a versão local
-				updateLocalVersion();
+				updateLocalVersion(remoteVersion);
 				showUpdateDialog(remoteVersion); // Mostra o diálogo de atualização
 			}
 
@@ -74,13 +66,6 @@ public class UpdateChecker {
 		} catch (IOException e) {
 			// Se ocorrer um erro ao ler o arquivo, retorna null
 			return null;
-		}
-	}
-
-	private static void createLocalVersionFile() throws IOException {
-		// Cria o arquivo VERSION local com a versão atual
-		try (FileWriter writer = new FileWriter(LOCAL_VERSION_PATH)) {
-			writer.write(CURRENT_VERSION); // Escreve a versão atual no arquivo
 		}
 	}
 
@@ -102,11 +87,11 @@ public class UpdateChecker {
 		}
 	}
 
-	private static void updateLocalVersion() throws IOException {
+	private static void updateLocalVersion(String remoteVersion) throws IOException {
 		// Atualiza o arquivo local com a versão atual
 		try (FileWriter writer = new FileWriter(LOCAL_VERSION_PATH)) {
-			writer.write(CURRENT_VERSION); // Atualiza o arquivo com a versão atual
-			System.out.println("Versão local atualizada para: " + CURRENT_VERSION);
+			writer.write(remoteVersion); // Atualiza o arquivo com a versão atual
+			System.out.println("Versão local atualizada para: " + remoteVersion);
 		}
 	}
 
