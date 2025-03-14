@@ -150,14 +150,20 @@ jobs:
         with:
           path: ./artifacts
 
+      - name: Verify downloaded artifacts
+        run: |
+          ls -lh ./artifacts/logicban-windows/target/jpackage/
+          ls -lh ./artifacts/logicban-linux-deb/
+          ls -lh ./artifacts/logicban-macos/target/jpackage/
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref_name }}  # Corrigido: usa apenas o nome da branch/tag
-          release_name: Release ${{ github.ref_name }}  # Corrigido: usa apenas o nome da branch/tag
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
           draft: false
           prerelease: false
 
@@ -167,7 +173,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-windows/*.exe
+          asset_path: ./artifacts/logicban-windows/target/jpackage/*.exe
           asset_name: LogicBan-Windows.exe
           asset_content_type: application/octet-stream
 
@@ -177,8 +183,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-linux/*.AppImage
-          asset_name: LogicBan-Linux.AppImage
+          asset_path: ./artifacts/logicban-linux-deb/*.deb
+          asset_name: LogicBan-Linux.deb
           asset_content_type: application/octet-stream
 
       - name: Upload macOS artifact to release
@@ -187,6 +193,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-macos/*.dmg
+          asset_path: ./artifacts/logicban-macos/target/jpackage/*.dmg
           asset_name: LogicBan-macOS.dmg
           asset_content_type: application/octet-stream
