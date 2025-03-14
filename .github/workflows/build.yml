@@ -46,7 +46,10 @@ jobs:
                    --win-per-user-install `
                    --win-help-url "https://github.com/GustavoBorges13/LogicBan/wiki/Tutorial-%E2%80%90-Como-jogar" `
                    --win-update-url "https://github.com/GustavoBorges13/LogicBan/releases/latest"
-
+      
+      - name: Verify Windows artifact
+        run: ls -lh target/jpackage/
+        
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
@@ -152,9 +155,9 @@ jobs:
 
       - name: Verify downloaded artifacts
         run: |
-          ls -lh ./artifacts/logicban-windows/target/jpackage/
-          ls -lh ./artifacts/logicban-linux-deb/
-          ls -lh ./artifacts/logicban-macos/target/jpackage/
+            ls -lh ./artifacts/logicban-windows
+            ls -lh ./artifacts/logicban-linux-deb
+            ls -lh ./artifacts/logicban-macos
 
       - name: Create Release
         id: create_release
@@ -173,7 +176,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-windows/target/jpackage/*.exe
+          asset_path: ./artifacts/logicban-windows/LogicBan.exe
           asset_name: LogicBan-Windows.exe
           asset_content_type: application/octet-stream
 
