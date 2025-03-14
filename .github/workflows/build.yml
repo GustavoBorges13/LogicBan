@@ -30,8 +30,9 @@ jobs:
 
       - name: Read Version from pom.xml
         id: project_version
+        shell: pwsh  # Especifica o shell como PowerShell
         run: |
-          VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
+          $VERSION = mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec
           echo "::set-output name=version::$VERSION"
 
       - name: Build with Maven
@@ -108,7 +109,7 @@ jobs:
           version="${{ steps.project_version.outputs.version }}"
           jpackage --type deb \
              --input target \
-             --main-jar "logicban-$version.jar" \
+             --main-jar "logicban-$version-jar-with-dependencies.jar" \
              --main-class br.ufcat.logicban.ui.Main \
              --dest ./jpackage-output \
              --app-version "$version" \
