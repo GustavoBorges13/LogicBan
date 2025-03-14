@@ -308,6 +308,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-macos/target/jpackage/LogicBan-${{ needs.build-windows.outputs.version }}.dmg
+          asset_path: ./artifacts/logicban-macos/LogicBan-${{ needs.build-windows.outputs.version }}.dmg
           asset_name: LogicBan-macOS.dmg
           asset_content_type: application/octet-stream
