@@ -266,7 +266,7 @@ jobs:
 
       - name: Verify macOS artifact
         run: |
-          if [ ! -f "./artifacts/logicban-macos/target/jpackage/LogicBan-${{ needs.build-windows.outputs.version }}.dmg" ]; then
+          if [ ! -f "./artifacts/logicban-macos/LogicBan-${{ needs.build-windows.outputs.version }}.dmg" ]; then
             echo "Arquivo LogicBan-${{ needs.build-windows.outputs.version }}.dmg não encontrado!"
             exit 1
           fi
