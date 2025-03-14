@@ -54,7 +54,7 @@ jobs:
       - name: Upload Linux installer
         uses: actions/upload-artifact@v4
         with:
-          path: ./dist/logicban_1.0.0-1_amd64.deb
+          path: ./dist/logicban_1.0.0_amd64.deb
           name: linux-installer
 
   build-windows-installer:
@@ -101,5 +101,5 @@ jobs:
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          path: ./dist/LogicBan-1.0.0.msi
+          path: ./dist/LogicBan-1.0.0.exe
           name: windows-installer
