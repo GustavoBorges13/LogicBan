@@ -92,34 +92,23 @@ jobs:
              --linux-deb-maintainer "ggustavo.borges13@exemplo.com" \
              --linux-rpm-license-type "GPLv3" 
 
-      - name: Create start script for LogicBan
-        run: |
-          echo '#!/bin/bash' > ./jpackage-output/logicban-start.sh
-          echo 'java -jar /opt/LogicBan/logicban-1.0.0.jar' >> ./jpackage-output/logicban-start.sh
-          chmod +x ./jpackage-output/logicban-start.sh
-
-      - name: Register start script
-        run: |
-          sudo cp ./jpackage-output/logicban-start.sh /usr/local/bin/logicban
-          sudo chmod +x /usr/local/bin/logicban
-
       - name: Clean up dependencies in control file
         run: |
-            # Extraindo o conteúdo do pacote .deb
-            dpkg-deb -x ./jpackage-output/logicban_1.0.0_amd64.deb /tmp/logicban
-            dpkg-deb -e ./jpackage-output/logicban_1.0.0_amd64.deb /tmp/logicban/DEBIAN
-  
-            # Removendo as dependências desnecessárias do arquivo control
-            sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
-            sed -i '/libmd0/d' /tmp/logicban/DEBIAN/control
-            sed -i '/libx11-6/d' /tmp/logicban/DEBIAN/control
-  
-            # Removendo o campo "Depends" se não for necessário
-            sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
-  
-            # Recriar o pacote .deb com o arquivo control modificado
-            dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_1.0.0_amd64.deb
-  
+          # Extraindo o conteúdo do pacote .deb
+          dpkg-deb -x ./jpackage-output/logicban_1.0.0_amd64.deb /tmp/logicban
+          dpkg-deb -e ./jpackage-output/logicban_1.0.0_amd64.deb /tmp/logicban/DEBIAN
+
+          # Removendo as dependências desnecessárias do arquivo control
+          sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
+          sed -i '/libmd0/d' /tmp/logicban/DEBIAN/control
+          sed -i '/libx11-6/d' /tmp/logicban/DEBIAN/control
+
+          # Removendo o campo "Depends" se não for necessário
+          sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
+
+          # Recriar o pacote .deb com o arquivo control modificado
+          dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_1.0.0_amd64.deb
+
       - name: Upload cleaned Debian artifact
         uses: actions/upload-artifact@v4
         with:
@@ -163,6 +152,13 @@ jobs:
 
   upload-release:
     runs-on: ubuntu-latest
+    permissions: 
+      contents: read  # Permissões de leitura de conteúdo (para baixar artefatos, por exemplo)
+      #issues: write  # Permissões para criar issues, caso necessário
+      pull-requests: write  # pull requests
+      deployments: write  # deploys
+      actions: write   # Permite ações como upload de ativos para o release
+
     needs: [build-windows, build-linux, build-macos]
     steps:
       - name: Download artifacts
