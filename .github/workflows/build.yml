@@ -21,10 +21,9 @@ jobs:
       - name: Build with Maven
         run: mvn package
 
-      - name: List jpackage output (debug)
+      - name: Package with jpackage (Windows)
         shell: pwsh
         run: |
-          ls target/jpackage
           jpackage --type exe `
                    --input target `
                    --main-jar logicban-1.0.0.jar `
@@ -48,52 +47,52 @@ jobs:
           path: target/jpackage/*.exe
 
   build-linux:
-            runs-on: ubuntu-latest
-            steps:
-              - name: Checkout code
-                uses: actions/checkout@v3
-        
-              - name: Set up JDK
-                uses: actions/setup-java@v3
-                with:
-                  java-version: '21'
-                  distribution: 'temurin'
-        
-              - name: Build with Maven
-                run: mvn package
-        
-              - name: Install dependencies for AppImage
-                run: |
-                  sudo apt-get update
-                  sudo apt-get install -y fuse libfuse2 wget
-        
-              - name: Download appimagetool
-                run: |
-                  wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
-                  chmod +x appimagetool
-        
-              - name: Package with jpackage (Linux)
-                run: |
-                  jpackage --type app-image \
-                           --input target \
-                           --main-jar logicban-1.0.0.jar \
-                           --main-class br.ufcat.logicban.ui.Main \
-                           --dest target/jpackage \
-                           --app-version 1.0.0 \
-                           --name LogicBan \
-                           --vendor "Bug Hunters" \
-                           --copyright "Copyright (C) 2025" \
-                           --icon src/resources/assets/logos/icone.png
-        
-              - name: Convert to AppImage
-                run: |
-                  ./appimagetool target/jpackage/LogicBan
-        
-              - name: Upload Linux artifact
-                uses: actions/upload-artifact@v4
-                with:
-                  name: logicban-linux
-                  path: LogicBan-x86_64.AppImage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: mvn package
+
+      - name: Install dependencies for AppImage
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fuse libfuse2 wget
+
+      - name: Download appimagetool
+        run: |
+          wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+          chmod +x appimagetool
+
+      - name: Package with jpackage (Linux)
+        run: |
+          jpackage --type app-image \
+                   --input target \
+                   --main-jar logicban-1.0.0.jar \
+                   --main-class br.ufcat.logicban.ui.Main \
+                   --dest target/jpackage \
+                   --app-version 1.0.0 \
+                   --name LogicBan \
+                   --vendor "Bug Hunters" \
+                   --copyright "Copyright (C) 2025" \
+                   --icon src/resources/assets/logos/icone.png
+
+      - name: Convert to AppImage
+        run: |
+          ./appimagetool target/jpackage/LogicBan
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: logicban-linux
+          path: LogicBan-x86_64.AppImage
 
   build-macos:
     runs-on: macos-latest
@@ -128,3 +127,53 @@ jobs:
         with:
           name: logicban-macos
           path: target/jpackage/*.dmg
+
+  upload-release:
+    runs-on: ubuntu-latest
+    needs: [build-windows, build-linux, build-macos]
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Windows artifact to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/logicban-windows/*.exe
+          asset_name: LogicBan-Windows.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux artifact to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/logicban-linux/*.AppImage
+          asset_name: LogicBan-Linux.AppImage
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS artifact to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/logicban-macos/*.dmg
+          asset_name: LogicBan-macOS.dmg
+          asset_content_type: application/octet-stream
