@@ -103,7 +103,7 @@ jobs:
         run: |
           rm -rf ./jpackage-output
           mkdir -p ./jpackage-output
-          
+
       - name: Verify jars targets
         run: |
           ls -lh target/*.jar
@@ -113,7 +113,7 @@ jobs:
           version="${{ steps.project_version.outputs.version }}"
           jpackage --type deb \
              --input target \
-             --main-jar "logicban-$version-jar-with-dependencies.jar" \
+             --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
              --main-class br.ufcat.logicban.ui.Main \
              --dest ./jpackage-output \
              --app-version "$version" \
@@ -188,7 +188,7 @@ jobs:
           version="${{ steps.project_version.outputs.version }}"
           jpackage --type dmg \
                    --input target \
-                   --main-jar "logicban-$version.jar" \
+                   --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
                    --main-class br.ufcat.logicban.ui.Main \
                    --dest target/jpackage \
                    --app-version "$version" \
