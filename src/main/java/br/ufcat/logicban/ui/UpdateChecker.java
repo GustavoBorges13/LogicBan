@@ -11,8 +11,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -24,189 +22,217 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import org.json.JSONObject;
 
 public class UpdateChecker {
 
-	// URL do arquivo VERSION no GitHub
-	private static final String REMOTE_VERSION_URL = "https://raw.githubusercontent.com/GustavoBorges13/LogicBan/main/VERSION";
-	// Caminho do arquivo VERSION local
-	private static final String LOCAL_VERSION_PATH = "./VERSION";
+    // URL da API do GitHub para obter a última release
+    private static final String GITHUB_API_URL = "https://api.github.com/repos/GustavoBorges13/LogicBan/releases/latest";
 
-	public static void checkForUpdates() {
-		try {
-			// Lê a versão local
-			String localVersion = readLocalVersion();
+    private static String currentVersion;
 
-			// Lê a versão remota
-			String remoteVersion = readRemoteVersion();
-			if (remoteVersion == null) {
-				System.err.println("Não foi possível ler a versão remota.");
-				return;
-			}
-			System.out.println("versao atual: " + localVersion + " Versao remota: " + remoteVersion);
+    static {
+        try {
+            currentVersion = getCurrentVersionFromPom();
+        } catch (Exception e) {
+            System.err.println("Erro ao ler a versão do pom.xml: " + e.getMessage());
+            currentVersion = "0.0.0"; // Versão padrão em caso de falha
+        }
+    }
 
-			// Compara as versões
-			if (!remoteVersion.equals(localVersion)) {
-				// Se a versão remota for diferente, atualiza a versão local
-				updateLocalVersion(remoteVersion);
-				showUpdateDialog(remoteVersion); // Mostra o diálogo de atualização
-			}
+    public static void checkForUpdates() {
+        try {
+            // Obtém a tag da última release da API do GitHub
+            String latestVersion = getLatestVersionFromGitHub();
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+            if (latestVersion != null) {
+                // Remove o "v" da tag do GitHub
+                latestVersion = latestVersion.startsWith("v") ? latestVersion.substring(1) : latestVersion;
 
-	private static String readLocalVersion() throws IOException {
-		// Lê a versão do arquivo VERSION local
-		try (BufferedReader reader = new BufferedReader(new FileReader(LOCAL_VERSION_PATH))) {
-			return reader.readLine(); // Lê a primeira linha do arquivo
-		} catch (IOException e) {
-			// Se ocorrer um erro ao ler o arquivo, retorna null
-			return null;
-		}
-	}
+                // Compara a versão atual com a última versão
+                if (!currentVersion.equals(latestVersion)) {
+                    System.out.println("Nova versão disponível: " + latestVersion);
+                    showUpdateDialog(latestVersion); // Mostra o diálogo de atualização
+                } else {
+                    System.out.println("O aplicativo está atualizado.");
+                }
+            } else {
+                System.err.println("Falha ao verificar atualizações.");
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao verificar atualizações: " + e.getMessage());
+        }
+    }
 
-	private static String readRemoteVersion() throws IOException {
-		// Faz uma requisição HTTP para buscar a versão remota
-		URL url = new URL(REMOTE_VERSION_URL);
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		connection.setRequestMethod("GET");
+    private static String getLatestVersionFromGitHub() throws IOException {
+        try {
+            URL url = new URL(GITHUB_API_URL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/vnd.github.v3+json"); // Informa que aceita JSON
 
-		// Verifica se a resposta foi bem-sucedida (código 200)
-		int responseCode = connection.getResponseCode();
-		if (responseCode == HttpURLConnection.HTTP_OK) {
-			try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-				return in.readLine(); // Lê a primeira linha do arquivo remoto
-			}
-		} else {
-			System.err.println("Erro ao buscar a versão remota. Código de resposta: " + responseCode);
-			return null;
-		}
-	}
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        response.append(line);
+                    }
 
-	private static void updateLocalVersion(String remoteVersion) throws IOException {
-		// Atualiza o arquivo local com a versão atual
-		try (FileWriter writer = new FileWriter(LOCAL_VERSION_PATH)) {
-			writer.write(remoteVersion); // Atualiza o arquivo com a versão atual
-			System.out.println("Versão local atualizada para: " + remoteVersion);
-		}
-	}
+                    // Faz o parsing da resposta JSON para obter a tag
+                    JSONObject jsonResponse = new JSONObject(response.toString());
+                    return jsonResponse.getString("tag_name"); // Assume que a tag é "tag_name"
+                }
+            } else {
+                System.err.println("Erro ao obter a última versão da API do GitHub. Código de resposta: " + responseCode);
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao processar a resposta da API do GitHub: " + e.getMessage());
+            return null;
+        }
+    }
 
-	private static void showUpdateDialog(String remoteVersion) {
-		// Configura o tema escuro
-		try {
-			UIManager.setLookAndFeel(new FlatDarkLaf()); // Ou FlatLightLaf para o tema claro
-		} catch (UnsupportedLookAndFeelException e) {
-			e.printStackTrace();
-		}
+    private static String getCurrentVersionFromPom() throws Exception {
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse("pom.xml");  // Nome do arquivo pom.xml
+            doc.getDocumentElement().normalize();
 
-		// Criação da mensagem da caixa de diálogo
-		String message = "Uma nova versão (" + remoteVersion + ") está disponível!\n"
-				+ "Clique em 'Prosseguir' para ir baixar a atualização ou 'Ignorar'\npara continuar com o jogo.\n";
+            NodeList nList = doc.getElementsByTagName("version");
+            if (nList.getLength() > 0) {
+                Node node = nList.item(0);
+                return node.getTextContent();
+            } else {
+                throw new Exception("Tag 'version' não encontrada no pom.xml");
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao ler o pom.xml: " + e.getMessage());
+            throw e;
+        }
+    }
 
-		// Criação do JDialog personalizado
-		JDialog dialog = createDialog(message);
+    private static void showUpdateDialog(String remoteVersion) {
+        // Configura o tema escuro
+        try {
+            UIManager.setLookAndFeel(new FlatDarkLaf()); // Ou FlatLightLaf para o tema claro
+        } catch (UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
 
-		// Exibe o diálogo
-		dialog.setVisible(true);
-	}
+        // Criação da mensagem da caixa de diálogo
+        String message = "Uma nova versão (" + remoteVersion + ") está disponível!\n"
+                + "Clique em 'Prosseguir' para ir baixar a atualização ou 'Ignorar'\npara continuar com o jogo.\n";
 
-	private static JDialog createDialog(String message) {
-		// Criação do JDialog
-		JDialog dialog = new JDialog((Frame) null, "Atualização Disponível", true);
-		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-		dialog.setLayout(new BorderLayout());
+        // Criação do JDialog personalizado
+        JDialog dialog = createDialog(message);
 
-		// Adiciona o painel de mensagem ao diálogo
-		dialog.add(createMessagePanel(message), BorderLayout.CENTER);
+        // Exibe o diálogo
+        dialog.setVisible(true);
+    }
 
-		// Adiciona o painel de botões ao diálogo
-		dialog.add(createButtonPanel(dialog), BorderLayout.SOUTH);
+    private static JDialog createDialog(String message) {
+        // Criação do JDialog
+        JDialog dialog = new JDialog((Frame) null, "Atualização Disponível", true);
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.setLayout(new BorderLayout());
 
-		// Configura o tamanho da janela (largura, altura)
-		dialog.setSize(460, 170); // Ajuste o tamanho conforme necessário
-		dialog.setLocationRelativeTo(null); // Centraliza a janela
+        // Adiciona o painel de mensagem ao diálogo
+        dialog.add(createMessagePanel(message), BorderLayout.CENTER);
 
-		// Adiciona um WindowListener para tratar o fechamento da janela
-		dialog.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				System.exit(0); // Encerra o programa ao clicar no X
-			}
-		});
+        // Adiciona o painel de botões ao diálogo
+        dialog.add(createButtonPanel(dialog), BorderLayout.SOUTH);
 
-		return dialog;
-	}
+        // Configura o tamanho da janela (largura, altura)
+        dialog.setSize(460, 170); // Ajuste o tamanho conforme necessário
+        dialog.setLocationRelativeTo(null); // Centraliza a janela
 
-	private static JPanel createMessagePanel(String message) {
-	    // Criação do JTextArea para exibir a mensagem com quebra de linha
-	    JTextArea textArea = new JTextArea(message);
-	    textArea.setEditable(false); // Impede a edição do texto
-	    textArea.setLineWrap(true); // Ativa a quebra de linha
-	    textArea.setWrapStyleWord(true); // Quebra por palavras inteiras
-	    textArea.setBackground(UIManager.getColor("Panel.background")); // Usa o fundo do tema
+        // Adiciona um WindowListener para tratar o fechamento da janela
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.exit(0); // Encerra o programa ao clicar no X
+            }
+        });
 
-	    // Obtém a fonte padrão do sistema e ajusta o estilo e o tamanho
-	    Font defaultFont = UIManager.getFont("Label.font");
-	    Font customFont = defaultFont.deriveFont(Font.PLAIN, 15);
-	    textArea.setFont(customFont); // Aplica a fonte personalizada
+        return dialog;
+    }
 
-	    textArea.setMargin(new Insets(10, 10, 10, 10)); // Adiciona margens internas
-	    textArea.setEnabled(false); // Impede a seleção de texto
-	    textArea.setDisabledTextColor(UIManager.getColor("Label.foreground")); // Usa a cor de texto padrão
-	    
-		// Criação do painel de mensagem
-		JPanel messagePanel = new JPanel(new BorderLayout());
-		messagePanel.add(textArea, BorderLayout.CENTER);
+    private static JPanel createMessagePanel(String message) {
+        // Criação do JTextArea para exibir a mensagem com quebra de linha
+        JTextArea textArea = new JTextArea(message);
+        textArea.setEditable(false); // Impede a edição do texto
+        textArea.setLineWrap(true); // Ativa a quebra de linha
+        textArea.setWrapStyleWord(true); // Quebra por palavras inteiras
+        textArea.setBackground(UIManager.getColor("Panel.background")); // Usa o fundo do tema
 
-		return messagePanel;
-	}
+        // Obtém a fonte padrão do sistema e ajusta o estilo e o tamanho
+        Font defaultFont = UIManager.getFont("Label.font");
+        Font customFont = defaultFont.deriveFont(Font.PLAIN, 15);
+        textArea.setFont(customFont); // Aplica a fonte personalizada
 
-	private static JPanel createButtonPanel(JDialog dialog) {
-		// Criação dos botões
-		JButton ignoreButton = new JButton("Ignorar");
-		JButton proceedButton = new JButton("Prosseguir");
+        textArea.setMargin(new Insets(10, 10, 10, 10)); // Adiciona margens internas
+        textArea.setEnabled(false); // Impede a seleção de texto
+        textArea.setDisabledTextColor(UIManager.getColor("Label.foreground")); // Usa a cor de texto padrão
 
-		// Estilização do botão "Ignorar" (fundo azul e texto branco)
-		ignoreButton.setBackground(new Color(0, 120, 215)); // Azul
-		ignoreButton.setForeground(Color.WHITE); // Texto branco
-		ignoreButton.setFocusPainted(false); // Remove o contorno de foco
+        // Criação do painel de mensagem
+        JPanel messagePanel = new JPanel(new BorderLayout());
+        messagePanel.add(textArea, BorderLayout.CENTER);
 
-		// Criação do painel de botões
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(proceedButton); // Adiciona "Prosseguir" primeiro
-		buttonPanel.add(ignoreButton); // Adiciona "Ignorar" depois
+        return messagePanel;
+    }
 
-		// Ação para o botão "Ignorar"
-		ignoreButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dialog.dispose(); // Fecha o diálogo
-			}
-		});
+    private static JPanel createButtonPanel(JDialog dialog) {
+        // Criação dos botões
+        JButton ignoreButton = new JButton("Ignorar");
+        JButton proceedButton = new JButton("Prosseguir");
 
-		// Ação para o botão "Prosseguir"
-		proceedButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					// Abrir o link do GitHub no navegador
-					Desktop.getDesktop().browse(new URI("https://github.com/GustavoBorges13/LogicBan/releases/latest"));
-				} catch (Exception ex) {
-					System.err.println("Erro ao abrir o navegador: " + ex.getMessage());
-				}
-				// Encerra o programa após redirecionar o usuário
-				System.exit(0); // Finaliza a aplicação
-			}
-		});
-		proceedButton.setSelected(false);
-		ignoreButton.setSelected(true);
-		// Define o foco inicial no botão "Ignorar"
-		ignoreButton.requestFocusInWindow();
+        // Estilização do botão "Ignorar" (fundo azul e texto branco)
+        ignoreButton.setBackground(new Color(0, 120, 215)); // Azul
+        ignoreButton.setForeground(Color.WHITE); // Texto branco
+        ignoreButton.setFocusPainted(false); // Remove o contorno de foco
 
-		return buttonPanel;
-	}
+        // Criação do painel de botões
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(proceedButton); // Adiciona "Prosseguir" primeiro
+        buttonPanel.add(ignoreButton); // Adiciona "Ignorar" depois
+
+        // Ação para o botão "Ignorar"
+        ignoreButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.dispose(); // Fecha o diálogo
+            }
+        });
+
+        // Ação para o botão "Prosseguir"
+        proceedButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    // Abrir o link do GitHub no navegador
+                    Desktop.getDesktop().browse(new URI("https://github.com/GustavoBorges13/LogicBan/releases/latest"));
+                } catch (Exception ex) {
+                    System.err.println("Erro ao abrir o navegador: " + ex.getMessage());
+                }
+                // Encerra o programa após redirecionar o usuário
+                System.exit(0); // Finaliza a aplicação
+            }
+        });
+        proceedButton.setSelected(false);
+        ignoreButton.setSelected(true);
+        // Define o foco inicial no botão "Ignorar"
+        ignoreButton.requestFocusInWindow();
+
+        return buttonPanel;
+    }
 }
