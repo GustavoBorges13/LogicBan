@@ -220,6 +220,9 @@ jobs:
              --copyright "Copyright (C) 2025" \
              --icon src/resources/assets/logos/icone.ico
     
+      - name: List jpackage Output
+        run: ls -lh target/jpackage/
+
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
@@ -264,7 +267,7 @@ jobs:
       - name: Verify macOS artifact
         run: |
           if [ ! -f "./artifacts/logicban-macos/target/jpackage/logicban_${{ needs.build-windows.outputs.version }}.dmg" ]; then
-            echo "Arquivo logicban_${{ needs.build-windows.outputs.version }}.dmg não encontrado!"
+            echo "Arquivo logicban-${{ needs.build-windows.outputs.version }}.dmg não encontrado!"
             exit 1
           fi
 
@@ -305,6 +308,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-macos/target/jpackage/logicban_${{ needs.build-windows.outputs.version }}.dmg
+          asset_path: ./artifacts/logicban-macos/target/jpackage/logicban-${{ needs.build-windows.outputs.version }}.dmg
           asset_name: LogicBan-macOS.dmg
           asset_content_type: application/octet-stream
