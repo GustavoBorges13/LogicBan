@@ -99,9 +99,12 @@ jobs:
           dpkg-deb -e ./jpackage-output/logicban_1.0.0_amd64.deb /tmp/logicban/DEBIAN
 
           # Removendo as dependências desnecessárias do arquivo control
-          sed -i 's/libasound2t64//g' /tmp/logicban/DEBIAN/control
-          sed -i 's/libmd0//g' /tmp/logicban/DEBIAN/control
-          sed -i 's/libx11-6//g' /tmp/logicban/DEBIAN/control
+          sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
+          sed -i '/libmd0/d' /tmp/logicban/DEBIAN/control
+          sed -i '/libx11-6/d' /tmp/logicban/DEBIAN/control
+
+          # Removendo o campo "Depends" se não for necessário
+          sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
 
           # Recriar o pacote .deb com o arquivo control modificado
           dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_1.0.0_amd64.deb
