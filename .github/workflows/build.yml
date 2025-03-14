@@ -32,9 +32,7 @@ jobs:
         id: project_version
         shell: pwsh
         run: |
-          # Extrai a versão do pom.xml usando um comando XML
-          [xml]$pom = Get-Content pom.xml
-          $VERSION = $pom.project.version
+          $VERSION = (mvn org.codehaus.mojo:exec-maven-plugin:1.6.0:exec -Dexec.executable="echo" -Dexec.args='${project.version}' -q --non-recursive)
           echo "version=$VERSION" >> $env:GITHUB_OUTPUT
 
       - name: Build with Maven
@@ -97,10 +95,8 @@ jobs:
       - name: Read Version from pom.xml
         id: project_version
         run: |
-          # Extrai a versão do pom.xml usando um comando XML
-          [xml]$pom = Get-Content pom.xml
-          $VERSION = $pom.project.version
-          echo "version=$VERSION" >> $env:GITHUB_OUTPUT
+          VERSION=$(mvn org.codehaus.mojo:exec-maven-plugin:1.6.0:exec -Dexec.executable="echo" -Dexec.args='${project.version}' -q --non-recursive)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Build with Maven
         run: mvn -q package -DincludeScope=compile
@@ -185,10 +181,8 @@ jobs:
       - name: Read Version from pom.xml
         id: project_version
         run: |
-          # Extrai a versão do pom.xml usando um comando XML
-          [xml]$pom = Get-Content pom.xml
-          $VERSION = $pom.project.version
-          echo "version=$VERSION" >> $env:GITHUB_OUTPUT
+          VERSION=$(mvn org.codehaus.mojo:exec-maven-plugin:1.6.0:exec -Dexec.executable="echo" -Dexec.args='${project.version}' -q --non-recursive)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Build with Maven
         run: mvn package
@@ -197,15 +191,15 @@ jobs:
         run: |
           version="${{ steps.project_version.outputs.version }}"
           jpackage --type dmg \
-                   --input target \
-                   --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
-                   --main-class br.ufcat.logicban.ui.Main \
-                   --dest target/jpackage \
-                   --app-version "$version" \
-                   --name LogicBan \
-                   --vendor "Bug Hunters" \
-                   --copyright "Copyright (C) 2025" \
-                   --icon src/resources/assets/logos/icone.ico
+             --input target \
+             --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
+             --main-class br.ufcat.logicban.ui.Main \
+             --dest target/jpackage \
+             --app-version "$version" \
+             --name LogicBan \
+             --vendor "Bug Hunters" \
+             --copyright "Copyright (C) 2025" \
+             --icon src/resources/assets/logos/icone.ico
     
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
