@@ -71,19 +71,10 @@ jobs:
           wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
           chmod +x appimagetool
 
-      - name: Verify JAR file
-        run: ls -lh target/logicban-1.0.0.jar
-        
-      - name: Verify icon file
-        run: ls -lh src/resources/assets/logos/icone.png
-        
       - name: Clean jpackage output directory
         run: |
             rm -rf ./jpackage-output
             mkdir -p ./jpackage-output
-
-      - name: Check disk space
-        run: df -h
 
       - name: Package with jpackage (Linux)
         run: |
@@ -111,6 +102,9 @@ jobs:
 
       - name: Verify jpackage output
         run: ls -lh ./jpackage-output/LogicBan
+
+      - name: Verify logicban bin
+        run: ls -lh ./jpackage-output/LogicBan/bin
 
       - name: Convert to AppImage
         run: |
