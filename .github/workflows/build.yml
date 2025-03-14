@@ -1,58 +1,70 @@
-name: Build and Package
+name: Build All Installers
 
 on:
+  workflow_dispatch: # Acionamento manual
   push:
     branches:
-      - main
+      - main # Executa quando há um push para o branch main
+  pull_request:
+    branches:
+      - main # Executa quando há um pull request para o branch main
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest] # Removemos macos-latest
+    runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Download Wix (Windows)
+        uses: i3h/download-release-asset@v1
+        if: matrix.os == 'windows-latest'
         with:
-          java-version: '23'
-          distribution: 'temurin'
+          owner: wixtoolset
+          repo: wix3
+          tag: wix3112rtm
+          file: wix311-binaries.zip
 
-      - name: Build with Maven
-        run: mvn package
+      - name: Decompress Wix (Windows)
+        uses: DuckSoft/extract-7z-action@v1.0
+        if: matrix.os == 'windows-latest'
+        with:
+          pathSource: wix311-binaries.zip
+          pathTarget: ./target/wix
 
-      - name: Package with jpackage (Windows)
+      - name: Add Wix to Path (Windows)
+        run: echo "$HOME/target/wix" >> $GITHUB_PATH
+        if: matrix.os == 'windows-latest'
+
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: 17
+          distribution: 'temurin' # Usando Temurin (OpenJDK)
+          cache: 'maven'
+
+      - name: "Build with Maven"
+        run: mvn -B clean install --file pom.xml
+
+      - name: "Package with jpackage (Windows)"
+        if: matrix.os == 'windows-latest'
         run: |
-          jpackage --type exe --input target --main-jar logicban-1.0.0.jar --main-class br.ufcat.logicban.ui.Main --dest target/jpackage --app-version 1.0.0 --name LogicBan --vendor "Bug Hunters" --copyright "Copyright (C) 2025" --icon src/resources/assets/logos/icone.ico --win-menu --win-shortcut --win-per-user-install --win-update-url "https://github.com/GustavoBorges13/LogicBan" --win-help-url "https://github.com/GustavoBorges13/LogicBan" --win-update-url "https://github.com/GustavoBorges13/LogicBan"
+          jpackage --type msi \
+                   --input target \
+                   --main-jar logicban-1.0.0.jar \
+                   --main-class br.ufcat.logicban.ui.Main \
+                   --dest target/jpackage \
+                   --app-version 1.0.0 \
+                   --name LogicBan \
+                   --vendor "Bug Hunters" \
+                   --copyright "Copyright (C) 2025" \
+                   --win-menu \
+                   --win-shortcut
 
-
-      - name: Upload Windows artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: logicban-windows
-          path: target/jpackage/*.exe
-
-  build-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '23'
-          distribution: 'temurin'
-
-      - name: Build with Maven
-        run: mvn package
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libasound2t64
-
-      - name: Package with jpackage (Linux)
+      - name: "Package with jpackage (Linux)"
+        if: matrix.os == 'ubuntu-latest'
         run: |
           jpackage --type deb \
                    --input target \
@@ -63,44 +75,12 @@ jobs:
                    --name LogicBan \
                    --vendor "Bug Hunters" \
                    --copyright "Copyright (C) 2025" \
-                   --icon src/resources/assets/logos/icone.png \
+                   --icon src/resources/assets/logos/icone.png
 
-      - name: Upload Linux artifact
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: logicban-linux
-          path: target/jpackage/*.deb
-
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '23'
-          distribution: 'temurin'
-
-      - name: Build with Maven
-        run: mvn package
-
-      - name: Package with jpackage (macOS)
-        run: |
-          jpackage --type dmg \
-                   --input target \
-                   --main-jar logicban-1.0.0.jar \
-                   --main-class br.ufcat.logicban.ui.Main \
-                   --dest target/jpackage \
-                   --app-version 1.0.0 \
-                   --name LogicBan \
-                   --vendor "Bug Hunters" \
-                   --copyright "Copyright (C) 2025" \
-                   --icon src/resources/assets/logos/icone.ico
-
-      - name: Upload macOS artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: logicban-macos
-          path: target/jpackage/*.dmg
+          name: logicban-${{ matrix.os }}
+          path: |
+            target/jpackage/*.msi
+            target/jpackage/*.deb
