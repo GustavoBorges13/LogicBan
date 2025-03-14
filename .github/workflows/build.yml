@@ -48,7 +48,9 @@ jobs:
                    --win-update-url "https://github.com/GustavoBorges13/LogicBan/releases/latest"
       
       - name: Verify Windows artifact
-        run: ls -lh target/jpackage/
+        shell: pwsh
+        run: |
+            dir target/jpackage/
         
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
