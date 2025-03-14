@@ -206,7 +206,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-windows/LogicBan.exe
+          asset_path: ./artifacts/logicban-windows//LogicBan-1.0.0.exe
           asset_name: LogicBan-Windows.exe
           asset_content_type: application/octet-stream
 
