@@ -75,22 +75,24 @@ jobs:
         run: |
           rm -rf ./jpackage-output
           mkdir -p ./jpackage-output
-          
+
       - name: Verify JAR file
         run: ls -lh target/logicban-1.0.0.jar
+      - name: Verify Logo file
+        run: ls -lh src/resources/assets/logos/icone.png
 
       - name: Package with jpackage (Linux)
         run: |
-            jpackage --type app-image \
-             --input target \
-             --main-jar logicban-1.0.0.jar \
-             --main-class br.ufcat.logicban.ui.Main \
-             --dest ./jpackage-output \  # Alterado para um diretório fora de "target"
-             --app-version 1.0.0 \
-             --name LogicBan \
-             --vendor "Bug Hunters" \
-             --copyright "Copyright (C) 2025" \
-             --icon src/resources/assets/logos/icone.png
+          jpackage --type app-image \
+                  --input target \
+                  --main-jar logicban-1.0.0.jar \
+                  --main-class br.ufcat.logicban.ui.Main \
+                  --dest ./jpackage-output \
+                  --app-version 1.0.0 \
+                  --name LogicBan \
+                  --vendor "Bug Hunters" \
+                  --copyright "Copyright (C) 2025" \
+                  --icon src/resources/assets/logos/icone.png
 
       - name: Convert to AppImage
         run: |
