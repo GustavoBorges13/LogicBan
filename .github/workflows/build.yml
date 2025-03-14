@@ -19,7 +19,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn package -DincludeScope=compile
+        run: mvn -q package -DincludeScope=compile
 
       - name: Package with jpackage (Windows)
         shell: pwsh
@@ -59,7 +59,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn package -DincludeScope=compile
+        run: mvn -q package -DincludeScope=compile
 
       - name: Install dependencies for AppImage
         run: |
@@ -90,7 +90,6 @@ jobs:
                     --vendor "Bug Hunters" \
                     --copyright "Copyright (C) 2025" \
                     --icon src/resources/assets/logos/icone.png \
-                    --strip-native-commands
 
       - name: Convert to AppImage
         run: |
