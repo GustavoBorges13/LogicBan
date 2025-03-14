@@ -68,12 +68,7 @@ jobs:
 
       - name: Build with Maven
         run: mvn -q package -DincludeScope=compile
-
-      - name: Install dependencies for .deb
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libfuse2 wget
-
+        
       - name: Clean jpackage output directory
         run: |
           rm -rf ./jpackage-output
@@ -96,7 +91,6 @@ jobs:
              --linux-app-category "Utility" \
              --linux-package-name "logicban" \
              --linux-deb-maintainer "ggustavo.borges13@exemplo.com" \
-             --linux-package-deps "default-jre" \
              --linux-rpm-license-type "GPLv3" \
              --linux-app-release "1"
 
