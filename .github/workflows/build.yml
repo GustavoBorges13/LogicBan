@@ -24,8 +24,18 @@ jobs:
         run: |
           mvn clean package
 
+      - name: List target directory (debug)
+        run: |
+          ls -l ./target
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fakeroot dpkg
+
       - name: Package with jpackage (Linux)
         run: |
+          mkdir -p ./dist
           jpackage --input ./target \
                    --main-jar logicban-1.0.0-jar-with-dependencies.jar \
                    --main-class br.ufcat.logicban.ui.Main \
@@ -36,6 +46,10 @@ jobs:
                    --copyright "Copyright (C) 2025" \
                    --linux-package-name logicban \
                    --linux-shortcut
+
+      - name: List dist directory (debug)
+        run: |
+          ls -l ./dist
 
       - name: Upload Linux installer
         uses: actions/upload-artifact@v4
@@ -61,16 +75,17 @@ jobs:
           mvn clean package
 
       - name: Package with jpackage (Windows)
+        shell: pwsh
         run: |
-          jpackage --input ./target \
-                   --main-jar logicban-1.0.0-jar-with-dependencies.jar \
-                   --main-class br.ufcat.logicban.ui.Main \
-                   --dest ./dist \
-                   --name LogicBan \
-                   --app-version 1.0.0 \
-                   --vendor "Bug Hunters" \
-                   --copyright "Copyright (C) 2025" \
-                   --win-menu \
+          jpackage --input ./target `
+                   --main-jar logicban-1.0.0-jar-with-dependencies.jar `
+                   --main-class br.ufcat.logicban.ui.Main `
+                   --dest ./dist `
+                   --name LogicBan `
+                   --app-version 1.0.0 `
+                   --vendor "Bug Hunters" `
+                   --copyright "Copyright (C) 2025" `
+                   --win-menu `
                    --win-shortcut
 
       - name: Upload Windows installer
