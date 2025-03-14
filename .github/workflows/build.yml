@@ -43,7 +43,6 @@ jobs:
                    --copyright "Copyright (C) 2025" `
                    --icon src/resources/assets/logos/icone.ico `
                    --win-menu `
-                   --win-shortcut `
                    --win-per-user-install `
                    --win-help-url "https://github.com/GustavoBorges13/LogicBan/wiki/Tutorial-%E2%80%90-Como-jogar" `
                    --win-update-url "https://github.com/GustavoBorges13/LogicBan/releases/latest"
@@ -91,14 +90,28 @@ jobs:
              --linux-app-category "Utility" \
              --linux-package-name "logicban" \
              --linux-deb-maintainer "ggustavo.borges13@exemplo.com" \
-             --linux-rpm-license-type "GPLv3" \
-             --linux-deb-dependencies "libc6, libbsd0, libx11-6, libxau6, libxcb1, libxdmcp6, libxext6, libxi6, libxrender1, libxtst6, xdg-utils"
+             --linux-rpm-license-type "GPLv3" 
 
-      - name: Upload Linux artifact
+      - name: Clean up dependencies in control file
+        run: |
+          # Extraindo o conteúdo do pacote .deb
+          dpkg-deb -x ./jpackage-output/logicban_1.0.0_amd64.deb /tmp/logicban
+          dpkg-deb -e ./jpackage-output/logicban_1.0.0_amd64.deb /tmp/logicban/DEBIAN
+
+          # Removendo as dependências desnecessárias do arquivo control
+          sed -i 's/libasound2t64//g' /tmp/logicban/DEBIAN/control
+          sed -i 's/libmd0//g' /tmp/logicban/DEBIAN/control
+          sed -i 's/libx11-6//g' /tmp/logicban/DEBIAN/control
+
+          # Recriar o pacote .deb com o arquivo control modificado
+          dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_1.0.0_amd64.deb
+
+      - name: Upload cleaned Debian artifact
         uses: actions/upload-artifact@v4
         with:
           name: logicban-linux-deb
-          path: ./jpackage-output/*.deb
+          path: ./jpackage-output/logicban_1.0.0_amd64.deb
+        
 
   build-macos:
     runs-on: macos-latest
