@@ -28,11 +28,30 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-
 
+      - name: Set JAVA_HOME
+        shell: pwsh
+        run: |
+          Write-Host "JAVA_HOME: $env:JAVA_HOME"
+          if (-not $env:JAVA_HOME) {
+            Write-Host "JAVA_HOME não está definido. Definindo..."
+            $env:JAVA_HOME = $env:JAVA_HOME_23_X64
+            Write-Host "JAVA_HOME agora: $env:JAVA_HOME"
+          }
+
+      - name: Add Maven to PATH
+        shell: pwsh
+        run: |
+          Write-Host "PATH antes: $env:PATH"
+          $env:PATH = "$env:PATH;C:\Maven SDK\apache-maven-3.9.9\bin" # Substitua pelo caminho correto
+          Write-Host "PATH depois: $env:PATH"
+
       - name: Read Version from pom.xml
         id: project_version
         shell: pwsh
         run: |
-          $VERSION = (mvn org.codehaus.mojo:exec-maven-plugin:1.6.0:exec -Dexec.executable="echo" -Dexec.args='${project.version}' -q --non-recursive)
+          # Extrai a versão do pom.xml usando um comando XML
+          [xml]$pom = Get-Content pom.xml
+          $VERSION = $pom.project.version
           echo "version=$VERSION" >> $env:GITHUB_OUTPUT
 
       - name: Build with Maven
@@ -44,7 +63,7 @@ jobs:
           $version = "${{ steps.project_version.outputs.version }}"
           jpackage --type exe `
                    --input target `
-                   --main-jar "logicban-$version.jar" `
+                   --main-jar "logicban-$version-jar-with-dependencies.jar" `
                    --main-class br.ufcat.logicban.ui.Main `
                    --dest target/jpackage `
                    --app-version $version `
