@@ -21,9 +21,10 @@ jobs:
       - name: Build with Maven
         run: mvn package
 
-      - name: Package with jpackage (Windows)
+      - name: List jpackage output (debug)
         shell: pwsh
         run: |
+          ls target/jpackage
           jpackage --type exe `
                    --input target `
                    --main-jar logicban-1.0.0.jar `
@@ -82,7 +83,7 @@ jobs:
                            --name LogicBan \
                            --vendor "Bug Hunters" \
                            --copyright "Copyright (C) 2025" \
-                           --icon src/resources/assets/logos/icone.ico
+                           --icon src/resources/assets/logos/icone.png
         
               - name: Convert to AppImage
                 run: |
