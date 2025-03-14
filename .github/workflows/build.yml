@@ -216,7 +216,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-linux-deb/*.deb
+          asset_path: ./artifacts/logicban-linux-deb/logicban_1.0.0_amd64.deb
           asset_name: LogicBan-Linux.deb
           asset_content_type: application/octet-stream
 
@@ -226,6 +226,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-macos/target/jpackage/*.dmg
+          asset_path: ./artifacts/logicban-macos/target/jpackage/logicban_1.0.0.dmg
           asset_name: LogicBan-macOS.dmg
           asset_content_type: application/octet-stream
