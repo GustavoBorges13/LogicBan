@@ -37,7 +37,6 @@ jobs:
                    --win-menu `
                    --win-shortcut `
                    --win-per-user-install `
-                   --win-about-url "https://github.com/GustavoBorges13/LogicBan" `
                    --win-help-url "https://github.com/GustavoBorges13/LogicBan/wiki/Tutorial-%E2%80%90-Como-jogar" `
                    --win-update-url "https://github.com/GustavoBorges13/LogicBan/releases/latest"
 
