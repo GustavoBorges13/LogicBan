@@ -153,19 +153,19 @@ jobs:
         run: |
           # Extraindo o conteúdo do pacote .deb
           version="${{ steps.project_version.outputs.version }}"
-          dpkg-deb -x ./jpackage-output/LogicBan_${version}_amd64.deb /tmp/logicban
-          dpkg-deb -e ./jpackage-output/LogicBan_${version}_amd64.deb /tmp/logicban/DEBIAN
+          dpkg-deb -x ./jpackage-output/LogicBan_${version}_amd64.deb /tmp/LogicBan
+          dpkg-deb -e ./jpackage-output/LogicBan_${version}_amd64.deb /tmp/LogicBan/DEBIAN
 
           # Removendo as dependências desnecessárias do arquivo control
-          sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
-          sed -i '/libmd0/d' /tmp/logicban/DEBIAN/control
-          sed -i '/libx11-6/d' /tmp/logicban/DEBIAN/control
+          sed -i '/libasound2t64/d' /tmp/LogicBan/DEBIAN/control
+          sed -i '/libmd0/d' /tmp/LogicBan/DEBIAN/control
+          sed -i '/libx11-6/d' /tmp/LogicBan/DEBIAN/control
 
           # Removendo o campo "Depends" se não for necessário
-          sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
+          sed -i '/^Depends:/d' /tmp/LogicBan/DEBIAN/control
 
           # Recriar o pacote .deb com o arquivo control modificado
-          dpkg-deb -b /tmp/logicban ./jpackage-output/LogicBan_${version}_amd64.deb
+          dpkg-deb -b /tmp/LogicBan ./jpackage-output/LogicBan_${version}_amd64.deb
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
