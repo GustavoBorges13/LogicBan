@@ -79,26 +79,54 @@ jobs:
             maven-${{ runner.os }}-
 
       - name: Build with Maven
-        run: mvn package
+        run: mvn -q package -DincludeScope=compile
+        
+      - name: Clean jpackage output directory
+        run: |
+          rm -rf ./jpackage-output
+          mkdir -p ./jpackage-output
 
       - name: Package with jpackage (Linux)
         run: |
           jpackage --type deb \
-                   --input target \
-                   --main-jar logicban-1.0.0.jar \
-                   --main-class br.ufcat.logicban.ui.Main \
-                   --dest ./jpackage-output \
-                   --app-version 1.0.0 \
-                   --name LogicBan \
-                   --vendor "Bug Hunters" \
-                   --copyright "Copyright (C) 2025" \
-                   --icon src/resources/assets/logos/icone.png
+             --input target \
+             --main-jar logicban-1.0.0.jar \
+             --main-class br.ufcat.logicban.ui.Main \
+             --dest ./jpackage-output \
+             --app-version 1.0.0 \
+             --name LogicBan \
+             --vendor "Bug Hunters" \
+             --copyright "Copyright (C) 2025" \
+             --icon src/resources/assets/logos/icone.png \
+             --linux-menu-group "Utility;" \
+             --linux-shortcut \
+             --linux-app-category "Utility" \
+             --linux-package-name "logicban" \
+             --linux-deb-maintainer "ggustavo.borges13@exemplo.com" \
+             --linux-rpm-license-type "GPLv3" 
 
-      - name: Upload Linux artifact
+      - name: Clean up dependencies in control file
+        run: |
+          # Extraindo o conteúdo do pacote .deb
+          dpkg-deb -x ./jpackage-output/logicban_1.0.0_amd64.deb /tmp/logicban
+          dpkg-deb -e ./jpackage-output/logicban_1.0.0_amd64.deb /tmp/logicban/DEBIAN
+
+          # Removendo as dependências desnecessárias do arquivo control
+          sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
+          sed -i '/libmd0/d' /tmp/logicban/DEBIAN/control
+          sed -i '/libx11-6/d' /tmp/logicban/DEBIAN/control
+
+          # Removendo o campo "Depends" se não for necessário
+          sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
+
+          # Recriar o pacote .deb com o arquivo control modificado
+          dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_1.0.0_amd64.deb
+
+      - name: Upload cleaned Debian artifact
         uses: actions/upload-artifact@v4
         with:
           name: logicban-linux-deb
-          path: ./jpackage-output/*.deb
+          path: ./jpackage-output/logicban_1.0.0_amd64.deb
 
   build-macos:
     runs-on: macos-latest
