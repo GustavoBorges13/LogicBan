@@ -87,17 +87,17 @@ jobs:
 
       - name: Package with jpackage (Linux)
         run: |
-              jpackage --type app-image \
-                       --input target \
-                       --main-jar logicban-1.0.0.jar \
-                       --main-class br.ufcat.logicban.ui.Main \
-                       --dest ./jpackage-output \
-                       --app-version 1.0.0 \
-                       --name LogicBan \
-                       --vendor "Bug Hunters" \
-                       --copyright "Copyright (C) 2025" \
-                       --icon src/resources/assets/logos/icone.png \
-                       --verbose
+          jpackage --type app-image \
+                   --input target \
+                   --main-jar logicban-1.0.0.jar \
+                   --main-class br.ufcat.logicban.ui.Main \
+                   --dest ./jpackage-output \
+                   --app-version 1.0.0 \
+                   --name LogicBan \
+                   --vendor "Bug Hunters" \
+                   --copyright "Copyright (C) 2025" \
+                   --icon src/resources/assets/logos/icone.png \
+                   --linux-shortcut
 
       - name: Verify jpackage output
         run: ls -lh ./jpackage-output/LogicBan
