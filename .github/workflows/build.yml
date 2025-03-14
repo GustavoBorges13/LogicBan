@@ -97,7 +97,14 @@ jobs:
                    --vendor "Bug Hunters" \
                    --copyright "Copyright (C) 2025" \
                    --icon src/resources/assets/logos/icone.png \
-                   --linux-shortcut
+                   --linux-menu-group "Utility;" \
+                   --linux-shortcut \
+                   --linux-app-category "Utility" \
+                   --linux-package-name "logicban" \
+                   --linux-deb-maintainer "ggustavo.borges13@exemplo.com" \
+                   --linux-package-deps "default-jre" \
+                   --linux-rpm-license-type "GPLv3" \
+                   --linux-app-release "1"
 
       - name: Verify jpackage output
         run: ls -lh ./jpackage-output/LogicBan
