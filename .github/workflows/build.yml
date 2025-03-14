@@ -15,11 +15,19 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '21'
+          java-version: '23'
           distribution: 'temurin'
 
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
       - name: Build with Maven
-        run: mvn -q package
+        run: mvn package
 
       - name: Package with jpackage (Windows)
         shell: pwsh
@@ -54,59 +62,38 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '21'
+          java-version: '23'
           distribution: 'temurin'
 
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
       - name: Build with Maven
-        run: mvn -q package -DincludeScope=compile
-        
-      - name: Clean jpackage output directory
-        run: |
-          rm -rf ./jpackage-output
-          mkdir -p ./jpackage-output
+        run: mvn package
 
       - name: Package with jpackage (Linux)
         run: |
           jpackage --type deb \
-             --input target \
-             --main-jar logicban-1.0.0.jar \
-             --main-class br.ufcat.logicban.ui.Main \
-             --dest ./jpackage-output \
-             --app-version 1.0.0 \
-             --name LogicBan \
-             --vendor "Bug Hunters" \
-             --copyright "Copyright (C) 2025" \
-             --icon src/resources/assets/logos/icone.png \
-             --linux-menu-group "Utility;" \
-             --linux-shortcut \
-             --linux-app-category "Utility" \
-             --linux-package-name "logicban" \
-             --linux-deb-maintainer "ggustavo.borges13@exemplo.com" \
-             --linux-rpm-license-type "GPLv3" 
+                   --input target \
+                   --main-jar logicban-1.0.0.jar \
+                   --main-class br.ufcat.logicban.ui.Main \
+                   --dest ./jpackage-output \
+                   --app-version 1.0.0 \
+                   --name LogicBan \
+                   --vendor "Bug Hunters" \
+                   --copyright "Copyright (C) 2025" \
+                   --icon src/resources/assets/logos/icone.png
 
-      - name: Clean up dependencies in control file
-        run: |
-          # Extraindo o conteúdo do pacote .deb
-          dpkg-deb -x ./jpackage-output/logicban_1.0.0_amd64.deb /tmp/logicban
-          dpkg-deb -e ./jpackage-output/logicban_1.0.0_amd64.deb /tmp/logicban/DEBIAN
-
-          # Removendo as dependências desnecessárias do arquivo control
-          sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
-          sed -i '/libmd0/d' /tmp/logicban/DEBIAN/control
-          sed -i '/libx11-6/d' /tmp/logicban/DEBIAN/control
-
-          # Removendo o campo "Depends" se não for necessário
-          sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
-
-          # Recriar o pacote .deb com o arquivo control modificado
-          dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_1.0.0_amd64.deb
-
-      - name: Upload cleaned Debian artifact
+      - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
           name: logicban-linux-deb
-          path: ./jpackage-output/logicban_1.0.0_amd64.deb
-        
+          path: ./jpackage-output/*.deb
 
   build-macos:
     runs-on: macos-latest
@@ -117,11 +104,19 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '21'
+          java-version: '23'
           distribution: 'temurin'
 
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
       - name: Build with Maven
-        run: mvn -q package
+        run: mvn package
 
       - name: Package with jpackage (macOS)
         run: |
@@ -161,8 +156,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ github.ref_name }}  # Corrigido: usa apenas o nome da branch/tag
+          release_name: Release ${{ github.ref_name }}  # Corrigido: usa apenas o nome da branch/tag
           draft: false
           prerelease: false
 
