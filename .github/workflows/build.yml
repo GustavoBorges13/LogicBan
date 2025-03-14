@@ -122,11 +122,11 @@ jobs:
           # Recriar o pacote .deb com o arquivo control modificado
           dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_1.0.0_amd64.deb
 
-      - name: Upload cleaned Debian artifact
+      - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
           name: logicban-linux-deb
-          path: ./jpackage-output/logicban_1.0.0_amd64.deb
+          path: ./jpackage-output/*.deb
 
   build-macos:
     runs-on: macos-latest
