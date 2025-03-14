@@ -103,6 +103,10 @@ jobs:
         run: |
           rm -rf ./jpackage-output
           mkdir -p ./jpackage-output
+          
+      - name: Verify jars targets
+        run: |
+          ls -lh target/*.jar
 
       - name: Package with jpackage (Linux)
         run: |
