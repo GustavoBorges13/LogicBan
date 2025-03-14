@@ -71,25 +71,26 @@ jobs:
           wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
           chmod +x appimagetool
 
-      - name: Clean up space
+      - name: Clean jpackage output directory
         run: |
-            sudo apt-get clean
-            sudo rm -rf /usr/local/lib/android # Exemplo: remover SDK Android se não for necessário
-            sudo rm -rf /usr/share/dotnet      # Exemplo: remover .NET SDK se não for necessário
-            df -h                              # Verificar o espaço livre
+          rm -rf ./jpackage-output
+          mkdir -p ./jpackage-output
+          
+      - name: Verify JAR file
+        run: ls -lh target/logicban-1.0.0.jar
 
       - name: Package with jpackage (Linux)
         run: |
             jpackage --type app-image \
-                    --input target \
-                    --main-jar logicban-1.0.0.jar \
-                    --main-class br.ufcat.logicban.ui.Main \
-                    --dest target/jpackage \
-                    --app-version 1.0.0 \
-                    --name LogicBan \
-                    --vendor "Bug Hunters" \
-                    --copyright "Copyright (C) 2025" \
-                    --icon src/resources/assets/logos/icone.png \
+             --input target \
+             --main-jar logicban-1.0.0.jar \
+             --main-class br.ufcat.logicban.ui.Main \
+             --dest ./jpackage-output \  # Alterado para um diretório fora de "target"
+             --app-version 1.0.0 \
+             --name LogicBan \
+             --vendor "Bug Hunters" \
+             --copyright "Copyright (C) 2025" \
+             --icon src/resources/assets/logos/icone.png
 
       - name: Convert to AppImage
         run: |
