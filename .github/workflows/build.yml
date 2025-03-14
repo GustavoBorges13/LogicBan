@@ -96,15 +96,18 @@ jobs:
                    --name LogicBan \
                    --vendor "Bug Hunters" \
                    --copyright "Copyright (C) 2025" \
-                   --icon src/resources/assets/logos/icone.png \
-                   --linux-menu-group "Utility;" \
-                   --linux-shortcut \
-                   --linux-app-category "Utility" \
-                   --linux-package-name "logicban" \
-                   --linux-deb-maintainer "ggustavo.borges13@exemplo.com" \
-                   --linux-package-deps "default-jre" \
-                   --linux-rpm-license-type "GPLv3" \
-                   --linux-app-release "1"
+                   --icon src/resources/assets/logos/icone.png 
+
+      - name: Create .desktop file
+        run: |
+          cat <<EOF > ./jpackage-output/LogicBan/LogicBan.desktop
+          [Desktop Entry]
+          Name=LogicBan
+          Exec=LogicBan
+          Icon=icone
+          Type=Application
+          Categories=Utility;Application;
+          EOF
 
       - name: Verify jpackage output
         run: ls -lh ./jpackage-output/LogicBan
