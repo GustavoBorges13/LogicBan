@@ -18,16 +18,8 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Cache Maven dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-${{ runner.os }}-
-
       - name: Build with Maven
-        run: mvn -q package -DincludeScope=compile
+        run: mvn -q package
 
       - name: Package with jpackage (Windows)
         shell: pwsh
@@ -152,12 +144,9 @@ jobs:
 
   upload-release:
     runs-on: ubuntu-latest
-    permissions: 
-      contents: read  # Permissões de leitura de conteúdo (para baixar artefatos, por exemplo)
-      #issues: write  # Permissões para criar issues, caso necessário
-      pull-requests: write  # pull requests
-      deployments: write  # deploys
-      actions: write   # Permite ações como upload de ativos para o release
+    permissions:
+      contents: write  # Permissão para criar releases e fazer upload de ativos
+      actions: read    # Permissão para acessar os artefatos
 
     needs: [build-windows, build-linux, build-macos]
     steps:
