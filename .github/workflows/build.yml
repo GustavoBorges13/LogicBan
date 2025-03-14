@@ -30,9 +30,9 @@ jobs:
 
       - name: Read Version from pom.xml
         id: project_version
-        shell: pwsh  # Especifica o shell como PowerShell
+        shell: pwsh
         run: |
-          $VERSION = (mvn org.codehaus.mojo:exec-maven-plugin:1.6.0:exec -Dexec.executable="echo" -Dexec.args='${project.version}' -q --non-recursive)
+          $VERSION = (mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "version=$VERSION" >> $env:GITHUB_OUTPUT
 
       - name: Build with Maven
