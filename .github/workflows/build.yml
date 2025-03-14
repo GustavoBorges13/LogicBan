@@ -1,105 +1,115 @@
-name: Build Installers
+name: Build and Package
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
 
 jobs:
-  build-linux-installer:
-    name: Build Installer on Linux
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 23
-
-      - name: Build with Maven
-        run: |
-          mvn clean package
-
-      - name: List target directory (debug)
-        run: |
-          ls -l ./target
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y fakeroot dpkg
-
-      - name: Package with jpackage (Linux)
-        run: |
-          mkdir -p ./dist
-          jpackage --input ./target \
-                   --main-jar logicban-1.0.0-jar-with-dependencies.jar \
-                   --main-class br.ufcat.logicban.ui.Main \
-                   --dest ./dist \
-                   --name LogicBan \
-                   --app-version 1.0.0 \
-                   --vendor "Bug Hunters" \
-                   --copyright "Copyright (C) 2025" \
-                   --linux-package-name logicban \
-                   --linux-shortcut
-
-      - name: List dist directory (debug)
-        run: |
-          ls -l ./dist
-
-      - name: Upload Linux installer
-        uses: actions/upload-artifact@v4
-        with:
-          path: ./dist/logicban_1.0.0_amd64.deb
-          name: linux-installer
-
-  build-windows-installer:
-    name: Build Installer on Windows
+  build-windows:
     runs-on: windows-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Setup JDK
-        uses: actions/setup-java@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
+          java-version: '23'
           distribution: 'temurin'
-          java-version: 23
 
       - name: Build with Maven
-        run: |
-          mvn clean package
-
-      - name: List target directory (debug)
-        shell: pwsh
-        run: |
-          ls ./target
+        run: mvn package
 
       - name: Package with jpackage (Windows)
-        shell: pwsh
         run: |
-          jpackage --input ./target `
-                   --main-jar logicban-1.0.0-jar-with-dependencies.jar `
-                   --main-class br.ufcat.logicban.ui.Main `
-                   --dest ./dist `
-                   --name LogicBan `
-                   --app-version 1.0.0 `
-                   --vendor "Bug Hunters" `
-                   --copyright "Copyright (C) 2025" `
-                   --win-menu `
-                   --win-shortcut
+          jpackage --type exe ^
+                   --input target ^
+                   --main-jar logicban-1.0.0.jar ^
+                   --main-class br.ufcat.logicban.ui.Main ^
+                   --dest target/jpackage ^
+                   --app-version 1.0.0 ^
+                   --name LogicBan ^
+                   --vendor "Bug Hunters" ^
+                   --copyright "Copyright (C) 2025" ^
+                   --icon src/resources/assets/logos/icone.ico ^
+                   --win-menu ^
+                   --win-shortcut ^
+                   --win-per-user-install ^
+                   --win-about-url "https://github.com/GustavoBorges13/LogicBan" ^
+                   --win-help-url "https://github.com/GustavoBorges13/LogicBan/wiki/Tutorial-%E2%80%90-Como-jogar ^
+                   --win-update-url "https://github.com/GustavoBorges13/LogicBan/releases/latest"
 
-      - name: List dist directory (debug)
-        shell: pwsh
-        run: |
-          ls ./dist
-
-      - name: Upload Windows installer
+      - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
-          path: ./dist/LogicBan-1.0.0.exe
-          name: windows-installer
+          name: logicban-windows
+          path: target/jpackage/*.exe
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '23'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: mvn package
+
+      - name: Package with jpackage (Linux)
+        run: |
+          jpackage --type deb \
+                   --input target \
+                   --main-jar logicban-1.0.0.jar \
+                   --main-class br.ufcat.logicban.ui.Main \
+                   --dest target/jpackage \
+                   --app-version 1.0.0 \
+                   --name LogicBan \
+                   --vendor "Bug Hunters" \
+                   --copyright "Copyright (C) 2025" \
+                   --icon src/resources/assets/logos/icone.ico
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: logicban-linux
+          path: target/jpackage/*.deb
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '23'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: mvn package
+
+      - name: Package with jpackage (macOS)
+        run: |
+          jpackage --type dmg \
+                   --input target \
+                   --main-jar logicban-1.0.0.jar \
+                   --main-class br.ufcat.logicban.ui.Main \
+                   --dest target/jpackage \
+                   --app-version 1.0.0 \
+                   --name LogicBan \
+                   --vendor "Bug Hunters" \
+                   --copyright "Copyright (C) 2025" \
+                   --icon src/resources/assets/logos/icone.ico
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: logicban-macos
+          path: target/jpackage/*.dmg
