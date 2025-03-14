@@ -47,38 +47,52 @@ jobs:
           path: target/jpackage/*.exe
 
   build-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Build with Maven
-        run: mvn package
-
-      - name: Package with jpackage (Linux)
-        run: |
-          jpackage --type deb \
-                   --input target \
-                   --main-jar logicban-1.0.0.jar \
-                   --main-class br.ufcat.logicban.ui.Main \
-                   --dest target/jpackage \
-                   --app-version 1.0.0 \
-                   --name LogicBan \
-                   --vendor "Bug Hunters" \
-                   --copyright "Copyright (C) 2025" \
-                   --icon src/resources/assets/logos/icone.ico
-
-      - name: Upload Linux artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: logicban-linux
-          path: target/jpackage/*.deb
+            runs-on: ubuntu-latest
+            steps:
+              - name: Checkout code
+                uses: actions/checkout@v3
+        
+              - name: Set up JDK
+                uses: actions/setup-java@v3
+                with:
+                  java-version: '21'
+                  distribution: 'temurin'
+        
+              - name: Build with Maven
+                run: mvn package
+        
+              - name: Install dependencies for AppImage
+                run: |
+                  sudo apt-get update
+                  sudo apt-get install -y fuse libfuse2 wget
+        
+              - name: Download appimagetool
+                run: |
+                  wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+                  chmod +x appimagetool
+        
+              - name: Package with jpackage (Linux)
+                run: |
+                  jpackage --type app-image \
+                           --input target \
+                           --main-jar logicban-1.0.0.jar \
+                           --main-class br.ufcat.logicban.ui.Main \
+                           --dest target/jpackage \
+                           --app-version 1.0.0 \
+                           --name LogicBan \
+                           --vendor "Bug Hunters" \
+                           --copyright "Copyright (C) 2025" \
+                           --icon src/resources/assets/logos/icone.ico
+        
+              - name: Convert to AppImage
+                run: |
+                  ./appimagetool target/jpackage/LogicBan
+        
+              - name: Upload Linux artifact
+                uses: actions/upload-artifact@v4
+                with:
+                  name: logicban-linux
+                  path: LogicBan-x86_64.AppImage
 
   build-macos:
     runs-on: macos-latest
