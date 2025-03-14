@@ -28,23 +28,6 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-
 
-      - name: Set JAVA_HOME
-        shell: pwsh
-        run: |
-          Write-Host "JAVA_HOME: $env:JAVA_HOME"
-          if (-not $env:JAVA_HOME) {
-            Write-Host "JAVA_HOME não está definido. Definindo..."
-            $env:JAVA_HOME = $env:JAVA_HOME_23_X64
-            Write-Host "JAVA_HOME agora: $env:JAVA_HOME"
-          }
-
-      - name: Add Maven to PATH
-        shell: pwsh
-        run: |
-          Write-Host "PATH antes: $env:PATH"
-          $env:PATH = "$env:PATH;C:\Maven SDK\apache-maven-3.9.9\bin" # Substitua pelo caminho correto
-          Write-Host "PATH depois: $env:PATH"
-
       - name: Read Version from pom.xml
         id: project_version
         shell: pwsh
@@ -86,6 +69,8 @@ jobs:
         with:
           name: logicban-windows
           path: target/jpackage/*.exe
+    outputs:
+      version: ${{ steps.project_version.outputs.version }}
 
   build-linux:
     runs-on: ubuntu-latest
@@ -112,8 +97,10 @@ jobs:
       - name: Read Version from pom.xml
         id: project_version
         run: |
-          VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
-          echo "::set-output name=version::$VERSION"
+          # Extrai a versão do pom.xml usando um comando XML
+          [xml]$pom = Get-Content pom.xml
+          $VERSION = $pom.project.version
+          echo "version=$VERSION" >> $env:GITHUB_OUTPUT
 
       - name: Build with Maven
         run: mvn -q package -DincludeScope=compile
@@ -170,6 +157,8 @@ jobs:
         with:
           name: logicban-linux-deb
           path: ./jpackage-output/*.deb
+    outputs:
+      version: ${{ steps.project_version.outputs.version }}
 
   build-macos:
     runs-on: macos-latest
@@ -196,8 +185,10 @@ jobs:
       - name: Read Version from pom.xml
         id: project_version
         run: |
-          VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
-          echo "::set-output name=version::$VERSION"
+          # Extrai a versão do pom.xml usando um comando XML
+          [xml]$pom = Get-Content pom.xml
+          $VERSION = $pom.project.version
+          echo "version=$VERSION" >> $env:GITHUB_OUTPUT
 
       - name: Build with Maven
         run: mvn package
@@ -221,6 +212,8 @@ jobs:
         with:
           name: logicban-macos
           path: target/jpackage/*.dmg
+    outputs:
+      version: ${{ steps.project_version.outputs.version }}
 
   upload-release:
     runs-on: ubuntu-latest
