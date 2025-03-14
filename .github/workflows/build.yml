@@ -104,11 +104,8 @@ jobs:
         run: ls -lh ./jpackage-output/LogicBan
 
       - name: Verify logicban bin
-        run: ls -lh ./jpackage-output/LogicBan/bin/logicBan
-
-      - name: Verify logicban tree
-        run: tree ./jpackage-output/LogicBan/bin/logicBan
-
+        run: ls -R ./jpackage-output/LogicBan
+        
       - name: Convert to AppImage
         run: |
           ./appimagetool ./jpackage-output/LogicBan
