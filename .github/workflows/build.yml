@@ -153,8 +153,8 @@ jobs:
         run: |
           # Extraindo o conteúdo do pacote .deb
           version="${{ steps.project_version.outputs.version }}"
-          dpkg-deb -x ./jpackage-output/LogicBan_${version}_amd64.deb /tmp/logicban
-          dpkg-deb -e ./jpackage-output/LogicBan_${version}_amd64.deb /tmp/logicban/DEBIAN
+          dpkg-deb -x ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban
+          dpkg-deb -e ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban/DEBIAN
 
           # Removendo as dependências desnecessárias do arquivo control
           sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
@@ -165,7 +165,7 @@ jobs:
           sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
 
           # Recriar o pacote .deb com o arquivo control modificado
-          dpkg-deb -b /tmp/logicban ./jpackage-output/LogicBan_${version}_amd64.deb
+          dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_${version}_amd64.deb
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
@@ -260,13 +260,13 @@ jobs:
       - name: Verify Linux artifact
         run: |
           if [ ! -f "./artifacts/logicban-linux-deb/logicban_${{ needs.build-windows.outputs.version }}_amd64.deb" ]; then
-            echo "Arquivo LogicBan_${{ needs.build-windows.outputs.version }}_amd64.deb não encontrado!"
+            echo "Arquivo logicban_${{ needs.build-windows.outputs.version }}_amd64.deb não encontrado!"
             exit 1
           fi
 
       - name: Verify macOS artifact
         run: |
-          if [ ! -f "./artifacts/logicban-macos/target/jpackage/logicban_${{ needs.build-windows.outputs.version }}.dmg" ]; then
+          if [ ! -f "./artifacts/logicban-macos/target/jpackage/LogicBan-${{ needs.build-windows.outputs.version }}.dmg" ]; then
             echo "Arquivo LogicBan-${{ needs.build-windows.outputs.version }}.dmg não encontrado!"
             exit 1
           fi
@@ -308,6 +308,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-macos/target/jpackage/logicban-${{ needs.build-windows.outputs.version }}.dmg
+          asset_path: ./artifacts/logicban-macos/target/jpackage/LogicBan-${{ needs.build-windows.outputs.version }}.dmg
           asset_name: LogicBan-macOS.dmg
           asset_content_type: application/octet-stream
