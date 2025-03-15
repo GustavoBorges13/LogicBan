@@ -1,5 +1,6 @@
 package br.ufcat.logicban.ui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -58,7 +59,7 @@ public class GamePanel extends JPanel implements Runnable {
 
 	// SYSTEM
 	TileManager tileM = new TileManager(this);
-	KeyHandler keyH = new KeyHandler(this);
+	public KeyHandler keyH = new KeyHandler(this);
 	public Sound music = new Sound();
 	public Sound sfx = new Sound();
 	public CollisionChecker cChecker = new CollisionChecker(this);
@@ -82,6 +83,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public InteractiveTile iTile[][] = new InteractiveTile[maxMap][10];
 	ArrayList<Entity> entityList = new ArrayList<>();
 	ParticleManager particleManager = new ParticleManager(this);; // Instância do ParticleManager
+	public Entity wire[][] = new Entity[maxMap][30];
 
 	// public ArrayList<Box> boxes = new ArrayList<>();
 
@@ -114,10 +116,10 @@ public class GamePanel extends JPanel implements Runnable {
 
 	public void setupGame() {
 
-		eHandler.playerNewGamePosition();
 		aSetter.setObject();
 		aSetter.setNPC();
 		aSetter.setInteractiveTile();
+		aSetter.setObjectsAndConnections();
 
 		// fase_atual = fase1;
 		gameState = titleState;
@@ -145,6 +147,7 @@ public class GamePanel extends JPanel implements Runnable {
 		aSetter.setObject();
 		aSetter.setNPC();
 		aSetter.setInteractiveTile();
+		aSetter.setObjectsAndConnections();
 	}
 
 	public void setFullScreen() {
@@ -243,6 +246,13 @@ public class GamePanel extends JPanel implements Runnable {
 					iTile[currentMap][i].update();
 				}
 			}
+
+			// wire tiles
+			for (int i = 0; i < wire[1].length; i++) {
+				if (wire[currentMap][i] != null) {
+					wire[currentMap][i].update();
+				}
+			}
 		}
 		if (gameState == pauseState) {
 			// nothing
@@ -278,6 +288,13 @@ public class GamePanel extends JPanel implements Runnable {
 				}
 			}
 
+			// ADD WIRES TO THE LIST
+			for (int i = 0; i < wire[1].length; i++) {
+				if (wire[currentMap][i] != null) {
+					entityList.add(wire[currentMap][i]);
+				}
+			}
+
 			// ADD ENTITIES TO THE LIST
 			entityList.add(player);
 
@@ -294,11 +311,12 @@ public class GamePanel extends JPanel implements Runnable {
 
 			// SORT
 			Collections.sort(entityList, new Comparator<Entity>() {
-
 				@Override
 				public int compare(Entity e1, Entity e2) {
-					int result = Integer.compare(e1.worldY, e2.worldY);
-					return result;
+					int e1BottomY = e1.worldY + e1.solidArea.height; // Supondo que tileSize seja a altura da entidade
+					int e2BottomY = e2.worldY + e2.solidArea.height;
+
+					return Integer.compare(e1BottomY, e2BottomY);
 				}
 			});
 
@@ -320,7 +338,7 @@ public class GamePanel extends JPanel implements Runnable {
 		if (keyH.showDebug == true) {
 			long drawEnd = System.nanoTime();
 			long passed = drawEnd - drawStart;
-			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 45F));
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 40F));
 			g2.setColor(Color.white);
 			int x = 10;
 			int y = screenHeight - (tileSize * 5);
@@ -340,19 +358,65 @@ public class GamePanel extends JPanel implements Runnable {
 			g2.drawString("FPS: " + drawCount, x, y);
 
 			// lado direito
-			x = screenWidth - tileSize * 6;
+			x = screenWidth - tileSize * 7;
 			y = screenHeight - (tileSize * 10);
 			lineHeigth = 40;
 
 			// Create a plate list
 			for (int i = 0; i < iTile[1].length; i++) {
+
 				if (iTile[currentMap][i] != null && iTile[currentMap][i].name != null
 						&& iTile[currentMap][i].name.equals(IT_MetalPlate.itName)) {
-					g2.drawString("Placa [" + i + "]: " + iTile[currentMap][i].estadoLogico, x, y);
+					
+					g2.drawString(i+"",iTile[currentMap][i].worldX+15,iTile[currentMap][i].worldY); // desenha numeros em cima das placas
+					
+					// outros debugs da placa
+					g2.drawString("Placa [" + i + "]: " + iTile[currentMap][i].estadoLogico + " caixa", x - 150, y); // verifica se tem caixa em cima da placa
 					y += lineHeigth;
+					if (iTile[currentMap][i].placaConectada == true) {
+						g2.drawString("Placa [" + i + "]: Fio "+wire[currentMap][i].name+" conectado", x - 150, y); // verifica se cabo ta conectado com a placa
+						y += lineHeigth;
+					}else {
+						g2.drawString("Placa [" + i + "]: Sem Fio conectado", x - 150, y); // verifica se cabo ta conectado com a placa
+						y += lineHeigth;
+					}
 				}
-
 			}
+
+
+//			// Adiciona o código de debug para os fios
+//			int wireSetIdToDebug = 0; // Defina qual wireSetId você quer debugar
+//			
+//			int xDistance;
+//			int yDistance;
+//			int distance;
+//			ArrayList<InteractiveTile> plateList = new ArrayList<InteractiveTile>();
+//			
+//			// Cria uma lista de placas
+//			for (int i = 0; i < iTile[1].length; i++) {
+//
+//				if (iTile[currentMap][i] != null && 
+//						iTile[currentMap][i].name != null && 
+//						iTile[currentMap][i].name.equals(IT_MetalPlate.itName)) {
+//					plateList.add(iTile[currentMap][i]);
+//				}
+//			}
+
+//			for (int i = 0; i < plateList.size(); i++) {
+//				g2.setColor(Color.black);
+//				g2.setStroke(new BasicStroke(4));
+//
+//				xDistance = Math.abs(wire[currentMap][i].worldX - plateList.get(i).worldX);
+//				yDistance = Math.abs(wire[currentMap][i].worldY - plateList.get(i).worldY);
+//				distance = Math.max(xDistance, yDistance);
+//				//System.out.println("distance "+distance);
+//				// Desenha o retângulo
+//				g2.drawRect(plateList.get(i).worldX, plateList.get(i).worldY, plateList.get(i).solidArea.height,	plateList.get(i).solidArea.width);
+//
+//			}
+
+			// System.out.println("HEAD: "+wire[currentMap][0]+" TAIL:
+			// "+wire[currentMap][wire.length]);
 		}
 	}
 
@@ -386,6 +450,7 @@ public class GamePanel extends JPanel implements Runnable {
 
 	public void changeArea() {
 		// Garante que proxima_fase está atualizado
+		player.speedMultiplicator = 0;
 		proxima_fase = faseMap[currentMap];
 
 		if (proxima_fase != fase_atual) {

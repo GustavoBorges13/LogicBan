@@ -272,7 +272,6 @@ public class KeyHandler implements KeyListener {
 					gp.currentMap = 0;
 					gp.highestUnlockedFase = 0; // Reset para fase inicial
 					gp.saveLoad.save();
-					gp.restart();
 					gp.stopMusic();
 					gp.playMusic(0);
 				} else {
@@ -286,11 +285,10 @@ public class KeyHandler implements KeyListener {
 							// Força atualização imediata
 							gp.proxima_fase = gp.faseMap[gp.currentMap];
 							gp.fase_atual = gp.currentMap;
-
-							gp.eHandler.playerNewGamePosition();
+							
 							gp.player.setDefaultValues();
-
 							gp.changeArea();
+							gp.eHandler.playerNewGamePosition();
 						}
 					}
 				}
@@ -454,7 +452,7 @@ public class KeyHandler implements KeyListener {
 		}
 		if (code == KeyEvent.VK_ENTER) {
 			enterPressed = true;
-
+//			gp.restart();
 		}
 
 		int maxCommandNum = 0;

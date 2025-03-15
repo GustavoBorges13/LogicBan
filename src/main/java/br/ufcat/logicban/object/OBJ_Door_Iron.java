@@ -17,9 +17,9 @@ public class OBJ_Door_Iron extends Entity {
 		collision = true;
 
 		solidArea.x = 0;
-		solidArea.y = 16 - 12;
+		solidArea.y = 0;
 		solidArea.width = 48;
-		solidArea.height = 38 + 4;
+		solidArea.height = 48;
 		solidAreaDefaultX = solidArea.x;
 		solidAreaDefaultY = solidArea.y;
 		color = Color.red;
