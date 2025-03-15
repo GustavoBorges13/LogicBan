@@ -11,7 +11,8 @@ public class Player extends Entity {
 	public int hasKey;
 	int standCounter;
 	public String walkType = "Smooth-Walk";
-	public int speedAux;
+	public int speedAux = 3;
+	public int speedMultiplicator = 0;
 	
 	//flags
 	public boolean allRocksOn = false;
@@ -43,8 +44,7 @@ public class Player extends Entity {
 		hasKey = 0;
 		worldX = gp.eHandler.newWorldX;
 		worldY = gp.eHandler.newWorldY;
-		speed = 3; // movimento de 48 pixels por vez
-		speedAux = speed;
+		speed = gp.eHandler.oldSpeed; // movimento de 48 pixels por vez
 		direction = "down";
 		color = Color.magenta;
 	}
@@ -65,7 +65,6 @@ public class Player extends Entity {
 	public void update() {
 	
 		if (walkType.equals("Smooth-Walk")) {
-			speed = speedAux;
 			if (keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true
 					|| keyH.rightPressed == true) {
 				if (keyH.upPressed == true) {
@@ -97,8 +96,11 @@ public class Player extends Entity {
 				// CHECK INTERACTIVE TILE COLISION
 				gp.cChecker.checkEntity(this, gp.iTile);
 
+				
 				// CHECK EVENT
 				gp.eHandler.checkEvent();
+				
+				
 
 				// IF COLLISION IS FALSE, PLAYER CAN MOVE
 				if (collisionOn == false) {
@@ -233,10 +235,11 @@ public class Player extends Entity {
 				}
 				break;
 			case "Boots":
+
 				gp.playSFX(2);
 				if (walkType.equals("Smooth-Walk")) {
+					speedMultiplicator += 1;
 					speed += 2;
-					speedAux = speed;
 					// gp.eHandler.teleport(1, 3,8);
 				} else {
 					speed = gp.tileSize;

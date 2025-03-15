@@ -15,7 +15,7 @@ public class EventHandler {
 	boolean canTouchEvent = true;
 	public int tempMap, tempCol, tempRow;
 	public boolean outTile = false;
-	public int newWorldX, newWorldY, newSpeed;
+	public int newWorldX, newWorldY, oldSpeed = 3;
 	public static boolean debugModeOn = false;
 	private ArrayList<TeleportEvent> teleportEvents = new ArrayList<>();
 
@@ -46,11 +46,7 @@ public class EventHandler {
 		teleportEvents.add(new TeleportEvent(0, 29, 6, "right", 1, 2, 2, "right")); // fase1 -> fase2
 		teleportEvents.add(new TeleportEvent(0, 29, 7, "right", 1, 2, 2, "right"));
 		teleportEvents.add(new TeleportEvent(0, 29, 8, "right", 1, 2, 2, "right"));
-
-		teleportEvents.add(new TeleportEvent(1, 0, 1, "left", 0, 28, 7, "left")); // fase2 -> fase1
-		teleportEvents.add(new TeleportEvent(1, 0, 2, "left", 0, 28, 7, "left"));
-		teleportEvents.add(new TeleportEvent(1, 0, 3, "left", 0, 28, 7, "left"));
-
+		
 		teleportEvents.add(new TeleportEvent(1, 1, 15, "down", 2, 1, 0, "down")); // fase2 -> fase3
 		teleportEvents.add(new TeleportEvent(1, 2, 15, "down", 2, 1, 0, "down"));
 		teleportEvents.add(new TeleportEvent(1, 3, 15, "down", 2, 1, 0, "down"));
@@ -64,9 +60,14 @@ public class EventHandler {
 	}
 
 	public void playerNewGamePosition() {
-		newWorldX = gp.tileSize * 4;
-		newWorldY = gp.tileSize * 2;
-		newSpeed = gp.player.speedAux;
+		switch(gp.currentMap) {
+		case 0: newWorldX = gp.tileSize * 4; newWorldY = gp.tileSize * 2; break;
+		case 1: newWorldX = gp.tileSize * 2; newWorldY = gp.tileSize * 2; break;
+		case 2: newWorldX = gp.tileSize * 1; newWorldY = gp.tileSize * 0; break;
+		case 3: newWorldX = gp.tileSize * 11; newWorldY = gp.tileSize * 10; break;
+		}
+		oldSpeed = gp.player.speed - (2*gp.player.speedMultiplicator);
+		gp.player.speedMultiplicator = 0;
 	}
 
 	public void checkEvent() {

@@ -1012,7 +1012,6 @@ public class UI {
 				gp.ui.titleScreenState = 0;
 				gp.stopMusic();
 				gp.playMusic(5);
-
 				gp.restart();
 			}
 		}

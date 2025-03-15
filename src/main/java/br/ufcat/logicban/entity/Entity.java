@@ -39,11 +39,19 @@ public class Entity {
 	// NPC
 	public int actionLockCounter = 0;
 
+	// WIRES
+    public int wireSetId;       // Identificador do conjunto de fios
+    public boolean isHead = false;      // Indica se é a "cabeça" do fio
+    public boolean isTail = false;      // Indica se é a "cauda" do fio
+    
+    
 	// TYPE
 	public int type; // 0 = player, 1 = npc, 2 = monster
 	public final int type_player = 0;
 	public final int type_npc = 0;
 	public final int type_pickaxe = 0;
+	
+	
 
 	// Debug
 	public static boolean debugModeOn = false;
@@ -65,7 +73,7 @@ public class Entity {
 		gp.cChecker.checkObject(this, false);
 		gp.cChecker.checkPlayer(this);
 		gp.cChecker.checkEntity(this, gp.npc);
-		//gp.cChecker.checkEntity(this, gp.iTile);
+		//gp.cChecker.checkEntity(this, gp.wire);
 		// boolean contactPlayer = gp.cChecker.checkPlayer(this);
 
 		// gp.cChecker.checkEntity(this, gp.monster);
@@ -163,18 +171,20 @@ public class Entity {
 			g2.setColor(color);
 			g2.setStroke(new BasicStroke(2));
 			g2.drawRect(worldX + solidArea.x, worldY + solidArea.y, solidArea.width, solidArea.height);
-			if (solidArea.width == 0 && solidArea.height == 0) {
+			if (solidArea.width == 0 && solidArea.height == 0 && name.equals("Metal Plate")) {
 			    int x = worldX + solidArea.x + 3;
 			    int y = worldY + solidArea.y + 3;
 			    int size = gp.tileSize - 6; // Ajuste do tamanho
 
 			    // Desenha o retângulo
-			    g2.drawRect(x, y, size, size);
+			    g2.drawRect(x-25, y-25, size, size);
 
 			    // Desenha um "X" dentro do retângulo
-			    g2.drawLine(x, y, x + size, y + size); // Linha diagonal \
-			    g2.drawLine(x + size, y, x, y + size); // Linha diagonal /
+			    g2.drawLine(x-25, y-25, x + size-25, y + size-25); // Linha diagonal \
+			    g2.drawLine(x + size-25, y-25, x-25, y + size-25); // Linha diagonal /
 			}
+			
+
 
 		}
 	}

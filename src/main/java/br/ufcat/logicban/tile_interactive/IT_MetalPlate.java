@@ -21,8 +21,8 @@ public class IT_MetalPlate extends InteractiveTile{
 		down1 = setup("/assets/tiles_interactive/metalplate", gp.tileSize, gp.tileSize);
 		//destructible = true;
 		
-		solidArea.x = 0;
-		solidArea.y = 0;
+		solidArea.x = 25;
+		solidArea.y = 25;
 		solidArea.width = 0;
 		solidArea.height = 0;
 		solidAreaDefaultX = solidArea.x;
