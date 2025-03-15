@@ -49,9 +49,7 @@ jobs:
         id: project_version
         shell: pwsh
         run: |
-          # Extrai a versão do pom.xml usando um comando XML
-          [xml]$pom = Get-Content pom.xml
-          $VERSION = $pom.project.version
+          $VERSION = mvn help:evaluate -Dexpression=project.version -q -DforceStdout
           echo "version=$VERSION" >> $env:GITHUB_OUTPUT
 
       - name: Build with Maven
@@ -63,7 +61,7 @@ jobs:
           $version = "${{ steps.project_version.outputs.version }}"
           jpackage --type exe `
                    --input target `
-                   --main-jar "logicban-$version-jar-with-dependencies.jar" `
+                   --main-jar "logicban-${{ steps.project_version.outputs.version }}-jar-with-dependencies.jar"  `
                    --main-class br.ufcat.logicban.ui.Main `
                    --dest target/jpackage `
                    --app-version $version `
@@ -134,7 +132,7 @@ jobs:
           version="${{ steps.project_version.outputs.version }}"
           jpackage --type deb \
              --input target \
-             --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
+             --main-jar "logicban-${{ steps.project_version.outputs.version }}-jar-with-dependencies.jar"  \
              --main-class br.ufcat.logicban.ui.Main \
              --dest ./jpackage-output \
              --app-version "$version" \
@@ -211,7 +209,7 @@ jobs:
           version="${{ steps.project_version.outputs.version }}"
           jpackage --type dmg \
              --input target \
-             --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
+             --main-jar "logicban-${{ steps.project_version.outputs.version }}-jar-with-dependencies.jar"  \
              --main-class br.ufcat.logicban.ui.Main \
              --dest target/jpackage \
              --app-version "$version" \

@@ -82,7 +82,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public InteractiveTile iTile[][] = new InteractiveTile[maxMap][10];
 	ArrayList<Entity> entityList = new ArrayList<>();
 	ParticleManager particleManager = new ParticleManager(this);; // Instância do ParticleManager
-	public Entity wire[][] = new Entity[maxMap][30];
+	public Entity wire[][] = new Entity[maxMap][70];
 
 	// public ArrayList<Box> boxes = new ArrayList<>();
 
@@ -112,6 +112,12 @@ public class GamePanel extends JPanel implements Runnable {
 
 		// Habilite aceleração de hardware:
 	}
+	
+	public void removeTest() {
+
+		
+
+	}
 
 	public void setupGame() {
 
@@ -140,7 +146,9 @@ public class GamePanel extends JPanel implements Runnable {
 
 		proxima_fase = faseMap[currentMap];
 		fase_atual = currentMap;
-
+		for (int i = 0; i < wire[1].length; i++) {
+			entityList.remove(wire[currentMap][i]);
+		}
 		eHandler.playerNewGamePosition();
 		player.setDefaultValues();
 		aSetter.setObject();

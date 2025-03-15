@@ -105,7 +105,23 @@ public class UpdateChecker {
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse("pom.xml");  // Nome do arquivo pom.xml
+
+            String pomXmlPath = System.getenv("POM_XML_PATH");
+            java.io.File pomFile;
+
+            if (pomXmlPath != null && !pomXmlPath.isEmpty()) {
+                System.out.println("Usando caminho do pom.xml da variável de ambiente: " + pomXmlPath);
+                pomFile = new java.io.File(pomXmlPath);
+            } else {
+                System.out.println("Variável de ambiente POM_XML_PATH não definida. Assumindo pom.xml no diretório raiz do projeto.");
+                pomFile = new java.io.File("pom.xml");
+            }
+
+            if (!pomFile.exists()) {
+                throw new Exception("pom.xml não encontrado em: " + pomFile.getAbsolutePath());
+            }
+
+            Document doc = dBuilder.parse(pomFile);
             doc.getDocumentElement().normalize();
 
             NodeList nList = doc.getElementsByTagName("version");
