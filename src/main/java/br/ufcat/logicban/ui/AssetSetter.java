@@ -3,6 +3,7 @@ package br.ufcat.logicban.ui;
 import java.awt.Color;
 
 import br.ufcat.logicban.entity.NPC_Box;
+import br.ufcat.logicban.entity.NPC_LogicalPort;
 import br.ufcat.logicban.entity.NPC_OldMan;
 import br.ufcat.logicban.entity.NPC_OldPlayer;
 import br.ufcat.logicban.object.OBJ_Boots;
@@ -93,6 +94,10 @@ public class AssetSetter {
 		gp.npc[mapNum][i].worldX = 7 * gp.tileSize;
 		gp.npc[mapNum][i].worldY = 3 * gp.tileSize;
 		i++;
+		gp.npc[mapNum][i] = new NPC_LogicalPort(gp, "and", "down");
+		gp.npc[mapNum][i].worldX = 10 * gp.tileSize;
+		gp.npc[mapNum][i].worldY = 4 * gp.tileSize;
+		i++;
 	}
 
 	public void setInteractiveTile() {
@@ -104,7 +109,7 @@ public class AssetSetter {
 		// gp.iTile[mapNum][i] = new IT_DryTree(gp, 9, 10);i++;
 		gp.iTile[mapNum][i] = new IT_MetalPlate(gp, 7, 5);
 		i++;
-		gp.iTile[mapNum][i] = new IT_MetalPlate(gp, 17, 4);
+		gp.iTile[mapNum][i] = new IT_MetalPlate(gp, 17, 2);
 		i++;
 		gp.iTile[mapNum][i] = new IT_MetalPlate(gp, 17, 6);
 		i++;
@@ -114,52 +119,98 @@ public class AssetSetter {
 	public void setObjectsAndConnections() {
 	    int mapNum = 1;
 	    int i = 0;
-	    int wireSet = 0; // Identificador do primeiro conjunto de fios
+	    String cor = "pink";
+	    // Primeiro conjunto de fios (rosa)
+	    // 								  gp | Coluna X | Linha Y | Imagem | Cor 
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 16, 6, "horizontal_up", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 6, "curve_left_down2", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 5, "vertical_right", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 4, "vertical_right", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 3, "vertical_right", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 2, "curve_right_up1", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 2, "horizontal_up", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 13, 2, "horizontal_up", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 2, "horizontal_up", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 11, 2, "horizontal_up", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 2, "curve_left_up1", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 3, "vertical_left", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 4, "vertical_left", cor); // debaixo da porta logica
+	    i++;
+	    
+	    cor = "red";
+	    // Primeiro conjunto de fios (vermelho)
+	    // 								  gp | Coluna X | Linha Y | Imagem | Cor 
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 8, 5, "horizontal_down", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 9, 5, "horizontal_down", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 5, "horizontal_down", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 11, 5, "curve_right_down1", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 11, 4, "vertical_right", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 11, 3, "curve_left_up3", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 3, "horizontal_down", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 13, 3, "curve_right_down1", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 13, 2, "curve_right_up1", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 2, "horizontal_up", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 11, 2, "horizontal_up", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 2, "curve_left_up1", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 3, "vertical_left", cor);
+	    i++;
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 4, "vertical_left", cor); // debaixo da porta logica
+	    i++;
 
-	    // Primeiro conjunto de fios
-	    gp.wire[mapNum][i] = new IT_RedWire(gp, 8, 5, "horizontal_down", wireSet); // Cabeça
-	    gp.wire[mapNum][i].solidArea.x = -10;
-	    gp.wire[mapNum][i].solidArea.y = 16;
-	    gp.wire[mapNum][i].solidArea.width = 20;
-	    gp.wire[mapNum][i].solidArea.height = 20;
-	    gp.wire[mapNum][i].solidAreaDefaultX =  gp.wire[mapNum][i].solidArea.x;
-	    gp.wire[mapNum][i].solidAreaDefaultY =  gp.wire[mapNum][i].solidArea.y;
-	    gp.wire[mapNum][i].color = Color.YELLOW;
-	    gp.wire[mapNum][i].isHead = true;
+	    cor = "green";
+	    // Primeiro conjunto de fios (vermelho)
+	    // 								  gp | Coluna X | Linha Y | Imagem | Cor 
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 16, 2, "horizontal_up", cor);
 	    i++;
-	    gp.wire[mapNum][i] = new IT_RedWire(gp, 9, 5, "horizontal_down", wireSet);
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 2, "horizontal_up", cor);
 	    i++;
-	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 5, "horizontal_down", wireSet);
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 2, "horizontal_up", cor);
 	    i++;
-	    gp.wire[mapNum][i] = new IT_RedWire(gp, 11, 5, "curve_right_down1", wireSet);
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 13, 2, "horizontal_up", cor);
 	    i++;
-	    gp.wire[mapNum][i] = new IT_RedWire(gp, 11, 4, "vertical_right", wireSet);
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 2, "horizontal_up", cor);
 	    i++;
-	    gp.wire[mapNum][i] = new IT_RedWire(gp, 11, 3, "curve_left_up2", wireSet);
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 11, 2, "horizontal_up", cor);
 	    i++;
-	    gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 3, "horizontal_down", wireSet);
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 2, "curve_left_up1", cor);
 	    i++;
-	    gp.wire[mapNum][i] = new IT_RedWire(gp, 13, 3, "curve_right_down1", wireSet);
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 3, "vertical_left", cor);
 	    i++;
-	    gp.wire[mapNum][i] = new IT_RedWire(gp, 13, 2, "curve_right_up1", wireSet);
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 4, "vertical_left", cor); // debaixo da porta logica
+	    
+	    
+	    // Fios da saida da porta AND
+	    cor = "black";
 	    i++;
-	    gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 2, "horizontal_up", wireSet);
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 5, "vertical_left", cor);
 	    i++;
-	    gp.wire[mapNum][i] = new IT_RedWire(gp, 11, 2, "horizontal_up", wireSet);
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 6, "vertical_left", cor);
 	    i++;
-	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 2, "curve_left_up1", wireSet);
-	    i++;
-	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 3, "vertical_left", wireSet); // Cauda
-	    gp.wire[mapNum][i].solidArea.x = 12;
-	    gp.wire[mapNum][i].solidArea.y = 36;
-	    gp.wire[mapNum][i].solidArea.width = 20;
-	    gp.wire[mapNum][i].solidArea.height = 20;
-	    gp.wire[mapNum][i].solidAreaDefaultX =  gp.wire[mapNum][i].solidArea.x;
-	    gp.wire[mapNum][i].solidAreaDefaultY =  gp.wire[mapNum][i].solidArea.y;
-	    gp.wire[mapNum][i].color = Color.black;
-	    gp.wire[mapNum][i].isTail = true;
-	    i++;
-
-	    // Se você tiver mais conjuntos de fios, incremente 'wireSet' e continue instanciando
+	    gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 7, "vertical_left", cor);
 	}
+	
 }

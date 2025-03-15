@@ -40,10 +40,10 @@ public class Entity {
 	public int actionLockCounter = 0;
 
 	// WIRES
-    public int wireSetId;       // Identificador do conjunto de fios
-    public boolean isHead = false;      // Indica se é a "cabeça" do fio
-    public boolean isTail = false;      // Indica se é a "cauda" do fio
-    
+//    public int wireSetId;       // Identificador do conjunto de fios
+//    public boolean isHead = false;      // Indica se é a "cabeça" do fio
+//    public boolean isTail = false;      // Indica se é a "cauda" do fio
+	public String tipo = "";
     
 	// TYPE
 	public int type; // 0 = player, 1 = npc, 2 = monster
