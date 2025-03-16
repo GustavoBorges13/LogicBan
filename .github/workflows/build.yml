@@ -103,7 +103,7 @@ jobs:
       - name: Read version from version.properties
         id: get_version
         run: |
-          VERSION=$(grep "version=" ./target/classes/version.properties | cut -d '=' -f 2)
+          VERSION=$(grep "version=" "$GITHUB_WORKSPACE/artifacts/target/classes/version.properties" | cut -d '=' -f 2)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Package with jpackage (Linux)
@@ -168,14 +168,14 @@ jobs:
       - name: Read version from version.properties
         id: get_version
         run: |
-          VERSION=$(grep "version=" ./target/classes/version.properties | cut -d '=' -f 2)
+          VERSION=$(grep "version=" "$GITHUB_WORKSPACE/artifacts/target/classes/version.properties" | cut -d '=' -f 2)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Package with jpackage (macOS)
         run: |
           jpackage --type dmg \
              --input target \
-             --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
+             --main-jar "LogicBan-${VERSION}-jar-with-dependencies.jar" \
              --main-class br.ufcat.logicban.ui.Main \
              --dest target/jpackage \
              --app-version "${VERSION}" \
