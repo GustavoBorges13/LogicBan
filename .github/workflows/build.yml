@@ -109,7 +109,7 @@ jobs:
       - name: Read version from version.properties
         id: get_version
         run: |
-          VERSION=$(sed -n 's/version=//p' ./artifacts/target/classes/version.properties)
+          VERSION=$(sed -n 's/version=//p' ./target/classes/version.properties)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
             
       - name: Print version
