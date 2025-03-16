@@ -98,12 +98,8 @@ jobs:
           VERSION=$(mvn org.codehaus.mojo:exec-maven-plugin:1.6.0:exec -Dexec.executable="echo" -Dexec.args='${project.version}' -q --non-recursive)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       - name: Build with Maven
-        run: mvn -q package -DincludeScope=compile
-        
-      - name: Clean jpackage output directory
-        run: |
-          rm -rf ./jpackage-output
-          mkdir -p ./jpackage-output
+        run: mvn package
+    
       - name: Verify jars targets
         run: |
           ls -lh target/*.jar
