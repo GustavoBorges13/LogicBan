@@ -199,12 +199,6 @@ jobs:
         run: |
           ls -lh ./artifacts
 
-      - name: Read version from version.properties
-        id: get_version
-        run: |
-          VERSION=$(sed -n 's/version=//p' ./artifacts/target/classes/version.properties)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
       - name: Verify downloaded artifacts
         run: |
             ls -lh ./artifacts/logicban-windows
