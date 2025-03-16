@@ -101,6 +101,13 @@ jobs:
         run: |
               ls -lh ./target/classes/
 
+      - name: Print version
+        run: |
+          echo "Version: $VERSION"
+      - name: Print version
+        run: |
+          cat ./target/classes/version.properties
+  
       - name: Read version from version.properties
         id: get_version
         run: |
