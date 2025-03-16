@@ -43,7 +43,8 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ steps.project_version.outputs.version }}"
-          jpackage --type exe `
+          jpackage --verbose `
+                   --type exe `
                    --input target `
                    --main-jar "LogicBan-$version-jar-with-dependencies.jar" `
                    --main-class br.ufcat.logicban.ui.Main `
@@ -57,7 +58,7 @@ jobs:
                    --win-per-user-install `
                    --win-help-url "https://github.com/GustavoBorges13/LogicBan/wiki/Tutorial-%E2%80%90-Como-jogar" `
                    --win-update-url "https://github.com/GustavoBorges13/LogicBan/releases/latest"
-      
+
       - name: Verify Windows artifact
         shell: pwsh
         run: |
@@ -120,12 +121,7 @@ jobs:
              --vendor "Bug Hunters" \
              --copyright "Copyright (C) 2025" \
              --icon src/resources/assets/logos/icone.png \
-             --linux-menu-group "Utility;" \
-             --linux-shortcut \
-             --linux-app-category "Utility" \
-             --linux-package-name "logicban" \
-             --linux-deb-maintainer "ggustavo.borges13@exemplo.com" \
-             --linux-rpm-license-type "GPLv3" 
+
       - name: Clean up dependencies in control file
         run: |
           # Extraindo o conteúdo do pacote .deb

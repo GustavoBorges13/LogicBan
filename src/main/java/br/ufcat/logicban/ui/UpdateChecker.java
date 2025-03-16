@@ -53,12 +53,35 @@ public class UpdateChecker {
 
 	private static String getVersionFromProperties() throws IOException {
 		Properties properties = new Properties();
-		try (InputStream input = UpdateChecker.class.getClassLoader().getResourceAsStream("app.properties")) {
+		InputStream input = null;
+		try {
+			System.out.println("Tentando carregar app.properties...");
+			input = UpdateChecker.class.getClassLoader().getResourceAsStream("app.properties");
 			if (input == null) {
+				System.err.println("app.properties NÃO encontrado!");
 				throw new IOException("app.properties não encontrado");
 			}
+			System.out.println("app.properties encontrado.");
 			properties.load(input);
-			return properties.getProperty("project.version");
+			System.out.println("app.properties carregado com sucesso.");
+			String version = properties.getProperty("project.version");
+			System.out.println("Versão lida do app.properties: " + version);
+			return version;
+		} catch (IOException e) {
+			System.err.println("Erro ao ler app.properties: " + e.getMessage());
+			throw e;
+		} catch (Exception e) {
+			System.err.println("Erro inesperado ao ler app.properties: " + e.getMessage());
+			throw new IOException("Erro inesperado ao ler app.properties", e);
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+					System.out.println("InputStream fechado.");
+				} catch (IOException e) {
+					System.err.println("Erro ao fechar InputStream: " + e.getMessage());
+				}
+			}
 		}
 	}
 
