@@ -34,7 +34,7 @@ jobs:
       - name: Package with jpackage (Windows)
         shell: pwsh
         run: |
-          $version = "${{ steps.get_version.outputs.version }}"
+          $version = (Get-Content ./target/classes/version.properties | Select-String -Pattern "version=" | ForEach-Object {$_.Line.Split("=")[1]})
           jpackage --type exe `
                    --input target `
                    --main-jar "LogicBan-$version-jar-with-dependencies.jar" `
@@ -156,7 +156,7 @@ jobs:
 
       - name: Package with jpackage (macOS)
         run: |
-          $version = "${{ steps.get_version.outputs.version }}"
+          version=$(sed -E -n 's/version=(.*)/\1/p' ./target/classes/version.properties)
           jpackage --type dmg \
              --input target \
              --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
