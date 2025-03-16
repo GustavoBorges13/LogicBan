@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>br.ufcat.logicban</groupId>
   <artifactId>LogicBan</artifactId>
-  <version>1.1.5</version>
+  <version>1.1.6</version>
   <packaging>jar</packaging>
 
   <name>LogicBan</name>
@@ -36,32 +36,46 @@
   </dependencies>
 
   <build>
+	 <resources>
+	        <resource>
+	            <directory>src/resources</directory>
+	            <filtering>true</filtering> <!-- Ativa a substituição de propriedades -->
+	            <includes>
+	                <include>version.properties</include>
+	            </includes>
+	        </resource>
+	    </resources>
     <finalName>${app.name}-${app.version}</finalName>
     <plugins>
-      <!-- Maven Resources Plugin -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>3.2.0</version>
-        <executions>
-          <execution>
-            <id>copy-resources</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/classes</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>src/resources</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
+ 
+    <!-- Plugin para copiar recursos com filtragem -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.2.0</version>
+            <executions>
+                <execution>
+                    <id>filter-version-properties</id>
+                    <phase>process-resources</phase>
+                    <goals>
+                        <goal>copy-resources</goal>
+                    </goals>
+                    <configuration>
+                        <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                        <resources>
+                            <resource>
+                                <directory>src/resources</directory>
+                                <filtering>true</filtering>
+                                <includes>
+                                    <include>version.properties</include>
+                                </includes>
+                            </resource>
+                        </resources>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+   
       <!-- Maven Compiler Plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
