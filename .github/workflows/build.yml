@@ -100,11 +100,13 @@ jobs:
       - name: verify actual version properties dir
         run: |
               ls -lh ./target/classes/
+
       - name: Read version from version.properties
         id: get_version
         run: |
-          VERSION=$(grep "version=" "$GITHUB_WORKSPACE/artifacts/target/classes/version.properties" | cut -d '=' -f 2)
+          VERSION=$(grep "version=" ./target/classes/version.properties | cut -d '=' -f 2)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+            
 
       - name: Package with jpackage (Linux)
         run: |
