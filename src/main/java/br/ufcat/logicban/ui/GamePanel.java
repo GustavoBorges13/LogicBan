@@ -20,8 +20,11 @@ import br.ufcat.logicban.button.Button_Start;
 import br.ufcat.logicban.button.Button_Voltar;
 import br.ufcat.logicban.data.SaveLoad;
 import br.ufcat.logicban.entity.Entity;
+import br.ufcat.logicban.entity.NPC_Box;
 import br.ufcat.logicban.entity.Player;
+import br.ufcat.logicban.object.OBJ_Door_Iron;
 import br.ufcat.logicban.tile.TileManager;
+import br.ufcat.logicban.tile_interactive.IT_LogicalPort;
 import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
 import br.ufcat.logicban.tile_interactive.InteractiveTile;
 
@@ -77,12 +80,16 @@ public class GamePanel extends JPanel implements Runnable {
 
 	// ENTITY AND OBJECT
 	public Player player = new Player(this, keyH);
-	public Entity obj[][] = new Entity[maxMap][10];
-	public Entity npc[][] = new Entity[maxMap][10];
-	public InteractiveTile iTile[][] = new InteractiveTile[maxMap][10];
+	public Entity obj[][] = new Entity[maxMap][50];
+	public Entity npc[][] = new Entity[maxMap][50];
+	public InteractiveTile iTile[][] = new InteractiveTile[maxMap][50];
 	ArrayList<Entity> entityList = new ArrayList<>();
 	ParticleManager particleManager = new ParticleManager(this);; // Instância do ParticleManager
 	public Entity wire[][] = new Entity[maxMap][70];
+	public int doorIndex = -1; // Índice da porta no array gp.obj (inicializado como -1)
+	public int doorWorldX; // Posição X da porta no mundo
+	public int doorWorldY; // Posição Y da porta no mundo
+	public ArrayList<Entity> boxList = new ArrayList<Entity>();
 
 	// public ArrayList<Box> boxes = new ArrayList<>();
 
@@ -112,19 +119,13 @@ public class GamePanel extends JPanel implements Runnable {
 
 		// Habilite aceleração de hardware:
 	}
-	
-	public void removeTest() {
-
-		
-
-	}
 
 	public void setupGame() {
 
+		aSetter.setWires();
 		aSetter.setObject();
-		aSetter.setNPC();
 		aSetter.setInteractiveTile();
-		aSetter.setObjectsAndConnections();
+		aSetter.setNPC();
 
 		// fase_atual = fase1;
 		gameState = titleState;
@@ -141,20 +142,45 @@ public class GamePanel extends JPanel implements Runnable {
 
 	}
 
+	public void limpeza() {
+		// Limpa o array iTile antes de redefinir os tiles interativos
+		for (int i = 0; i < iTile[currentMap].length; i++) {
+			iTile[currentMap][i] = null;
+		}
+
+		// Limpa o array npcs antes de redefinir os npcs
+		for (int i = 0; i < npc[currentMap].length; i++) {
+			npc[currentMap][i] = null;
+		}
+
+		// Limpa o array objetos antes de redefinir os objetos
+		for (int i = 0; i < obj[currentMap].length; i++) {
+			obj[currentMap][i] = null;
+		}
+
+		// Limpa o array wires antes de redefinir os wires
+		for (int i = 0; i < wire[currentMap].length; i++) {
+			wire[currentMap][i] = null;
+		}
+	}
+
 	public void restart() {
 		ui.playTime = 0;
 
 		proxima_fase = faseMap[currentMap];
 		fase_atual = currentMap;
-		for (int i = 0; i < wire[1].length; i++) {
-			entityList.remove(wire[currentMap][i]);
-		}
+
 		eHandler.playerNewGamePosition();
 		player.setDefaultValues();
-		aSetter.setObject();
-		aSetter.setNPC();
+
+		limpeza();
+		aSetter.setWires();
+		aSetter.setObject(); // Garante que os objetos sejam redefinido
 		aSetter.setInteractiveTile();
-		aSetter.setObjectsAndConnections();
+		aSetter.setNPC();
+
+		// Restaura o estado inicial da porta
+		doorIndex = -1;
 	}
 
 	public void setFullScreen() {
@@ -254,12 +280,39 @@ public class GamePanel extends JPanel implements Runnable {
 				}
 			}
 
-			// wire tiles
-			for (int i = 0; i < wire[1].length; i++) {
-				if (wire[currentMap][i] != null) {
-					wire[currentMap][i].update();
-				}
+			NPC_Box box = null;
+			for (int i = 0; i < npc[currentMap].length; i++) {
+			    if (npc[currentMap][i] instanceof NPC_Box && npc[currentMap][i] != null) {
+			        box = (NPC_Box) npc[currentMap][i];
+			        break;
+			    }
 			}
+
+			if (box != null) {
+			    for (int i = 0; i < obj[currentMap].length; i++) {
+			        if (obj[currentMap][i] instanceof OBJ_Door_Iron && obj[currentMap][i] != null) {
+			            OBJ_Door_Iron door = (OBJ_Door_Iron) obj[currentMap][i];
+
+			            for (IT_LogicalPort port : box.logicalPortList) {
+			                if (port.id == door.controllingPortID) {
+			                    if (port.outputState) {
+			                        // Se a porta está fechada, abra-a
+			                        door.openDoor(); // Chama o método para "abrir" a porta
+			                        System.out.println("Porta de ferro " + door.controllingPortID + " aberta!");
+			                    } else {
+			                        // Se a porta está aberta, feche-a
+			                        door.closeDoor(); // Chama o método para "fechar" a porta
+			                        System.out.println("Porta de ferro " + door.controllingPortID + " fechada.");
+			                    }
+			                    break;
+			                }
+			            }
+			        }
+			    }
+			} else {
+			    System.out.println("NPC_Box não encontrado no mapa!");
+			}
+
 		}
 		if (gameState == pauseState) {
 			// nothing
@@ -288,16 +341,12 @@ public class GamePanel extends JPanel implements Runnable {
 			// TILE
 			tileM.draw(g2);
 
-			// INTERACTIVE TILES
-			for (int i = 0; i < iTile[1].length; i++) {
-				if (iTile[currentMap][i] != null) {
-					iTile[currentMap][i].draw(g2);
+			// ADD ENTITIES TO THE LIST - COMBINED ITILE AND WIRE ADDITION
+			for (int i = 0; i < Math.max(iTile[currentMap].length, wire[currentMap].length); i++) {
+				if (i < iTile[currentMap].length && iTile[currentMap][i] != null) {
+					entityList.add(iTile[currentMap][i]);
 				}
-			}
-
-			// ADD WIRES TO THE LIST
-			for (int i = 0; i < wire[1].length; i++) {
-				if (wire[currentMap][i] != null) {
+				if (i < wire[currentMap].length && wire[currentMap][i] != null) {
 					entityList.add(wire[currentMap][i]);
 				}
 			}
@@ -364,67 +413,61 @@ public class GamePanel extends JPanel implements Runnable {
 			y += lineHeigth;
 			g2.drawString("FPS: " + drawCount, x, y);
 
-			// lado direito
-			x = screenWidth - tileSize * 7;
-			y = screenHeight - (tileSize * 10);
-			lineHeigth = 40;
+			if (gameState == playState || gameState == optionState) {
 
-			// Create a plate list
-			for (int i = 0; i < iTile[1].length; i++) {
+				// lado direito
+				x = screenWidth - tileSize * 7;
+				y = screenHeight - (tileSize * 10);
+				lineHeigth = 40;
 
-				if (iTile[currentMap][i] != null && iTile[currentMap][i].name != null
-						&& iTile[currentMap][i].name.equals(IT_MetalPlate.itName)) {
-					
-					g2.drawString(i+"",iTile[currentMap][i].worldX+15,iTile[currentMap][i].worldY); // desenha numeros em cima das placas
-					
-					// outros debugs da placa
-					g2.drawString("Placa [" + i + "]: " + iTile[currentMap][i].estadoLogico + " caixa", x - 150, y); // verifica se tem caixa em cima da placa
-					y += lineHeigth;
-					if (iTile[currentMap][i].placaConectada == true) {
-						g2.drawString("Placa [" + i + "]: Fio "+wire[currentMap][i].name+" conectado", x - 150, y); // verifica se cabo ta conectado com a placa
-						y += lineHeigth;
-					}else {
-						g2.drawString("Placa [" + i + "]: Sem Fio conectado", x - 150, y); // verifica se cabo ta conectado com a placa
+				// Create a plate list
+				for (int i = 0; i < iTile[1].length; i++) {
+					if (iTile[currentMap][i] != null && iTile[currentMap][i].name != null
+							&& iTile[currentMap][i].name.equals(IT_MetalPlate.itName)) {
+						g2.drawString(i + "", iTile[currentMap][i].worldX + 15, iTile[currentMap][i].worldY);
+
+						// outros debugs da placa
+						g2.drawString("Placa [" + i + "]: " + iTile[currentMap][i].estadoLogico + " caixa", x - 150, y);
 						y += lineHeigth;
 					}
 				}
+
+				// Mostrar o estado das portas lógicas
+				NPC_Box npcBox = null;
+				for (int i = 0; i < npc[1].length; i++) {
+					if (npc[currentMap][i] instanceof NPC_Box) {
+						npcBox = (NPC_Box) npc[currentMap][i];
+						break;
+					}
+				}
+
+				if (npcBox != null) {
+					ArrayList<String> debugInfo = npcBox.getLogicalPortDebugInfo();
+
+					// Aqui também precisa ter um loop para os iTiles
+					for (String debugString : debugInfo) {
+
+						g2.drawString(debugString, x - 150, y);
+						y += lineHeigth;
+					}
+
+					for (int i = 0; i < iTile[currentMap].length; i++) {
+
+						if (iTile[currentMap][i] instanceof IT_LogicalPort) {
+							IT_LogicalPort port = (IT_LogicalPort) iTile[currentMap][i];
+
+							for (String debugString : debugInfo) {
+
+								g2.drawString(port.id + "", iTile[currentMap][i].worldX + 15,
+										iTile[currentMap][i].worldY);
+								break;
+							}
+						}
+					}
+				}
 			}
-
-
-//			// Adiciona o código de debug para os fios
-//			int wireSetIdToDebug = 0; // Defina qual wireSetId você quer debugar
-//			
-//			int xDistance;
-//			int yDistance;
-//			int distance;
-//			ArrayList<InteractiveTile> plateList = new ArrayList<InteractiveTile>();
-//			
-//			// Cria uma lista de placas
-//			for (int i = 0; i < iTile[1].length; i++) {
-//
-//				if (iTile[currentMap][i] != null && 
-//						iTile[currentMap][i].name != null && 
-//						iTile[currentMap][i].name.equals(IT_MetalPlate.itName)) {
-//					plateList.add(iTile[currentMap][i]);
-//				}
-//			}
-
-//			for (int i = 0; i < plateList.size(); i++) {
-//				g2.setColor(Color.black);
-//				g2.setStroke(new BasicStroke(4));
-//
-//				xDistance = Math.abs(wire[currentMap][i].worldX - plateList.get(i).worldX);
-//				yDistance = Math.abs(wire[currentMap][i].worldY - plateList.get(i).worldY);
-//				distance = Math.max(xDistance, yDistance);
-//				//System.out.println("distance "+distance);
-//				// Desenha o retângulo
-//				g2.drawRect(plateList.get(i).worldX, plateList.get(i).worldY, plateList.get(i).solidArea.height,	plateList.get(i).solidArea.width);
-//
-//			}
-
-			// System.out.println("HEAD: "+wire[currentMap][0]+" TAIL:
-			// "+wire[currentMap][wire.length]);
 		}
+
 	}
 
 	public void drawToScreen() {

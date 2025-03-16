@@ -9,6 +9,7 @@ public class IT_MetalPlate extends InteractiveTile{
 
 	GamePanel gp;
 	public static final String itName = "Metal Plate";
+	public boolean soundPlayed = false;
 	
 	public IT_MetalPlate(GamePanel gp, int col, int row) {
 		super(gp, col, row);

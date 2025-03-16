@@ -7,6 +7,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
+import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
 import br.ufcat.logicban.ui.GamePanel;
 import br.ufcat.logicban.ui.UtilityTool;
 
@@ -44,15 +45,16 @@ public class Entity {
 //    public boolean isHead = false;      // Indica se é a "cabeça" do fio
 //    public boolean isTail = false;      // Indica se é a "cauda" do fio
 	public String tipo = "";
-    
+
 	// TYPE
 	public int type; // 0 = player, 1 = npc, 2 = monster
 	public final int type_player = 0;
 	public final int type_npc = 0;
 	public final int type_pickaxe = 0;
 	
+	public IT_MetalPlate lastPlate = null;
+	public int doorIndex;
 	
-
 	// Debug
 	public static boolean debugModeOn = false;
 
@@ -73,7 +75,8 @@ public class Entity {
 		gp.cChecker.checkObject(this, false);
 		gp.cChecker.checkPlayer(this);
 		gp.cChecker.checkEntity(this, gp.npc);
-		//gp.cChecker.checkEntity(this, gp.wire);
+		gp.cChecker.checkEntity(this, gp.iTile);
+		// gp.cChecker.checkEntity(this, gp.wire);
 		// boolean contactPlayer = gp.cChecker.checkPlayer(this);
 
 		// gp.cChecker.checkEntity(this, gp.monster);
@@ -164,28 +167,65 @@ public class Entity {
 			break;
 		}
 		g2.drawImage(image, worldX, worldY, null);
-		
-		
+
 		if (debugModeOn) {
 			// Debug área de colisão
 			g2.setColor(color);
 			g2.setStroke(new BasicStroke(2));
 			g2.drawRect(worldX + solidArea.x, worldY + solidArea.y, solidArea.width, solidArea.height);
 			if (solidArea.width == 0 && solidArea.height == 0 && name.equals("Metal Plate")) {
-			    int x = worldX + solidArea.x + 3;
-			    int y = worldY + solidArea.y + 3;
-			    int size = gp.tileSize - 6; // Ajuste do tamanho
+				int x = worldX + solidArea.x + 3;
+				int y = worldY + solidArea.y + 3;
+				int size = gp.tileSize - 6; // Ajuste do tamanho
 
-			    // Desenha o retângulo
-			    g2.drawRect(x-25, y-25, size, size);
+				// Desenha o retângulo
+				g2.drawRect(x - 25, y - 25, size, size);
 
-			    // Desenha um "X" dentro do retângulo
-			    g2.drawLine(x-25, y-25, x + size-25, y + size-25); // Linha diagonal \
-			    g2.drawLine(x + size-25, y-25, x-25, y + size-25); // Linha diagonal /
+				// Desenha um "X" dentro do retângulo
+				g2.drawLine(x - 25, y - 25, x + size - 25, y + size - 25); // Linha diagonal \
+				g2.drawLine(x + size - 25, y - 25, x - 25, y + size - 25); // Linha diagonal /
 			}
-			
-
-
 		}
 	}
+
+	public void detectPlate() {
+        IT_MetalPlate currentPlate = null; // Placa atual sob a entidade (se houver)
+
+        // Verifica se a entidade está em cima de uma placa
+        for (int i = 0; i < gp.iTile[gp.currentMap].length; i++) {
+            if (gp.iTile[gp.currentMap][i] != null && gp.iTile[gp.currentMap][i].name != null
+                    && gp.iTile[gp.currentMap][i].name.equals(IT_MetalPlate.itName)) {
+                IT_MetalPlate plate = (IT_MetalPlate) gp.iTile[gp.currentMap][i];
+
+                // Calcula a distância entre a entidade e a placa
+                int xDistance = Math.abs(worldX - plate.worldX);
+                int yDistance = Math.abs(worldY - plate.worldY);
+                int distance = Math.max(xDistance, yDistance);
+
+                // Se a entidade estiver perto da placa
+                if (distance < 27) {
+                    // Ativa a placa
+                    plate.estadoLogico = 1;
+                    currentPlate = plate; // Define a placa atual
+
+                    // Se for uma nova placa, toca o som
+                    if (plate != lastPlate) {
+                        if (!plate.soundPlayed) {
+                            gp.playSFX(3);
+                            plate.soundPlayed = true;
+                        }
+                    }
+                }
+                //System.out.println("X: "+ xDistance +" Y: "+yDistance + " plateX:"+ plate.worldX+ " plateY:"+plate.worldY+ " worldX: "+worldX+ " worldY: "+ worldY);
+            }
+        }
+
+        // Desativa a placa anterior se a entidade não estiver mais sobre ela
+        if (lastPlate != null && lastPlate != currentPlate) {
+            lastPlate.estadoLogico = 0;
+            lastPlate.soundPlayed = false; // Permite tocar novamente quando voltar
+        }
+
+        lastPlate = currentPlate; // Atualiza a última placa
+    }
 }
