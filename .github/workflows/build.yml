@@ -111,18 +111,15 @@ jobs:
         run: |
           VERSION=$(sed -n 's/version=//p' ./target/classes/version.properties)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-            
-      - name: Print version
-        run: |
-            echo (grep "version=" ./target/classes/version.properties | cut -d '=' -f 2)
+          
       - name: Package with jpackage (Linux)
         run: |
           jpackage --type deb \
              --input target \
-             --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
+             --main-jar "LogicBan-${VERSION}-jar-with-dependencies.jar" \
              --main-class br.ufcat.logicban.ui.Main \
              --dest ./jpackage-output \
-             --app-version "$version" \
+             --app-version "${VERSION}" \
              --name LogicBan \
              --vendor "Bug Hunters" \
              --copyright "Copyright (C) 2025" \
@@ -131,8 +128,8 @@ jobs:
       - name: Clean up dependencies in control file
         run: |
           # Extraindo o conteúdo do pacote .deb
-          dpkg-deb -x ./jpackage-output/logicban_$version_amd64.deb /tmp/logicban
-          dpkg-deb -e ./jpackage-output/logicban_$version_amd64.deb /tmp/logicban/DEBIAN
+          dpkg-deb -x ./jpackage-output/logicban_${VERSION}_amd64.deb /tmp/logicban
+          dpkg-deb -e ./jpackage-output/logicban_${VERSION}_amd64.deb /tmp/logicban/DEBIAN
           # Removendo as dependências desnecessárias do arquivo control
           sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
           sed -i '/libmd0/d' /tmp/logicban/DEBIAN/control
@@ -140,7 +137,7 @@ jobs:
           # Removendo o campo "Depends" se não for necessário
           sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
           # Recriar o pacote .deb com o arquivo control modificado
-          dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_$version_amd64.deb
+          dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_${VERSION}_amd64.deb
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
