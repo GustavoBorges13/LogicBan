@@ -38,6 +38,22 @@
   <build>
     <finalName>${app.name}-${app.version}</finalName>
     <plugins>
+	    <plugin>
+		    <groupId>org.codehaus.mojo</groupId>
+		    <artifactId>properties-maven-plugin</artifactId>
+		    <version>1.0.0</version>
+		    <executions>
+		        <execution>
+		            <phase>generate-resources</phase>
+		            <goals>
+		                <goal>write-project-properties</goal>
+		            </goals>
+		            <configuration>
+		                <outputFile>${project.build.outputDirectory}/app.properties</outputFile>
+		            </configuration>
+		        </execution>
+	    	</executions>
+		</plugin>
       <!-- Maven Resources Plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
