@@ -28,23 +28,6 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-
 
-      - name: Set JAVA_HOME
-        shell: pwsh
-        run: |
-          Write-Host "JAVA_HOME: $env:JAVA_HOME"
-          if (-not $env:JAVA_HOME) {
-            Write-Host "JAVA_HOME não está definido. Definindo..."
-            $env:JAVA_HOME = $env:JAVA_HOME_23_X64
-            Write-Host "JAVA_HOME agora: $env:JAVA_HOME"
-          }
-
-      - name: Add Maven to PATH
-        shell: pwsh
-        run: |
-          Write-Host "PATH antes: $env:PATH"
-          $env:PATH = "$env:PATH;C:\Maven SDK\apache-maven-3.9.9\bin" # Substitua pelo caminho correto
-          Write-Host "PATH depois: $env:PATH"
-
       - name: Read Version from pom.xml
         id: project_version
         shell: pwsh
@@ -77,13 +60,16 @@ jobs:
       - name: Verify Windows artifact
         shell: pwsh
         run: |
-            dir target/jpackage/
+            if (!(Test-Path -Path "target/jpackage/LogicBan-$version.exe")) {
+                Write-Error "File 'target/jpackage/LogicBan-$version.exe' not found."
+                exit 1
+            }
         
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: logicban-windows
-          path: target/jpackage/*.exe
+          path: target/jpackage/LogicBan-*.exe
     outputs:
       version: ${{ steps.project_version.outputs.version }}
 
@@ -147,23 +133,13 @@ jobs:
              --linux-deb-maintainer "ggustavo.borges13@exemplo.com" \
              --linux-rpm-license-type "GPLv3" 
 
-      - name: Clean up dependencies in control file
+      - name: Verify Linux artifact
         run: |
-          # Extraindo o conteúdo do pacote .deb
           version="${{ steps.project_version.outputs.version }}"
-          dpkg-deb -x ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban
-          dpkg-deb -e ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban/DEBIAN
-
-          # Removendo as dependências desnecessárias do arquivo control
-          sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
-          sed -i '/libmd0/d' /tmp/logicban/DEBIAN/control
-          sed -i '/libx11-6/d' /tmp/logicban/DEBIAN/control
-
-          # Removendo o campo "Depends" se não for necessário
-          sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
-
-          # Recriar o pacote .deb com o arquivo control modificado
-          dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_${version}_amd64.deb
+          if [ ! -f "./jpackage-output/logicban_${version}_amd64.deb" ]; then
+            echo "Arquivo logicban_${version}_amd64.deb não encontrado!"
+            exit 1
+          fi
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
@@ -218,6 +194,14 @@ jobs:
              --copyright "Copyright (C) 2025" \
              --icon src/resources/assets/logos/icone.ico
     
+      - name: Verify macOS artifact
+        run: |
+          version="${{ steps.project_version.outputs.version }}"
+          if [ ! -f "target/jpackage/LogicBan-$version.dmg" ]; then
+            echo "Arquivo LogicBan-$version.dmg não encontrado!"
+            exit 1
+          fi
+
       - name: List jpackage Output
         run: ls -lh target/jpackage/
 
@@ -254,9 +238,9 @@ jobs:
         shell: bash
         run: |
           VERSION="${{ needs.build-windows.outputs.version }}"
-          WIN_FILE="./artifacts/logicban-windows/LogicBan-${VERSION}.exe"
+          WIN_FILE="./artifacts/logicban-windows/LogicBan-$VERSION.exe"
           LINUX_FILE="./artifacts/logicban-linux-deb/logicban_${VERSION}_amd64.deb"
-          MACOS_FILE="./artifacts/logicban-macos/LogicBan-${VERSION}.dmg"
+          MACOS_FILE="./artifacts/logicban-macos/LogicBan-$VERSION.dmg"
 
           WIN_SHA256=$(sha256sum "$WIN_FILE" | awk '{print $1}')
           LINUX_SHA256=$(sha256sum "$LINUX_FILE" | awk '{print $1}')
@@ -269,8 +253,8 @@ jobs:
       - name: Verify Windows artifact
         run: |
           VERSION="${{ needs.build-windows.outputs.version }}"
-          if [ ! -f "./artifacts/logicban-windows/LogicBan-${VERSION}.exe" ]; then
-            echo "Arquivo LogicBan-${VERSION}.exe não encontrado!"
+          if [ ! -f "./artifacts/logicban-windows/LogicBan-$VERSION.exe" ]; then
+            echo "Arquivo LogicBan-$VERSION.exe não encontrado!"
             exit 1
           fi
 
@@ -285,8 +269,8 @@ jobs:
       - name: Verify macOS artifact
         run: |
           VERSION="${{ needs.build-windows.outputs.version }}"
-          if [ ! -f "./artifacts/logicban-macos/LogicBan-${VERSION}.dmg" ]; then
-            echo "Arquivo LogicBan-${VERSION}.dmg não encontrado!"
+          if [ ! -f "./artifacts/logicban-macos/LogicBan-$VERSION.dmg" ]; then
+            echo "Arquivo LogicBan-$VERSION.dmg não encontrado!"
             exit 1
           fi
 
