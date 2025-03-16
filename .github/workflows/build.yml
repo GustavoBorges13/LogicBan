@@ -37,7 +37,7 @@ jobs:
           $version = "${{ steps.project_version.outputs.version }}"
           jpackage --type exe `
                    --input target `
-                   --main-jar "LogicBan$version-jar-with-dependencies.jar" `
+                   --main-jar "LogicBan-$version-jar-with-dependencies.jar" `
                    --main-class br.ufcat.logicban.ui.Main `
                    --dest target/jpackage `
                    --app-version $version `
@@ -91,10 +91,10 @@ jobs:
           ls -lh target/*.jar
       - name: Package with jpackage (Linux)
         run: |
-          version="${{ steps.project_version.outputs.version }}"
+          $version = "${{ steps.get_version.outputs.version }}"
           jpackage --type deb \
              --input target \
-             --main-jar "LogicBan$version-jar-with-dependencies.jar" \
+             --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
              --main-class br.ufcat.logicban.ui.Main \
              --dest ./jpackage-output \
              --app-version "$version" \
@@ -106,7 +106,7 @@ jobs:
       - name: Clean up dependencies in control file
         run: |
           # Extraindo o conteúdo do pacote .deb
-          version="${{ steps.project_version.outputs.version }}"
+          $version = "${{ steps.get_version.outputs.version }}"
           dpkg-deb -x ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban
           dpkg-deb -e ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban/DEBIAN
           # Removendo as dependências desnecessárias do arquivo control
@@ -150,10 +150,10 @@ jobs:
 
       - name: Package with jpackage (macOS)
         run: |
-          version="${{ steps.project_version.outputs.version }}"
+          $version = "${{ steps.get_version.outputs.version }}"
           jpackage --type dmg \
              --input target \
-             --main-jar "LogicBan$version-jar-with-dependencies.jar" \
+             --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
              --main-class br.ufcat.logicban.ui.Main \
              --dest target/jpackage \
              --app-version "$version" \
@@ -213,8 +213,8 @@ jobs:
       - name: Verify Windows artifact
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
-          if [ ! -f "./artifacts/logicban-windows/LogicBan${VERSION}.exe" ]; then
-            echo "Arquivo LogicBan${VERSION}.exe não encontrado!"
+          if [ ! -f "./artifacts/logicban-windows/LogicBan-${VERSION}.exe" ]; then
+            echo "Arquivo LogicBan-${VERSION}.exe não encontrado!"
             exit 1
           fi
       - name: Verify Linux artifact
@@ -227,8 +227,8 @@ jobs:
       - name: Verify macOS artifact
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
-          if [ ! -f "./artifacts/logicban-macos/LogicBan${VERSION}.dmg" ]; then
-            echo "Arquivo LogicBan${VERSION}.dmg não encontrado!"
+          if [ ! -f "./artifacts/logicban-macos/LogicBan-${VERSION}.dmg" ]; then
+            echo "Arquivo LogicBan-${VERSION}.dmg não encontrado!"
             exit 1
           fi
 
@@ -254,7 +254,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-windows/LogicBan${{ steps.get_version.outputs.version }}.exe
+          asset_path: ./artifacts/logicban-windows/LogicBan-${{ steps.get_version.outputs.version }}.exe
           asset_name: LogicBan-Windows.exe
           asset_content_type: application/octet-stream
 
@@ -274,6 +274,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-macos/LogicBan${{ steps.get_version.outputs.version }}.dmg
+          asset_path: ./artifacts/logicban-macos/LogicBan-${{ steps.get_version.outputs.version }}.dmg
           asset_name: LogicBan-macOS.dmg
           asset_content_type: application/octet-stream
