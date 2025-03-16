@@ -31,10 +31,16 @@ jobs:
       - name: Build with Maven
         run: mvn package
 
+      - name: Print version
+        shell: pwsh
+        run: |
+          echo "Version: $version"
+
       - name: Package with jpackage (Windows)
         shell: pwsh
         run: |
-          $version = "${{ steps.project_version.outputs.version }}"
+          $version = "${{ steps.get_version.outputs.version }}"
+          echo "Version: $version"
           jpackage --type exe `
                    --input target `
                    --main-jar "LogicBan-$version-jar-with-dependencies.jar" `
@@ -91,7 +97,7 @@ jobs:
           ls -lh target/*.jar
       - name: Package with jpackage (Linux)
         run: |
-          $version = "${{ steps.get_version.outputs.version }}"
+          version="${{ steps.project_version.outputs.version }}"
           jpackage --type deb \
              --input target \
              --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
@@ -106,7 +112,7 @@ jobs:
       - name: Clean up dependencies in control file
         run: |
           # Extraindo o conteúdo do pacote .deb
-          $version = "${{ steps.get_version.outputs.version }}"
+          version="${{ steps.project_version.outputs.version }}"
           dpkg-deb -x ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban
           dpkg-deb -e ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban/DEBIAN
           # Removendo as dependências desnecessárias do arquivo control
@@ -150,7 +156,7 @@ jobs:
 
       - name: Package with jpackage (macOS)
         run: |
-          $version = "${{ steps.get_version.outputs.version }}"
+          version="${{ steps.project_version.outputs.version }}"
           jpackage --type dmg \
              --input target \
              --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
