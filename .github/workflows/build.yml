@@ -194,7 +194,7 @@ jobs:
       - name: List artifacts directory
         shell: bash
         run: |
-          ls -lh ./artifacts/target/classes
+          ls -lh ./artifacts
 
       - name: Read version from version.properties
         id: get_version
