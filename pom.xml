@@ -34,7 +34,8 @@
     	<version>20231013</version>
 	</dependency>
   </dependencies>
-
+  
+  
   <build>
 	 <resources>
 	        <resource>
@@ -48,27 +49,23 @@
     <finalName>${app.name}-${app.version}</finalName>
     <plugins>
  
-    <!-- Plugin para copiar recursos com filtragem -->
+       <!-- Maven Resources Plugin -->
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-resources-plugin</artifactId>
             <version>3.2.0</version>
             <executions>
                 <execution>
-                    <id>filter-version-properties</id>
+                    <id>copy-resources</id>
                     <phase>process-resources</phase>
                     <goals>
                         <goal>copy-resources</goal>
                     </goals>
                     <configuration>
-                        <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                        <outputDirectory>${project.build.directory}/classes</outputDirectory>
                         <resources>
                             <resource>
                                 <directory>src/resources</directory>
-                                <filtering>true</filtering>
-                                <includes>
-                                    <include>version.properties</include>
-                                </includes>
                             </resource>
                         </resources>
                     </configuration>

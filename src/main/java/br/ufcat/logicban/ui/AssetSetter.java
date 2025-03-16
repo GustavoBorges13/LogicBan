@@ -177,7 +177,7 @@ public class AssetSetter {
 		gp.iTile[mapNum][i] = notPort;
 		i++;
 
-		IT_LogicalPort xorPort = new IT_LogicalPort(gp, 13, 6, "xor", "down", 1);
+		IT_LogicalPort xorPort = new IT_LogicalPort(gp, 10, 4, "and", "down", 1);
 		xorPort.addPlateIndex(0);
 		xorPort.addPlateIndex(1);
 		xorPort.inputPortIDs.add(0);

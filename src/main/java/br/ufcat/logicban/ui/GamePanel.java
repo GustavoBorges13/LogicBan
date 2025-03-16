@@ -298,11 +298,11 @@ public class GamePanel extends JPanel implements Runnable {
 			                    if (port.outputState) {
 			                        // Se a porta está fechada, abra-a
 			                        door.openDoor(); // Chama o método para "abrir" a porta
-			                        System.out.println("Porta de ferro " + door.controllingPortID + " aberta!");
+			                       // System.out.println("Porta de ferro " + door.controllingPortID + " aberta!");
 			                    } else {
 			                        // Se a porta está aberta, feche-a
 			                        door.closeDoor(); // Chama o método para "fechar" a porta
-			                        System.out.println("Porta de ferro " + door.controllingPortID + " fechada.");
+			                       // System.out.println("Porta de ferro " + door.controllingPortID + " fechada.");
 			                    }
 			                    break;
 			                }
@@ -310,7 +310,7 @@ public class GamePanel extends JPanel implements Runnable {
 			        }
 			    }
 			} else {
-			    System.out.println("NPC_Box não encontrado no mapa!");
+			   // System.out.println("Sem caixas no mapa!");
 			}
 
 		}

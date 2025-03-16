@@ -198,12 +198,23 @@ jobs:
         shell: bash
         run: |
           ls -lh ./artifacts
+          ls -lh ./artifacts/logicban-windows  # Adicionado para debug
+          ls -lh ./artifacts/logicban-linux-deb  # Adicionado para debug
+          ls -lh ./artifacts/logicban-macos  # Adicionado para debug
+
+      # Mova o passo de leitura da versão para aqui:
+      - name: Read version from version.properties
+        id: get_version
+        run: |
+          VERSION=$(sed -n 's/version=//p' ./artifacts/logicban-linux-deb/target/classes/version.properties)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Verify downloaded artifacts
         run: |
-            ls -lh ./artifacts/logicban-windows
-            ls -lh ./artifacts/logicban-linux-deb
-            ls -lh ./artifacts/logicban-macos
+          ls -lh ./artifacts/logicban-windows
+          ls -lh ./artifacts/logicban-linux-deb
+          ls -lh ./artifacts/logicban-macos
+
       # Calcular Hashes
       - name: Generate checksums
         id: checksums
@@ -219,6 +230,7 @@ jobs:
           echo "win_sha256=$WIN_SHA256" >> $GITHUB_OUTPUT
           echo "linux_sha256=$LINUX_SHA256" >> $GITHUB_OUTPUT
           echo "macos_sha256=$MACOS_SHA256" >> $GITHUB_OUTPUT
+
       - name: Verify Windows artifact
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
@@ -247,8 +259,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ needs.build-linux.outputs.get_version.outputs.version }}
-          release_name: Release v${{ needs.build-linux.outputs.get_version.outputs.version }}
+          tag_name: v${{ steps.get_version.outputs.version }}
+          release_name: Release v${{ steps.get_version.outputs.version }}
           draft: false
           prerelease: false
           body: |
@@ -263,7 +275,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-windows/LogicBan-${{ needs.build-linux.outputs.get_version.outputs.version }}.exe
+          asset_path: ./artifacts/logicban-windows/LogicBan-${{ steps.get_version.outputs.version }}.exe
           asset_name: LogicBan-Windows.exe
           asset_content_type: application/octet-stream
 
@@ -273,7 +285,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-linux-deb/logicban_${{ needs.build-linux.outputs.get_version.outputs.version }}_amd64.deb
+          asset_path: ./artifacts/logicban-linux-deb/logicban_${{ steps.get_version.outputs.version }}_amd64.deb
           asset_name: LogicBan-Linux.deb
           asset_content_type: application/octet-stream
 
@@ -283,6 +295,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-macos/LogicBan-${{ needs.build-linux.outputs.get_version.outputs.version }}.dmg
+          asset_path: ./artifacts/logicban-macos/LogicBan-${{ steps.get_version.outputs.version }}.dmg
           asset_name: LogicBan-macOS.dmg
           asset_content_type: application/octet-stream
