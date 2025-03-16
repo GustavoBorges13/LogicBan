@@ -35,7 +35,9 @@ jobs:
         shell: pwsh
         run: |
           echo "Version: $version"
-
+      - name: Verify version properties dir
+        run: |
+              dir target/classes/
       - name: Read version from version.properties
         id: get_version
         run: |
@@ -95,9 +97,9 @@ jobs:
 
       - name: Build with Maven
         run: mvn package
-      - name: verify actual dir
+      - name: verify actual version properties dir
         run: |
-              ls -lh
+              ls -lh ./target/classes/
       - name: Read version from version.properties
         id: get_version
         run: |
@@ -160,9 +162,9 @@ jobs:
 
       - name: Build with Maven
         run: mvn package
-      - name: verify actual dir
+      - name: verify actual version properties dir
         run: |
-              ls -lh
+              ls -lh ./target/classes/
       - name: Read version from version.properties
         id: get_version
         run: |
