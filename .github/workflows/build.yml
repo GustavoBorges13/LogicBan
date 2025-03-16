@@ -32,10 +32,9 @@ jobs:
         id: project_version
         shell: pwsh
         run: |
-            # Extrai a versão do pom.xml usando um comando XML
-            [xml]$pom = Get-Content pom.xml
-            $VERSION = $pom.project.version
-            echo "version=$VERSION" >> $env:GITHUB_OUTPUT
+              $VERSION = $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+                echo "version=$VERSION" >> $env:GITHUB_OUTPUT
+                echo "version_with_v=$VERSION" >> $env:GITHUB_OUTPUT # Add v for tag
 
       - name: Build with Maven
         run: mvn package
