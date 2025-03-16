@@ -27,21 +27,7 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
-      - name: Set JAVA_HOME
-        shell: pwsh
-        run: |
-          Write-Host "JAVA_HOME: $env:JAVA_HOME"
-          if (-not $env:JAVA_HOME) {
-            Write-Host "JAVA_HOME não está definido. Definindo..."
-            $env:JAVA_HOME = $env:JAVA_HOME_23_X64
-            Write-Host "JAVA_HOME agora: $env:JAVA_HOME"
-          }
-      - name: Add Maven to PATH
-        shell: pwsh
-        run: |
-          Write-Host "PATH antes: $env:PATH"
-          $env:PATH = "$env:PATH;C:\Maven SDK\apache-maven-3.9.9\bin" # Substitua pelo caminho correto
-          Write-Host "PATH depois: $env:PATH"
+
       - name: Read Version from pom.xml
         id: project_version
         shell: pwsh
