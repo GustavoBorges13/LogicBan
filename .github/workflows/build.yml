@@ -36,10 +36,13 @@ jobs:
         run: |
           echo "Version: $version"
 
+      - name: verify actual dir
+        run: |
+                ls -lh
       - name: Read version from version.properties
         id: get_version
         run: |
-          VERSION=$(grep "version=" ./artifacts/target/classes/version.properties | cut -d '=' -f 2)
+          VERSION=$(grep "version=" ./target/classes/version.properties | cut -d '=' -f 2)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Package with jpackage (Windows)
@@ -95,7 +98,9 @@ jobs:
 
       - name: Build with Maven
         run: mvn package
-      
+      - name: verify actual dir
+        run: |
+              ls -lh
       - name: Read version from version.properties
         id: get_version
         run: |
@@ -158,7 +163,9 @@ jobs:
 
       - name: Build with Maven
         run: mvn package
-
+      - name: verify actual dir
+        run: |
+              ls -lh
       - name: Read version from version.properties
         id: get_version
         run: |
