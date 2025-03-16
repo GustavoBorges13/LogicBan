@@ -59,6 +59,20 @@ public class NPC_Box extends Entity {
 		detectPlate();
 		updateLogicalPorts(); // Adicione esta linha
 	}
+	
+	@Override
+	public void checkCollision() {
+		collisionOn = false;
+		gp.cChecker.checkTile(this);
+		gp.cChecker.checkObject(this, false);
+		gp.cChecker.checkPlayer(this);
+		//gp.cChecker.checkEntity(this, gp.npc);
+		gp.cChecker.checkEntity(this, gp.iTile);
+		// gp.cChecker.checkEntity(this, gp.wire);
+		// boolean contactPlayer = gp.cChecker.checkPlayer(this);
+
+		// gp.cChecker.checkEntity(this, gp.monster);
+	}
 
 	public void move(String d) {
 		if (isMoving)
@@ -90,6 +104,7 @@ public class NPC_Box extends Entity {
 		// Verifica colisão com tiles
 		collisionOn = false;
 		gp.cChecker.checkTile(this); // Supondo que este método verifica a colisão com tiles
+		checkCollision();
 		if (collisionOn) {
 			worldX = oldWorldX;
 			worldY = oldWorldY;
