@@ -186,6 +186,9 @@ jobs:
 
     needs: [build-windows, build-linux, build-macos]
     steps:
+      - name: Debug Needs Context
+        run: echo "${{ toJSON(needs) }}"
+
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
