@@ -31,13 +31,6 @@ jobs:
       - name: Build with Maven
         run: mvn package
 
-      - name: Print version
-        shell: pwsh
-        run: |
-          echo "Version: $version"
-      - name: Verify version properties dir
-        run: |
-              dir target/classes/
       - name: Read version from version.properties
         id: get_version
         run: |
@@ -49,10 +42,10 @@ jobs:
         run: |
           jpackage --type exe `
                    --input target `
-                   --main-jar "LogicBan-${VERSION}-jar-with-dependencies.jar" `
+                   --main-jar "LogicBan-$version-jar-with-dependencies.jar" `
                    --main-class br.ufcat.logicban.ui.Main `
                    --dest target/jpackage `
-                   --app-version ${VERSION} `
+                   --app-version "$version" `
                    --name LogicBan `
                    --vendor "Bug Hunters" `
                    --copyright "Copyright (C) 2025" `
