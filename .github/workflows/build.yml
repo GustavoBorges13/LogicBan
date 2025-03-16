@@ -59,7 +59,7 @@ jobs:
           $version = "${{ steps.project_version.outputs.version }}"
           jpackage --type exe `
                    --input target `
-                   --main-jar "logicban-$version-jar-with-dependencies.jar" `
+                   --main-jar "LogicBan-$version-jar-with-dependencies.jar" `
                    --main-class br.ufcat.logicban.ui.Main `
                    --dest target/jpackage `
                    --app-version $version `
