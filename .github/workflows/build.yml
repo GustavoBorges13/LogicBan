@@ -12,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Necessário para obter o histórico completo para tags
 
       - name: Set up JDK
         uses: actions/setup-java@v3
@@ -32,10 +32,10 @@ jobs:
         id: project_version
         shell: pwsh
         run: |
+          # Extrai a versão do pom.xml usando um comando XML
           [xml]$pom = Get-Content pom.xml
           $VERSION = $pom.project.version
           echo "version=$VERSION" >> $env:GITHUB_OUTPUT
-
       - name: Build with Maven
         run: mvn package
 
@@ -43,8 +43,7 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ steps.project_version.outputs.version }}"
-          jpackage --verbose `
-                   --type exe `
+          jpackage --type exe `
                    --input target `
                    --main-jar "LogicBan-$version-jar-with-dependencies.jar" `
                    --main-class br.ufcat.logicban.ui.Main `
@@ -58,12 +57,12 @@ jobs:
                    --win-per-user-install `
                    --win-help-url "https://github.com/GustavoBorges13/LogicBan/wiki/Tutorial-%E2%80%90-Como-jogar" `
                    --win-update-url "https://github.com/GustavoBorges13/LogicBan/releases/latest"
-
+      
       - name: Verify Windows artifact
         shell: pwsh
         run: |
             dir target/jpackage/
-
+        
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
@@ -99,12 +98,8 @@ jobs:
           VERSION=$(mvn org.codehaus.mojo:exec-maven-plugin:1.6.0:exec -Dexec.executable="echo" -Dexec.args='${project.version}' -q --non-recursive)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       - name: Build with Maven
-        run: mvn -q package -DincludeScope=compile
-        
-      - name: Clean jpackage output directory
-        run: |
-          rm -rf ./jpackage-output
-          mkdir -p ./jpackage-output
+        run: mvn package
+    
       - name: Verify jars targets
         run: |
           ls -lh target/*.jar
@@ -120,7 +115,7 @@ jobs:
              --name LogicBan \
              --vendor "Bug Hunters" \
              --copyright "Copyright (C) 2025" \
-             --icon src/resources/assets/logos/icone.png \
+             --icon src/resources/assets/logos/icone.png 
 
       - name: Clean up dependencies in control file
         run: |
