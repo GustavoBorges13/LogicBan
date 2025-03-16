@@ -27,11 +27,29 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
-
-      - name: Get POM version
+      - name: Set JAVA_HOME
+        shell: pwsh
+        run: |
+          Write-Host "JAVA_HOME: $env:JAVA_HOME"
+          if (-not $env:JAVA_HOME) {
+            Write-Host "JAVA_HOME não está definido. Definindo..."
+            $env:JAVA_HOME = $env:JAVA_HOME_23_X64
+            Write-Host "JAVA_HOME agora: $env:JAVA_HOME"
+          }
+      - name: Add Maven to PATH
+        shell: pwsh
+        run: |
+          Write-Host "PATH antes: $env:PATH"
+          $env:PATH = "$env:PATH;C:\Maven SDK\apache-maven-3.9.9\bin" # Substitua pelo caminho correto
+          Write-Host "PATH depois: $env:PATH"
+      - name: Read Version from pom.xml
         id: project_version
-        uses: PERES-Richard/maven-get-version-action@v3.0.0
-      
+        shell: pwsh
+        run: |
+          # Extrai a versão do pom.xml usando um comando XML
+          [xml]$pom = Get-Content pom.xml
+          $VERSION = $pom.project.version
+          echo "version=$VERSION" >> $env:GITHUB_OUTPUT
       - name: Build with Maven
         run: mvn package
 
@@ -41,7 +59,7 @@ jobs:
           $version = "${{ steps.project_version.outputs.version }}"
           jpackage --type exe `
                    --input target `
-                   --main-jar "LogicBan-$version-jar-with-dependencies.jar"  `
+                   --main-jar "LogicBan-$version-jar-with-dependencies.jar" `
                    --main-class br.ufcat.logicban.ui.Main `
                    --dest target/jpackage `
                    --app-version $version `
@@ -57,16 +75,13 @@ jobs:
       - name: Verify Windows artifact
         shell: pwsh
         run: |
-            if (!(Test-Path -Path "target/jpackage/LogicBan-$version.exe")) {
-                Write-Error "File 'target/jpackage/LogicBan-$version.exe' not found."
-                exit 1
-            }
+            dir target/jpackage/
         
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: logicban-windows
-          path: target/jpackage/LogicBan-*.exe
+          path: target/jpackage/*.exe
     outputs:
       version: ${{ steps.project_version.outputs.version }}
 
@@ -91,13 +106,11 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
-
       - name: Read Version from pom.xml
         id: project_version
         run: |
           VERSION=$(mvn org.codehaus.mojo:exec-maven-plugin:1.6.0:exec -Dexec.executable="echo" -Dexec.args='${project.version}' -q --non-recursive)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
       - name: Build with Maven
         run: mvn -q package -DincludeScope=compile
         
@@ -105,17 +118,15 @@ jobs:
         run: |
           rm -rf ./jpackage-output
           mkdir -p ./jpackage-output
-
       - name: Verify jars targets
         run: |
           ls -lh target/*.jar
-
       - name: Package with jpackage (Linux)
         run: |
           version="${{ steps.project_version.outputs.version }}"
           jpackage --type deb \
              --input target \
-             --main-jar "LogicBan-$version-jar-with-dependencies.jar"  \
+             --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
              --main-class br.ufcat.logicban.ui.Main \
              --dest ./jpackage-output \
              --app-version "$version" \
@@ -129,15 +140,20 @@ jobs:
              --linux-package-name "logicban" \
              --linux-deb-maintainer "ggustavo.borges13@exemplo.com" \
              --linux-rpm-license-type "GPLv3" 
-
-      - name: Verify Linux artifact
+      - name: Clean up dependencies in control file
         run: |
+          # Extraindo o conteúdo do pacote .deb
           version="${{ steps.project_version.outputs.version }}"
-          if [ ! -f "./jpackage-output/logicban_${version}_amd64.deb" ]; then
-            echo "Arquivo logicban_${version}_amd64.deb não encontrado!"
-            exit 1
-          fi
-
+          dpkg-deb -x ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban
+          dpkg-deb -e ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban/DEBIAN
+          # Removendo as dependências desnecessárias do arquivo control
+          sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
+          sed -i '/libmd0/d' /tmp/logicban/DEBIAN/control
+          sed -i '/libx11-6/d' /tmp/logicban/DEBIAN/control
+          # Removendo o campo "Depends" se não for necessário
+          sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
+          # Recriar o pacote .deb com o arquivo control modificado
+          dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_${version}_amd64.deb
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
@@ -167,13 +183,11 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
-
       - name: Read Version from pom.xml
         id: project_version
         run: |
           VERSION=$(mvn org.codehaus.mojo:exec-maven-plugin:1.6.0:exec -Dexec.executable="echo" -Dexec.args='${project.version}' -q --non-recursive)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
       - name: Build with Maven
         run: mvn package
 
@@ -182,7 +196,7 @@ jobs:
           version="${{ steps.project_version.outputs.version }}"
           jpackage --type dmg \
              --input target \
-             --main-jar "LogicBan-$version-jar-with-dependencies.jar"  \
+             --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
              --main-class br.ufcat.logicban.ui.Main \
              --dest target/jpackage \
              --app-version "$version" \
@@ -191,14 +205,6 @@ jobs:
              --copyright "Copyright (C) 2025" \
              --icon src/resources/assets/logos/icone.ico
     
-      - name: Verify macOS artifact
-        run: |
-          version="${{ steps.project_version.outputs.version }}"
-          if [ ! -f "target/jpackage/LogicBan-$version.dmg" ]; then
-            echo "Arquivo LogicBan-$version.dmg não encontrado!"
-            exit 1
-          fi
-
       - name: List jpackage Output
         run: ls -lh target/jpackage/
 
@@ -228,33 +234,28 @@ jobs:
             ls -lh ./artifacts/logicban-windows
             ls -lh ./artifacts/logicban-linux-deb
             ls -lh ./artifacts/logicban-macos
-
       # Calcular Hashes
       - name: Generate checksums
         id: checksums
         shell: bash
         run: |
           VERSION="${{ needs.build-windows.outputs.version }}"
-          WIN_FILE="./artifacts/logicban-windows/LogicBan-$VERSION.exe"
+          WIN_FILE="./artifacts/logicban-windows/LogicBan-${VERSION}.exe"
           LINUX_FILE="./artifacts/logicban-linux-deb/logicban_${VERSION}_amd64.deb"
-          MACOS_FILE="./artifacts/logicban-macos/LogicBan-$VERSION.dmg"
-
+          MACOS_FILE="./artifacts/logicban-macos/LogicBan-${VERSION}.dmg"
           WIN_SHA256=$(sha256sum "$WIN_FILE" | awk '{print $1}')
           LINUX_SHA256=$(sha256sum "$LINUX_FILE" | awk '{print $1}')
           MACOS_SHA256=$(sha256sum "$MACOS_FILE" | awk '{print $1}')
-
           echo "win_sha256=$WIN_SHA256" >> $GITHUB_OUTPUT
           echo "linux_sha256=$LINUX_SHA256" >> $GITHUB_OUTPUT
           echo "macos_sha256=$MACOS_SHA256" >> $GITHUB_OUTPUT
-
       - name: Verify Windows artifact
         run: |
           VERSION="${{ needs.build-windows.outputs.version }}"
-          if [ ! -f "./artifacts/logicban-windows/LogicBan-$VERSION.exe" ]; then
-            echo "Arquivo LogicBan-$VERSION.exe não encontrado!"
+          if [ ! -f "./artifacts/logicban-windows/LogicBan-${VERSION}.exe" ]; then
+            echo "Arquivo LogicBan-${VERSION}.exe não encontrado!"
             exit 1
           fi
-
       - name: Verify Linux artifact
         run: |
           VERSION="${{ needs.build-windows.outputs.version }}"
@@ -262,15 +263,13 @@ jobs:
             echo "Arquivo logicban_${VERSION}_amd64.deb não encontrado!"
             exit 1
           fi
-
       - name: Verify macOS artifact
         run: |
           VERSION="${{ needs.build-windows.outputs.version }}"
-          if [ ! -f "./artifacts/logicban-macos/LogicBan-$VERSION.dmg" ]; then
-            echo "Arquivo LogicBan-$VERSION.dmg não encontrado!"
+          if [ ! -f "./artifacts/logicban-macos/LogicBan-${VERSION}.dmg" ]; then
+            echo "Arquivo LogicBan-${VERSION}.dmg não encontrado!"
             exit 1
           fi
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -286,7 +285,6 @@ jobs:
             * Windows SHA256: ${{ steps.checksums.outputs.win_sha256 }}
             * Linux SHA256: ${{ steps.checksums.outputs.linux_sha256 }}
             * macOS SHA256: ${{ steps.checksums.outputs.macos_sha256 }}
-
       - name: Upload Windows artifact to release
         uses: actions/upload-release-asset@v1
         env:
