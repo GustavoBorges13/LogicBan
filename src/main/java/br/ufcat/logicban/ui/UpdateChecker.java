@@ -12,13 +12,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Properties;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -27,13 +24,12 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import org.json.JSONObject;
 
 public class UpdateChecker {
 
@@ -44,60 +40,22 @@ public class UpdateChecker {
 
 	static {
 		try {
-			currentVersion = getVersionFromProperties();
-		} catch (IOException e) {
-			System.err.println("Erro ao ler a versão do app.properties: " + e.getMessage());
-			currentVersion = "0.0.0"; // Versão padrão em caso de falha
-		}
-	}
-
-	private static String getVersionFromProperties() throws IOException {
-		Properties properties = new Properties();
-		InputStream input = null;
-		try {
-			System.out.println("Tentando carregar app.properties...");
-			input = UpdateChecker.class.getClassLoader().getResourceAsStream("app.properties");
-			if (input == null) {
-				System.err.println("app.properties NÃO encontrado!");
-				throw new IOException("app.properties não encontrado");
-			}
-			System.out.println("app.properties encontrado.");
-			properties.load(input);
-			System.out.println("app.properties carregado com sucesso.");
-			String version = properties.getProperty("project.version");
-			System.out.println("Versão lida do app.properties: " + version);
-			return version;
-		} catch (IOException e) {
-			System.err.println("Erro ao ler app.properties: " + e.getMessage());
-			throw e;
+			currentVersion = getCurrentVersionFromPom();
 		} catch (Exception e) {
-			System.err.println("Erro inesperado ao ler app.properties: " + e.getMessage());
-			throw new IOException("Erro inesperado ao ler app.properties", e);
-		} finally {
-			if (input != null) {
-				try {
-					input.close();
-					System.out.println("InputStream fechado.");
-				} catch (IOException e) {
-					System.err.println("Erro ao fechar InputStream: " + e.getMessage());
-				}
-			}
+			System.err.println("Erro ao ler a versão do pom.xml: " + e.getMessage());
+			currentVersion = "0.0.0"; // Versão padrão em caso de falha
 		}
 	}
 
 	public static void checkForUpdates() {
 		try {
-			// Obtém a tag da última release da API do GitHub
 			String latestVersion = getLatestVersionFromGitHub();
-
 			if (latestVersion != null) {
-				// Remove o "v" da tag do GitHub
 				latestVersion = latestVersion.startsWith("v") ? latestVersion.substring(1) : latestVersion;
 
-				// Compara a versão atual com a última versão
-				if (!currentVersion.equals(latestVersion)) {
+				if (isGitHubVersionNewer(currentVersion, latestVersion)) {
 					System.out.println("Nova versão disponível: " + latestVersion);
-					showUpdateDialog(latestVersion); // Mostra o diálogo de atualização
+					showUpdateDialog(latestVersion);
 				} else {
 					System.out.println("O aplicativo está atualizado.");
 				}
@@ -106,6 +64,29 @@ public class UpdateChecker {
 			}
 		} catch (IOException e) {
 			System.err.println("Erro ao verificar atualizações: " + e.getMessage());
+		}
+	}
+
+	private static boolean isGitHubVersionNewer(String currentVersion, String latestVersion) {
+		String[] currentParts = currentVersion.split("\\.");
+		String[] latestParts = latestVersion.split("\\.");
+
+		int currentMajor = Integer.parseInt(currentParts[0]);
+		int currentMinor = Integer.parseInt(currentParts[1]);
+		int currentPatch = Integer.parseInt(currentParts[2]);
+
+		int latestMajor = Integer.parseInt(latestParts[0]);
+		int latestMinor = Integer.parseInt(latestParts[1]);
+		int latestPatch = Integer.parseInt(latestParts[2]);
+
+		if (latestMajor > currentMajor) {
+			return true;
+		} else if (latestMajor == currentMajor && latestMinor > currentMinor) {
+			return true;
+		} else if (latestMajor == currentMajor && latestMinor == currentMinor && latestPatch > currentPatch) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -137,6 +118,26 @@ public class UpdateChecker {
 		} catch (Exception e) {
 			System.err.println("Erro ao processar a resposta da API do GitHub: " + e.getMessage());
 			return null;
+		}
+	}
+
+	private static String getCurrentVersionFromPom() throws Exception {
+		try {
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse("pom.xml"); // Nome do arquivo pom.xml
+			doc.getDocumentElement().normalize();
+
+			NodeList nList = doc.getElementsByTagName("version");
+			if (nList.getLength() > 0) {
+				Node node = nList.item(0);
+				return node.getTextContent();
+			} else {
+				throw new Exception("Tag 'version' não encontrada no pom.xml");
+			}
+		} catch (Exception e) {
+			System.err.println("Erro ao ler o pom.xml: " + e.getMessage());
+			throw e;
 		}
 	}
 

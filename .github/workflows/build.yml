@@ -12,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Necessário para obter o histórico completo para tags
 
       - name: Set up JDK
         uses: actions/setup-java@v3
@@ -27,15 +27,29 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
-
+      - name: Set JAVA_HOME
+        shell: pwsh
+        run: |
+          Write-Host "JAVA_HOME: $env:JAVA_HOME"
+          if (-not $env:JAVA_HOME) {
+            Write-Host "JAVA_HOME não está definido. Definindo..."
+            $env:JAVA_HOME = $env:JAVA_HOME_23_X64
+            Write-Host "JAVA_HOME agora: $env:JAVA_HOME"
+          }
+      - name: Add Maven to PATH
+        shell: pwsh
+        run: |
+          Write-Host "PATH antes: $env:PATH"
+          $env:PATH = "$env:PATH;C:\Maven SDK\apache-maven-3.9.9\bin" # Substitua pelo caminho correto
+          Write-Host "PATH depois: $env:PATH"
       - name: Read Version from pom.xml
         id: project_version
         shell: pwsh
         run: |
+          # Extrai a versão do pom.xml usando um comando XML
           [xml]$pom = Get-Content pom.xml
           $VERSION = $pom.project.version
           echo "version=$VERSION" >> $env:GITHUB_OUTPUT
-
       - name: Build with Maven
         run: mvn package
 
@@ -43,8 +57,7 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ steps.project_version.outputs.version }}"
-          jpackage --verbose `
-                   --type exe `
+          jpackage --type exe `
                    --input target `
                    --main-jar "LogicBan-$version-jar-with-dependencies.jar" `
                    --main-class br.ufcat.logicban.ui.Main `
@@ -58,12 +71,12 @@ jobs:
                    --win-per-user-install `
                    --win-help-url "https://github.com/GustavoBorges13/LogicBan/wiki/Tutorial-%E2%80%90-Como-jogar" `
                    --win-update-url "https://github.com/GustavoBorges13/LogicBan/releases/latest"
-
+      
       - name: Verify Windows artifact
         shell: pwsh
         run: |
             dir target/jpackage/
-
+        
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
@@ -120,7 +133,7 @@ jobs:
              --name LogicBan \
              --vendor "Bug Hunters" \
              --copyright "Copyright (C) 2025" \
-             --icon src/resources/assets/logos/icone.png \
+             --icon src/resources/assets/logos/icone.png 
 
       - name: Clean up dependencies in control file
         run: |
