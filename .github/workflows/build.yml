@@ -28,14 +28,10 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-
 
-      - name: Read Version from pom.xml
+      - name: Get POM version
         id: project_version
-        shell: pwsh
-        run: |
-              $VERSION = $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-                echo "version=$VERSION" >> $env:GITHUB_OUTPUT
-                echo "version_with_v=$VERSION" >> $env:GITHUB_OUTPUT # Add v for tag
-
+        uses: PERES-Richard/maven-get-version-action@v3.0.0
+      
       - name: Build with Maven
         run: mvn package
 
