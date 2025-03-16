@@ -29,6 +29,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+
+import br.ufcat.logicban.util.AppVersion;
+
 import org.json.JSONObject;
 
 public class UpdateChecker {
@@ -39,12 +42,12 @@ public class UpdateChecker {
 	private static String currentVersion;
 
 	static {
-		try {
-			currentVersion = getCurrentVersionFromPom();
-		} catch (Exception e) {
-			System.err.println("Erro ao ler a versão do pom.xml: " + e.getMessage());
-			currentVersion = "0.0.0"; // Versão padrão em caso de falha
-		}
+	    try {
+	        currentVersion = AppVersion.VERSION; // Use a constante da classe
+	    } catch (Exception e) {
+	        System.err.println("Erro ao ler a versão: " + e.getMessage());
+	        currentVersion = "0.0.0"; // Versão padrão em caso de falha
+	    }
 	}
 
 	public static void checkForUpdates() {

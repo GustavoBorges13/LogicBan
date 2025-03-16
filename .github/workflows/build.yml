@@ -28,14 +28,6 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-
 
-      - name: Read Version from pom.xml
-        id: project_version
-        shell: pwsh
-        run: |
-          # Extrai a versão do pom.xml usando um comando XML
-          [xml]$pom = Get-Content pom.xml
-          $VERSION = $pom.project.version
-          echo "version=$VERSION" >> $env:GITHUB_OUTPUT
       - name: Build with Maven
         run: mvn package
 
@@ -68,8 +60,6 @@ jobs:
         with:
           name: logicban-windows
           path: target/jpackage/*.exe
-    outputs:
-      version: ${{ steps.project_version.outputs.version }}
 
   build-linux:
     runs-on: ubuntu-latest
@@ -92,11 +82,7 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
-      - name: Read Version from pom.xml
-        id: project_version
-        run: |
-          VERSION=$(mvn org.codehaus.mojo:exec-maven-plugin:1.6.0:exec -Dexec.executable="echo" -Dexec.args='${project.version}' -q --non-recursive)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Build with Maven
         run: mvn package
     
@@ -136,8 +122,6 @@ jobs:
         with:
           name: logicban-linux-deb
           path: ./jpackage-output/*.deb
-    outputs:
-      version: ${{ steps.project_version.outputs.version }}
 
   build-macos:
     runs-on: macos-latest
@@ -160,11 +144,7 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
-      - name: Read Version from pom.xml
-        id: project_version
-        run: |
-          VERSION=$(mvn org.codehaus.mojo:exec-maven-plugin:1.6.0:exec -Dexec.executable="echo" -Dexec.args='${project.version}' -q --non-recursive)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Build with Maven
         run: mvn package
 
@@ -190,14 +170,12 @@ jobs:
         with:
           name: logicban-macos
           path: target/jpackage/*.dmg
-    outputs:
-      version: ${{ steps.project_version.outputs.version }}
 
   upload-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Permissão para criar releases e fazer upload de ativos
-      actions: read    # Permissão para acessar os artefatos
+      contents: write
+      actions: read
 
     needs: [build-windows, build-linux, build-macos]
     steps:
@@ -205,6 +183,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
+
+      - name: Read version from version.properties
+        id: get_version
+        run: |
+          VERSION=$(grep "version=" ./artifacts/target/classes/version.properties | cut -d '=' -f 2)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Verify downloaded artifacts
         run: |
@@ -216,7 +200,7 @@ jobs:
         id: checksums
         shell: bash
         run: |
-          VERSION="${{ needs.build-windows.outputs.version }}"
+          VERSION="${{ steps.get_version.outputs.version }}"
           WIN_FILE="./artifacts/logicban-windows/LogicBan-${VERSION}.exe"
           LINUX_FILE="./artifacts/logicban-linux-deb/logicban_${VERSION}_amd64.deb"
           MACOS_FILE="./artifacts/logicban-macos/LogicBan-${VERSION}.dmg"
@@ -228,33 +212,34 @@ jobs:
           echo "macos_sha256=$MACOS_SHA256" >> $GITHUB_OUTPUT
       - name: Verify Windows artifact
         run: |
-          VERSION="${{ needs.build-windows.outputs.version }}"
+          VERSION="${{ steps.get_version.outputs.version }}"
           if [ ! -f "./artifacts/logicban-windows/LogicBan-${VERSION}.exe" ]; then
             echo "Arquivo LogicBan-${VERSION}.exe não encontrado!"
             exit 1
           fi
       - name: Verify Linux artifact
         run: |
-          VERSION="${{ needs.build-windows.outputs.version }}"
+          VERSION="${{ steps.get_version.outputs.version }}"
           if [ ! -f "./artifacts/logicban-linux-deb/logicban_${VERSION}_amd64.deb" ]; then
             echo "Arquivo logicban_${VERSION}_amd64.deb não encontrado!"
             exit 1
           fi
       - name: Verify macOS artifact
         run: |
-          VERSION="${{ needs.build-windows.outputs.version }}"
+          VERSION="${{ steps.get_version.outputs.version }}"
           if [ ! -f "./artifacts/logicban-macos/LogicBan-${VERSION}.dmg" ]; then
             echo "Arquivo LogicBan-${VERSION}.dmg não encontrado!"
             exit 1
           fi
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ needs.build-windows.outputs.version }}
-          release_name: Release v${{ needs.build-windows.outputs.version }}
+          tag_name: v${{ steps.get_version.outputs.version }}
+          release_name: Release v${{ steps.get_version.outputs.version }}
           draft: false
           prerelease: false
           body: |
@@ -262,13 +247,14 @@ jobs:
             * Windows SHA256: ${{ steps.checksums.outputs.win_sha256 }}
             * Linux SHA256: ${{ steps.checksums.outputs.linux_sha256 }}
             * macOS SHA256: ${{ steps.checksums.outputs.macos_sha256 }}
+
       - name: Upload Windows artifact to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-windows/LogicBan-${{ needs.build-windows.outputs.version }}.exe
+          asset_path: ./artifacts/logicban-windows/LogicBan-${{ steps.get_version.outputs.version }}.exe
           asset_name: LogicBan-Windows.exe
           asset_content_type: application/octet-stream
 
@@ -278,7 +264,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-linux-deb/logicban_${{ needs.build-windows.outputs.version }}_amd64.deb
+          asset_path: ./artifacts/logicban-linux-deb/logicban_${{ steps.get_version.outputs.version }}_amd64.deb
           asset_name: LogicBan-Linux.deb
           asset_content_type: application/octet-stream
 
@@ -288,6 +274,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-macos/LogicBan-${{ needs.build-windows.outputs.version }}.dmg
+          asset_path: ./artifacts/logicban-macos/LogicBan-${{ steps.get_version.outputs.version }}.dmg
           asset_name: LogicBan-macOS.dmg
           asset_content_type: application/octet-stream
