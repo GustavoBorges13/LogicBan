@@ -3,6 +3,8 @@ package br.ufcat.logicban.entity;
 import java.awt.Color;
 import java.awt.Rectangle;
 
+import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
+import br.ufcat.logicban.tile_interactive.InteractiveTile;
 import br.ufcat.logicban.ui.GamePanel;
 import br.ufcat.logicban.ui.KeyHandler;
 
@@ -13,10 +15,10 @@ public class Player extends Entity {
 	public String walkType = "Smooth-Walk";
 	public int speedAux = 3;
 	public int speedMultiplicator = 0;
-	
-	//flags
+
+	// flags
 	public boolean allRocksOn = false;
-	
+
 	public Player(GamePanel gp, KeyHandler keyH) {
 		super(gp);
 
@@ -29,17 +31,16 @@ public class Player extends Entity {
 		solidAreaDefaultY = solidArea.y;
 		solidArea.width = 32;
 		solidArea.height = 32;
-		
+
 		color = Color.magenta;
-		
-		//setDefaultValues();
+
+		// setDefaultValues();
 		getPlayerImage();
-		
-		
+
 	}
 
 	public void setDefaultValues() {
-		
+
 		standCounter = 0;
 		hasKey = 0;
 		worldX = gp.eHandler.newWorldX;
@@ -51,19 +52,19 @@ public class Player extends Entity {
 
 	public void getPlayerImage() {
 		String name = "robot";
-		up1 = setup("/assets/player/"+name+"_up_1", gp.tileSize, gp.tileSize);
-		up2 = setup("/assets/player/"+name+"_up_2", gp.tileSize, gp.tileSize);
-		down1 = setup("/assets/player/"+name+"_down_1", gp.tileSize, gp.tileSize);
-		down2 = setup("/assets/player/"+name+"_down_2", gp.tileSize, gp.tileSize);
-		left1 = setup("/assets/player/"+name+"_left_1", gp.tileSize, gp.tileSize);
-		left2 = setup("/assets/player/"+name+"_left_2", gp.tileSize, gp.tileSize);
-		right1 = setup("/assets/player/"+name+"_right_1", gp.tileSize, gp.tileSize);
-		right2 = setup("/assets/player/"+name+"_right_2", gp.tileSize, gp.tileSize);
+		up1 = setup("/assets/player/" + name + "_up_1", gp.tileSize, gp.tileSize);
+		up2 = setup("/assets/player/" + name + "_up_2", gp.tileSize, gp.tileSize);
+		down1 = setup("/assets/player/" + name + "_down_1", gp.tileSize, gp.tileSize);
+		down2 = setup("/assets/player/" + name + "_down_2", gp.tileSize, gp.tileSize);
+		left1 = setup("/assets/player/" + name + "_left_1", gp.tileSize, gp.tileSize);
+		left2 = setup("/assets/player/" + name + "_left_2", gp.tileSize, gp.tileSize);
+		right1 = setup("/assets/player/" + name + "_right_1", gp.tileSize, gp.tileSize);
+		right2 = setup("/assets/player/" + name + "_right_2", gp.tileSize, gp.tileSize);
 
 	}
 
 	public void update() {
-	
+
 		if (walkType.equals("Smooth-Walk")) {
 			if (keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true
 					|| keyH.rightPressed == true) {
@@ -96,11 +97,8 @@ public class Player extends Entity {
 				// CHECK INTERACTIVE TILE COLISION
 				gp.cChecker.checkEntity(this, gp.iTile);
 
-				
 				// CHECK EVENT
 				gp.eHandler.checkEvent();
-				
-				
 
 				// IF COLLISION IS FALSE, PLAYER CAN MOVE
 				if (collisionOn == false) {
@@ -119,7 +117,7 @@ public class Player extends Entity {
 						worldX += speed;
 						break;
 					}
-				} 
+				}
 
 				// trocador de imagens/ sprrites
 				spriteCounter++;
@@ -196,6 +194,7 @@ public class Player extends Entity {
 			}
 			keyH.resetJustPressed();
 		}
+		detectPlate(); // Detecta se o player está em cima de uma placa
 	}
 
 	public void pickUpObject(int i) {
@@ -260,9 +259,7 @@ public class Player extends Entity {
 	public void interactNPC(int i) {
 
 		if (i != 999) {
-			//System.out.println("Voce esta colidindo com NPC");
-
-			// MOVER
+			// Obtém a entidade que o player está interagindo
 			gp.npc[gp.currentMap][i].move(direction);
 		}
 	}
