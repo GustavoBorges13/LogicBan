@@ -111,7 +111,7 @@ jobs:
       - name: Read version from version.properties
         id: get_version
         run: |
-          VERSION=$(grep "version=" ./target/classes/version.properties | cut -d '=' -f 2)
+          VERSION=$(sed -n 's/^version=//p' ./target/classes/version.properties | tr -d '[:space:]')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
             
 
