@@ -27,7 +27,6 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
-
       - name: Build with Maven
         run: mvn package
 
@@ -37,7 +36,6 @@ jobs:
         run: |
           $version = (Get-Content ./target/classes/version.properties | Select-String -Pattern "version=" | ForEach-Object {$_.Line.Split("=")[1]})
           echo "version=$version" >> $env:GITHUB_OUTPUT
-
       - name: Package with jpackage (Windows)
         shell: pwsh
         run: |
@@ -97,20 +95,17 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
-
       - name: Build with Maven
         run: mvn package
     
       - name: Verify jars targets
         run: |
           ls -lh target/*.jar
-
       - name: Read version from version.properties
         id: get_version
         run: |
           VERSION=$(sed -n 's/version=//p' ./target/classes/version.properties)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
       - name: Package with jpackage (Linux)
         run: |
           jpackage --type deb \
@@ -123,7 +118,6 @@ jobs:
              --vendor "Bug Hunters" \
              --copyright "Copyright (C) 2025" \
              --icon src/resources/assets/logos/icone.png
-
       - name: Clean up dependencies in control file
         run: |
           # Extraindo o conteúdo do pacote .deb
@@ -138,7 +132,6 @@ jobs:
           sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
           # Recriar o pacote .deb com o arquivo control modificado
           dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_${version}_amd64.deb
-
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
@@ -169,7 +162,6 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
-
       - name: Build with Maven
         run: mvn package
 
@@ -178,7 +170,6 @@ jobs:
         run: |
           VERSION=$(sed -E -n 's/version=(.*)/\1/p' ./target/classes/version.properties)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
       - name: Package with jpackage (macOS)
         run: |
           jpackage --type dmg \
@@ -195,7 +186,6 @@ jobs:
       - name: List jpackage Output
         run: |
           ls -lh target/jpackage/
-
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
@@ -213,22 +203,8 @@ jobs:
 
     needs: [build-windows, build-linux, build-macos]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Necessário para obter o histórico completo para tags
-
-      - name: Generate Changelog
-        id: changelog
-        uses: github-changelog-generator/github-changelog-generator@v1.15.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          future_release: v${{ needs.build-windows.outputs.version }}
-
-      - name: Debug Changelog
-        run: |
-          echo "Changelog:"
-          echo "${{ steps.changelog.outputs.changelog }}"
+      - name: Debug Needs Context
+        run: echo "${{ toJSON(needs) }}"
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -249,7 +225,6 @@ jobs:
           ls -lh ./artifacts/logicban-linux-deb
           ls -lh ./artifacts/logicban-macos
           ls -lh ./artifacts/logicban-jar      # Adicionado para debug
-
       # Calcular Hashes
       - name: Generate checksums
         id: checksums
@@ -258,22 +233,18 @@ jobs:
           VERSION_WIN="${{ needs.build-windows.outputs.version }}"
           VERSION_LINUX="${{ needs.build-linux.outputs.version }}"
           VERSION_MACOS="${{ needs.build-macos.outputs.version }}"
-
           WIN_FILE="./artifacts/logicban-windows/LogicBan-${VERSION_WIN}.exe"
           LINUX_FILE="./artifacts/logicban-linux-deb/logicban_${VERSION_LINUX}_amd64.deb"
           MACOS_FILE="./artifacts/logicban-macos/LogicBan-${VERSION_MACOS}.dmg"
           JAR_FILE="./artifacts/logicban-jar/LogicBan-${VERSION_WIN}-jar-with-dependencies.jar"
-
           WIN_SHA256=$(sha256sum "$WIN_FILE" | awk '{print $1}')
           LINUX_SHA256=$(sha256sum "$LINUX_FILE" | awk '{print $1}')
           MACOS_SHA256=$(sha256sum "$MACOS_FILE" | awk '{print $1}')
           JAR_SHA256=$(sha256sum "$JAR_FILE" | awk '{print $1}')
-
           echo "win_sha256=$WIN_SHA256" >> $GITHUB_OUTPUT
           echo "linux_sha256=$LINUX_SHA256" >> $GITHUB_OUTPUT
           echo "macos_sha256=$MACOS_SHA256" >> $GITHUB_OUTPUT
           echo "jar_sha256=$JAR_SHA256" >> $GITHUB_OUTPUT
-
       - name: Verify Windows artifact
         run: |
           VERSION_WIN="${{ needs.build-windows.outputs.version }}"
@@ -281,7 +252,6 @@ jobs:
             echo "Arquivo LogicBan-${VERSION_WIN}.exe não encontrado!"
             exit 1
           fi
-
       - name: Verify Linux artifact
         run: |
           VERSION_LINUX="${{ needs.build-linux.outputs.version }}"
@@ -289,7 +259,6 @@ jobs:
             echo "Arquivo logicban_${VERSION_LINUX}_amd64.deb não encontrado!"
             exit 1
           fi
-
       - name: Verify macOS artifact
         run: |
           VERSION_MACOS="${{ needs.build-macos.outputs.version }}"
@@ -297,7 +266,6 @@ jobs:
             echo "Arquivo LogicBan-${VERSION_MACOS}.dmg não encontrado!"
             exit 1
           fi
-
       - name: Verify Jar artifact
         run: |
           VERSION_WIN="${{ needs.build-windows.outputs.version }}"
@@ -305,7 +273,6 @@ jobs:
             echo "Arquivo LogicBan-${VERSION_WIN}-jar-with-dependencies.jar não encontrado!"
             exit 1
           fi
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -322,10 +289,6 @@ jobs:
             * Linux SHA256: ${{ steps.checksums.outputs.linux_sha256 }}
             * macOS SHA256: ${{ steps.checksums.outputs.macos_sha256 }}
             * JAR SHA256: ${{ steps.checksums.outputs.jar_sha256 }}
-
-            ## What's Changed
-            ${{ steps.changelog.outputs.changelog }}
-
       - name: Upload Windows artifact to release
         uses: actions/upload-release-asset@v1
         env:
