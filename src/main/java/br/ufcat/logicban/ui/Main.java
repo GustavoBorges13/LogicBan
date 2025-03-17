@@ -2,6 +2,10 @@ package br.ufcat.logicban.ui;
 
 import javax.swing.*;
 import com.formdev.flatlaf.FlatDarkLaf;
+
+import br.ufcat.logicban.util.MonitorSelectionWindow;
+import br.ufcat.logicban.util.UpdateChecker;
+
 import java.awt.*;
 
 public class Main {

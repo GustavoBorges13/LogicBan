@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 
 import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
 import br.ufcat.logicban.ui.GamePanel;
-import br.ufcat.logicban.ui.UtilityTool;
+import br.ufcat.logicban.util.UtilityTool;
 
 public class Entity {
 	GamePanel gp;

@@ -1,4 +1,4 @@
-package br.ufcat.logicban.ui;
+package br.ufcat.logicban.util;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -29,8 +29,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.formdev.flatlaf.FlatDarkLaf;
-
-import br.ufcat.logicban.util.AppVersion;
 
 import org.json.JSONObject;
 

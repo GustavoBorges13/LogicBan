@@ -5,19 +5,19 @@ import java.awt.image.BufferedImage;
 
 import br.ufcat.logicban.ui.GamePanel;
 
-public class Button_Voltar extends Button {
+public class Button_Continuar extends Button {
 
 	GamePanel gp;
-	public static final String objName = "Botao Proxima Fase";
+	public static final String objName = "Botao Continuar";
 
 	// Tamanho do botao na UI
 	int largura = 240, altura = 105; // tamanho imagem
 
-	public Button_Voltar(GamePanel gp) {
+	public Button_Continuar(GamePanel gp) {
 		super(gp);
 		this.gp = gp;
 
-		String imagePaths[] = { "/assets/buttons/voltar" };
+		String imagePaths[] = { "/assets/buttons/continuar" };
 
 		btnClick = setup(imagePaths[0], largura, altura);
 

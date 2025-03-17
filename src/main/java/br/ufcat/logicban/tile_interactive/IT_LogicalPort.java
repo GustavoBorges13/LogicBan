@@ -25,15 +25,79 @@ public class IT_LogicalPort extends InteractiveTile {
 		this.id = id;
 
 		name = itName;
-
-		solidArea = new Rectangle();
-		solidArea.x = 6;
-		solidArea.y = 8;
-		solidArea.width = 36;
-		solidArea.height = 38;
-		solidAreaDefaultX = solidArea.x;
-		solidAreaDefaultY = solidArea.y;
-		color = Color.black;
+		
+		switch (tipo) {
+		case "not":
+			solidArea = new Rectangle();
+			solidArea.x = 2;
+			solidArea.y = 8;
+			solidArea.width = 36;
+			solidArea.height = 30;
+			solidAreaDefaultX = solidArea.x;
+			solidAreaDefaultY = solidArea.y;
+			color = Color.black;
+			break;
+		case "and":
+			solidArea = new Rectangle();
+			solidArea.x = 6;
+			solidArea.y = 10;
+			solidArea.width = 36;
+			solidArea.height = 38;
+			solidAreaDefaultX = solidArea.x;
+			solidAreaDefaultY = solidArea.y;
+			color = Color.black;
+			break;
+		case "or":
+			solidArea = new Rectangle();
+			solidArea.x = 6;
+			solidArea.y = 8;
+			solidArea.width = 36;
+			solidArea.height = 38;
+			solidAreaDefaultX = solidArea.x;
+			solidAreaDefaultY = solidArea.y;
+			color = Color.black;
+			break;
+		case "nor":
+			solidArea = new Rectangle();
+			solidArea.x = 6;
+			solidArea.y = 8;
+			solidArea.width = 36;
+			solidArea.height = 38;
+			solidAreaDefaultX = solidArea.x;
+			solidAreaDefaultY = solidArea.y;
+			color = Color.black;
+			break;
+		case "xor":
+			solidArea = new Rectangle();
+			solidArea.x = 6;
+			solidArea.y = 8;
+			solidArea.width = 36;
+			solidArea.height = 38;
+			solidAreaDefaultX = solidArea.x;
+			solidAreaDefaultY = solidArea.y;
+			color = Color.black;
+			break;
+		case "nand":
+			solidArea = new Rectangle();
+			solidArea.x = 6;
+			solidArea.y = 8;
+			solidArea.width = 36;
+			solidArea.height = 38;
+			solidAreaDefaultX = solidArea.x;
+			solidAreaDefaultY = solidArea.y;
+			color = Color.black;
+			break;
+		case "xnor":
+			solidArea = new Rectangle();
+			solidArea.x = 6;
+			solidArea.y = 8;
+			solidArea.width = 36;
+			solidArea.height = 38;
+			solidAreaDefaultX = solidArea.x;
+			solidAreaDefaultY = solidArea.y;
+			color = Color.black;
+			break;
+		}
 
 		getImage(tipo);
 	}

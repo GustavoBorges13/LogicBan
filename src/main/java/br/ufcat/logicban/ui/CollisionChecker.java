@@ -78,7 +78,7 @@ public class CollisionChecker {
 		}
 		if (gp.tileM.tile[tileNum1].collision == true || gp.tileM.tile[tileNum2].collision == true) {
 			entity.collisionOn = true;
-			// System.out.println("Colidiu com paredes ou arvores, etc");
+			System.out.println("Colidiu com paredes ou arvores, etc");
 		}
 
 	}

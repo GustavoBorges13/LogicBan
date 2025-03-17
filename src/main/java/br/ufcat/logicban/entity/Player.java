@@ -81,7 +81,7 @@ public class Player extends Entity {
 				// CHECK TILE COLLISION
 				collisionOn = false;
 				collisionEndWorld = false;
-				gp.cChecker.checkTile(this);
+				//gp.cChecker.checkTile(this);
 
 				// CHECK END WORLD COLLISION
 				gp.cChecker.checkEnd(this);
@@ -93,6 +93,9 @@ public class Player extends Entity {
 				// CHECK NPC COLLISION
 				int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
 				interactNPC(npcIndex);
+
+				int iTileIndex = gp.cChecker.checkObject(this, true);
+				interactInteractiveTile(iTileIndex);
 
 				// CHECK INTERACTIVE TILE COLISION
 				gp.cChecker.checkEntity(this, gp.iTile);
@@ -164,6 +167,9 @@ public class Player extends Entity {
 				int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
 				interactNPC(npcIndex);
 
+				int iTileIndex = gp.cChecker.checkObject(this, true);
+				interactInteractiveTile(iTileIndex);
+
 				// CHECK INTERACTIVE TILE COLISION
 				gp.cChecker.checkEntity(this, gp.iTile);
 
@@ -223,16 +229,28 @@ public class Player extends Entity {
 					System.out.println("Porta: " + hasKey); // debug em terminal
 					gp.ui.showMessage("Você abriu a porta!"); // debug em UI
 				} else {
-					gp.ui.showMessage("Voce precisa de uma chave!");
+					gp.ui.showMessage("Voce precisa acerta a combinação logica!");
 				}
 				break;
+
 			case "Door Iron":
-				if (allRocksOn == true) {
+				if (hasKey > 0) {
+					gp.playSFX(3);
+					gp.obj[gp.currentMap][i] = null;
+					hasKey--;
+					System.out.println("Porta: " + hasKey); // debug em terminal
 					gp.ui.showMessage("Você abriu a porta!"); // debug em UI
 				} else {
-					gp.ui.showMessage("Voce precisa de três caixas nas placas");
+					gp.ui.showMessage("Voce precisa acerta a combinação logica!");
 				}
 				break;
+//			case "Door Iron":
+//				if (allRocksOn == true) {
+//					gp.ui.showMessage("Você abriu a porta!"); // debug em UI
+//				} else {
+//					gp.ui.showMessage("Voce precisa acerta a combinação logica!");
+//				}
+//				break;
 			case "Boots":
 
 				gp.playSFX(2);
@@ -248,9 +266,11 @@ public class Player extends Entity {
 				gp.ui.showMessage("Speed UP!");
 				break;
 			case "Chest":
-				gp.ui.gameFinished = true;
+//				gp.ui.gameFinished = true;
 				gp.stopMusic();
 				gp.playSFX(4);
+				gp.ui.levelFinished = true;
+				gp.gameState = gp.nextPhaseState;
 				break;
 			}
 		}
@@ -261,6 +281,15 @@ public class Player extends Entity {
 		if (i != 999) {
 			// Obtém a entidade que o player está interagindo
 			gp.npc[gp.currentMap][i].move(direction);
+		}
+	}
+
+	public void interactInteractiveTile(int i) {
+
+		if (i != 999) {
+
+			gp.ui.showMessage("Voce precisa acerta a combinação logica!");
+
 		}
 	}
 }

@@ -119,6 +119,7 @@ public class NPC_OldMan extends Entity {
 			// CHECK END WORLD COLLISION
 			gp.cChecker.checkEnd(this);
 
+			
 			gp.cChecker.checkPlayer(this);
 
 			// CHECK NPC COLLISION
