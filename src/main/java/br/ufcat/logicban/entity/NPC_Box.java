@@ -28,10 +28,10 @@ public class NPC_Box extends Entity {
 		speed = 3;
 
 		solidArea = new Rectangle();
-		solidArea.x = 6;
-		solidArea.y = 9;
-		solidArea.width = 38;
-		solidArea.height = 32;
+		solidArea.x = 4;
+		solidArea.y = 4;
+		solidArea.width = 42;
+		solidArea.height = 42;
 		solidAreaDefaultX = solidArea.x;
 		solidAreaDefaultY = solidArea.y;
 		color = Color.ORANGE;

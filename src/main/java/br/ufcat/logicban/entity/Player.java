@@ -81,7 +81,7 @@ public class Player extends Entity {
 				// CHECK TILE COLLISION
 				collisionOn = false;
 				collisionEndWorld = false;
-				//gp.cChecker.checkTile(this);
+				gp.cChecker.checkTile(this);
 
 				// CHECK END WORLD COLLISION
 				gp.cChecker.checkEnd(this);
