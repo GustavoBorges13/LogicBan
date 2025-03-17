@@ -27,6 +27,7 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
+
       - name: Build with Maven
         run: mvn package
 
@@ -65,6 +66,12 @@ jobs:
         with:
           name: logicban-windows
           path: target/jpackage/*.exe
+          
+      - name: Upload Jar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: logicban-jar
+          path: target/LogicBan-${{ steps.get_version.outputs.version }}-jar-with-dependencies.jar
 
     outputs:
       version: ${{ steps.get_version.outputs.version }}
@@ -90,17 +97,20 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
+
       - name: Build with Maven
         run: mvn package
     
       - name: Verify jars targets
         run: |
           ls -lh target/*.jar
+
       - name: Read version from version.properties
         id: get_version
         run: |
           VERSION=$(sed -n 's/version=//p' ./target/classes/version.properties)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Package with jpackage (Linux)
         run: |
           jpackage --type deb \
@@ -113,6 +123,7 @@ jobs:
              --vendor "Bug Hunters" \
              --copyright "Copyright (C) 2025" \
              --icon src/resources/assets/logos/icone.png
+
       - name: Clean up dependencies in control file
         run: |
           # Extraindo o conteúdo do pacote .deb
@@ -127,11 +138,13 @@ jobs:
           sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
           # Recriar o pacote .deb com o arquivo control modificado
           dpkg-deb -b /tmp/logicban ./jpackage-output/logicban_${version}_amd64.deb
+
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
           name: logicban-linux-deb
           path: ./jpackage-output/*.deb
+
     outputs:
       version: ${{ steps.get_version.outputs.version }}
 
@@ -156,6 +169,7 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
+
       - name: Build with Maven
         run: mvn package
 
@@ -181,6 +195,7 @@ jobs:
       - name: List jpackage Output
         run: |
           ls -lh target/jpackage/
+
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
@@ -213,11 +228,14 @@ jobs:
           ls -lh ./artifacts/logicban-windows  # Adicionado para debug
           ls -lh ./artifacts/logicban-linux-deb  # Adicionado para debug
           ls -lh ./artifacts/logicban-macos  # Adicionado para debug
+          ls -lh ./artifacts/logicban-jar      # Adicionado para debug
       - name: Verify downloaded artifacts
         run: |
           ls -lh ./artifacts/logicban-windows
           ls -lh ./artifacts/logicban-linux-deb
           ls -lh ./artifacts/logicban-macos
+          ls -lh ./artifacts/logicban-jar      # Adicionado para debug
+
       # Calcular Hashes
       - name: Generate checksums
         id: checksums
@@ -230,14 +248,18 @@ jobs:
           WIN_FILE="./artifacts/logicban-windows/LogicBan-${VERSION_WIN}.exe"
           LINUX_FILE="./artifacts/logicban-linux-deb/logicban_${VERSION_LINUX}_amd64.deb"
           MACOS_FILE="./artifacts/logicban-macos/LogicBan-${VERSION_MACOS}.dmg"
+          JAR_FILE="./artifacts/logicban-jar/LogicBan-${VERSION_WIN}-jar-with-dependencies.jar"
 
           WIN_SHA256=$(sha256sum "$WIN_FILE" | awk '{print $1}')
           LINUX_SHA256=$(sha256sum "$LINUX_FILE" | awk '{print $1}')
           MACOS_SHA256=$(sha256sum "$MACOS_FILE" | awk '{print $1}')
+          JAR_SHA256=$(sha256sum "$JAR_FILE" | awk '{print $1}')
 
           echo "win_sha256=$WIN_SHA256" >> $GITHUB_OUTPUT
           echo "linux_sha256=$LINUX_SHA256" >> $GITHUB_OUTPUT
           echo "macos_sha256=$MACOS_SHA256" >> $GITHUB_OUTPUT
+          echo "jar_sha256=$JAR_SHA256" >> $GITHUB_OUTPUT
+
       - name: Verify Windows artifact
         run: |
           VERSION_WIN="${{ needs.build-windows.outputs.version }}"
@@ -245,6 +267,7 @@ jobs:
             echo "Arquivo LogicBan-${VERSION_WIN}.exe não encontrado!"
             exit 1
           fi
+
       - name: Verify Linux artifact
         run: |
           VERSION_LINUX="${{ needs.build-linux.outputs.version }}"
@@ -252,6 +275,7 @@ jobs:
             echo "Arquivo logicban_${VERSION_LINUX}_amd64.deb não encontrado!"
             exit 1
           fi
+
       - name: Verify macOS artifact
         run: |
           VERSION_MACOS="${{ needs.build-macos.outputs.version }}"
@@ -259,6 +283,15 @@ jobs:
             echo "Arquivo LogicBan-${VERSION_MACOS}.dmg não encontrado!"
             exit 1
           fi
+
+      - name: Verify Jar artifact
+        run: |
+          VERSION_WIN="${{ needs.build-windows.outputs.version }}"
+          if [ ! -f "./artifacts/logicban-jar/LogicBan-${VERSION_WIN}-jar-with-dependencies.jar" ]; then
+            echo "Arquivo LogicBan-${VERSION_WIN}-jar-with-dependencies.jar não encontrado!"
+            exit 1
+          fi
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -274,6 +307,8 @@ jobs:
             * Windows SHA256: ${{ steps.checksums.outputs.win_sha256 }}
             * Linux SHA256: ${{ steps.checksums.outputs.linux_sha256 }}
             * macOS SHA256: ${{ steps.checksums.outputs.macos_sha256 }}
+            * JAR SHA256: ${{ steps.checksums.outputs.jar_sha256 }}
+
       - name: Upload Windows artifact to release
         uses: actions/upload-release-asset@v1
         env:
@@ -303,3 +338,13 @@ jobs:
           asset_path: ./artifacts/logicban-macos/LogicBan-${{ needs.build-macos.outputs.version }}.dmg
           asset_name: LogicBan-macOS.dmg
           asset_content_type: application/octet-stream
+
+      - name: Upload Jar artifact to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/logicban-jar/LogicBan-${{ needs.build-windows.outputs.version }}-jar-with-dependencies.jar
+          asset_name: LogicBan.jar
+          asset_content_type: application/java-archive
