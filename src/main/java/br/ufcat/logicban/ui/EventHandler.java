@@ -18,6 +18,7 @@ public class EventHandler {
 	public int newWorldX, newWorldY, oldSpeed = 3;
 	public static boolean debugModeOn = false;
 	private ArrayList<TeleportEvent> teleportEvents = new ArrayList<>();
+	private TeleportEvent pendingTeleport; // Armazena informações do teleporte pendente
 
 	public EventHandler(GamePanel gp) {
 		this.gp = gp;
@@ -43,31 +44,14 @@ public class EventHandler {
 
 	// Aqui onde fica eventos de teleporte, TP inicial X TP final
 	private void carregarEventos() {
-		teleportEvents.add(new TeleportEvent(0, 29, 6, "right", 1, 2, 2, "right")); // fase1 -> fase2
-		teleportEvents.add(new TeleportEvent(0, 29, 7, "right", 1, 2, 2, "right"));
-		teleportEvents.add(new TeleportEvent(0, 29, 8, "right", 1, 2, 2, "right"));
-		
-		teleportEvents.add(new TeleportEvent(1, 1, 15, "down", 2, 1, 0, "down")); // fase2 -> fase3
-		teleportEvents.add(new TeleportEvent(1, 2, 15, "down", 2, 1, 0, "down"));
-		teleportEvents.add(new TeleportEvent(1, 3, 15, "down", 2, 1, 0, "down"));
+		teleportEvents.add(new TeleportEvent(0, 16, 8, "right", 1, 9, 9, "right")); // fase1 -> fase2
 
-		teleportEvents.add(new TeleportEvent(2, 0, 0, "up", 1, 2, 15, "up")); // fase3 -> fase2
-		teleportEvents.add(new TeleportEvent(2, 1, 0, "up", 1, 2, 15, "up"));
-		teleportEvents.add(new TeleportEvent(2, 2, 0, "up", 1, 2, 15, "up"));
+		teleportEvents.add(new TeleportEvent(1, 21, 12, "down", 2, 1, 0, "down")); // fase2 -> fase3
 
-		teleportEvents.add(new TeleportEvent(2, 16, 10, "left", 3, 11, 10, "up")); // fase3 -> fase4
-		teleportEvents.add(new TeleportEvent(3, 11, 11, "down", 2, 17, 10, "right")); // fase4 -> fase3
 	}
 
 	public void playerNewGamePosition() {
-		switch(gp.currentMap) {
-		case 0: newWorldX = gp.tileSize * 4; newWorldY = gp.tileSize * 2; break;
-		case 1: newWorldX = gp.tileSize * 2; newWorldY = gp.tileSize * 2; break;
-		case 2: newWorldX = gp.tileSize * 1; newWorldY = gp.tileSize * 0; break;
-		case 3: newWorldX = gp.tileSize * 11; newWorldY = gp.tileSize * 10; break;
-		}
-		oldSpeed = gp.player.speed - (2*gp.player.speedMultiplicator);
-		gp.player.speedMultiplicator = 0;
+
 	}
 
 	public void checkEvent() {
@@ -83,10 +67,27 @@ public class EventHandler {
 		if (canTouchEvent) {
 			for (TeleportEvent event : teleportEvents) {
 				if (hit(event.currentMap, event.col, event.row, event.direction)) {
-					teleport(event.targetMap, event.targetCol, event.targetRow, event.targetDirection);
-					break; // Evita múltiplos teleportes simultâneos
+					// Armazena as informações do teleporte pendente
+					pendingTeleport = event;
+
+					// Abre a tela de escolha
+					gp.gameState = gp.nextPhaseState;
+					gp.ui.levelFinished = true;
+					gp.stopMusic();
+					gp.playSFX(4);
+					break; // Importante: Evita múltiplos eventos
 				}
 			}
+		}
+	}
+
+	// Novo método para executar o teleporte (chamado pelo KeyHandler)
+	public void executePendingTeleport() {
+		if (pendingTeleport != null) {
+			teleport(pendingTeleport.targetMap, pendingTeleport.targetCol, pendingTeleport.targetRow,
+					pendingTeleport.targetDirection);
+			pendingTeleport = null; // Limpa o teleporte pendente
+			gp.ui.levelFinished = false; // Reseta pra nao bugar a tela e só aparecer 1 vez
 		}
 	}
 
@@ -121,6 +122,7 @@ public class EventHandler {
 	}
 
 	public void teleport(int targetMapIndex, int col, int row, String direction) {
+		
 		// Garante que o índice está dentro do array
 		if (targetMapIndex >= 0 && targetMapIndex < gp.faseMap.length) {
 			gp.gameState = gp.transitionState;
@@ -134,20 +136,19 @@ public class EventHandler {
 			// gp.currentMap = targetMapIndex; // Opcional, depende do fluxo
 		}
 	}
-	
-	
+
 	// Os teleporte agora são desenhado de azul na tela caso use ferramenta debug !
 	public void draw(Graphics2D g2) {
-	    if (debugModeOn && eventRect != null) {
-	        g2.setColor(Color.CYAN);
-	        g2.setStroke(new BasicStroke(4));
+		if (debugModeOn && eventRect != null) {
+			g2.setColor(Color.CYAN);
+			g2.setStroke(new BasicStroke(4));
 
-	        for (TeleportEvent event : teleportEvents) {
-	            if (event.currentMap == gp.currentMap) { // Filtra apenas os eventos do mapa atual
-	                g2.drawRect(event.col * gp.tileSize, event.row * gp.tileSize, gp.tileSize, gp.tileSize);
-	            }
-	        }
-	    }
+			for (TeleportEvent event : teleportEvents) {
+				if (event.currentMap == gp.currentMap) { // Filtra apenas os eventos do mapa atual
+					g2.drawRect(event.col * gp.tileSize, event.row * gp.tileSize, gp.tileSize, gp.tileSize);
+				}
+			}
+		}
 	}
 
 }

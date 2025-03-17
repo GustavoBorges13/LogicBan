@@ -5,35 +5,34 @@ import java.awt.image.BufferedImage;
 
 import br.ufcat.logicban.ui.GamePanel;
 
-public class Button_Voltar extends Button {
+public class Button_Menu extends Button {
 
 	GamePanel gp;
-	public static final String objName = "Botao Proxima Fase";
+	public static final String objName = "Botao Menu";
 
 	// Tamanho do botao na UI
 	int largura = 240, altura = 105; // tamanho imagem
 
-	public Button_Voltar(GamePanel gp) {
+	public Button_Menu(GamePanel gp) {
 		super(gp);
 		this.gp = gp;
-
-		String imagePaths[] = { "/assets/buttons/voltar" };
+		
+		String imagePaths[] = { "/assets/buttons/menu" };
 
 		btnClick = setup(imagePaths[0], largura, altura);
 
-		btnAnimation = null;
+		btnAnimation = getSoundButtonImage("/assets/buttons/menu");
 
 	}
 
 	public BufferedImage[] getSoundButtonImage(String nameFile) {
 		BufferedImage[] frames = new BufferedImage[12]; // Certifique-se de inicializar o array
-		if (btnAnimation != null) {
-			for (int i = 0; i < 12; i++) {
-				frames[i] = setup(nameFile + (i + 1), largura, altura);
-			}
 
-			return frames;
-		} return null;
+		for (int i = 0; i < 12; i++) {
+			frames[i] = setup(nameFile + (i + 1), largura, altura);
+		}
+
+		return frames;
 	}
 
 	public void update() {
@@ -47,6 +46,21 @@ public class Button_Voltar extends Button {
 		if (!animation) {
 			return; // Se a animação não estiver ativada, não faz nada
 		}
+
+		spriteCounter++; // Incrementa o contador
+
+		// Começa a animação a cada 5 atualizações
+		if (spriteCounter >= 5) {
+			spriteNum++; // Avança para o próximo quadro
+			spriteCounter = 0; // Reseta o contador
+
+			if (spriteNum >= totalFrames) {
+				spriteNum = 0; // Reinicia a animação
+				animation = false; // Para a animação após completar
+				gp.ui.titleScreenState = 1;
+				gp.ui.commandNum = gp.currentMap;
+			}
+		}
 	}
 
 	public void draw(Graphics2D g2, int imgX, int imgY, int imgW, int imgH) {
@@ -57,6 +71,8 @@ public class Button_Voltar extends Button {
 		case "enable":
 			if (!animation) {
 				image = btnClick; // Exibe a imagem do botão 'on' quando não animando
+			} else {
+				image = btnAnimation[spriteNum]; // Exibe o quadro atual da animação "enable"
 			}
 			break;
 

@@ -8,13 +8,11 @@ import br.ufcat.logicban.tile.TileManager;
 public class KeyHandler implements KeyListener {
 
 	GamePanel gp;
-	public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed, rPressed;
+	public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed, rPressed, back_spacePressed = false;
 	int countAux = 0;
 	// Cooldown para o Undo
 	public int undoCooldown = 0;
 	final int undoCooldownMax = 5; // cooldown de 0.5 segundos (120 frames)
-
-	boolean flag = false;
 
 	// DEBUG
 	boolean showDebug = false;
@@ -44,7 +42,14 @@ public class KeyHandler implements KeyListener {
 
 		// PAUSE STATE
 		else if (gp.gameState == gp.pauseState) {
-			pauseState(code);
+			pauseState(code, e);
+		}
+
+		// PAUSE STATE
+		else if (gp.gameState == gp.nextPhaseState) {
+			// pauseState(code);
+
+			nextPhaseState(code, e);
 		}
 
 		// DIALOGUE STATE - NOTHING
@@ -53,16 +58,15 @@ public class KeyHandler implements KeyListener {
 
 		// OPTION STATE
 		else if (gp.gameState == gp.optionState) {
-			optionsState(code);
+			optionsState(code, e);
 		}
 	}
 
 	public void titleState(int code, KeyEvent e) {
 		// menu principal
-
 		if (gp.ui.titleScreenState == 0) {
 			if (code == KeyEvent.VK_W) {
-				//System.out.println("cmd " + gp.ui.commandNum + " aux " + countAux);
+				// System.out.println("cmd " + gp.ui.commandNum + " aux " + countAux);
 				gp.ui.commandNum--;
 				if (gp.ui.commandNum < 0) {
 					gp.ui.commandNum = 3;
@@ -70,7 +74,7 @@ public class KeyHandler implements KeyListener {
 				gp.playSFX(6);
 			}
 			if (code == KeyEvent.VK_S) {
-				//System.out.println("cmd " + gp.ui.commandNum + " aux " + countAux);
+				// System.out.println("cmd " + gp.ui.commandNum + " aux " + countAux);
 				gp.ui.commandNum++;
 				if (gp.ui.commandNum > 3) {
 					gp.ui.commandNum = 0;
@@ -78,7 +82,7 @@ public class KeyHandler implements KeyListener {
 				gp.playSFX(6);
 			}
 			if (code == KeyEvent.VK_A) {
-				//System.out.println("cmd " + gp.ui.commandNum + " aux " + countAux);
+				// System.out.println("cmd " + gp.ui.commandNum + " aux " + countAux);
 				// gp.ui.commandNum = 2;
 				switch (gp.ui.commandNum) {
 				case 0:
@@ -95,7 +99,7 @@ public class KeyHandler implements KeyListener {
 				gp.playSFX(6);
 			}
 			if (code == KeyEvent.VK_D) {
-				//System.out.println("cmd " + gp.ui.commandNum + " aux " + countAux);
+				// System.out.println("cmd " + gp.ui.commandNum + " aux " + countAux);
 				switch (gp.ui.commandNum) {
 				case 0:
 					gp.ui.commandNum = 3;
@@ -147,45 +151,28 @@ public class KeyHandler implements KeyListener {
 				// SOUND
 				if (gp.ui.commandNum == 3) {
 
-					if (gp.btnSom.estadoBotao == true) {
-
+					if (gp.sfx.volumeScale == 0 && gp.music.volumeScale == 0) {
+						gp.config.setDefaultValues();
+						gp.music.checkVolume();
+						gp.btnSom.estadoBotao = true;
+						gp.btnSom.state = "enable"; // Troca para 'enable'
+						gp.btnSom.animation = true; // Inicia a animação
+						gp.btnSom.spriteNum = 0; // Reseta a animação para o início
+						gp.btnSom.spriteCounter = 0; // Reseta o contador de frames
+						gp.config.saveConfig();
+					} else if (gp.sfx.volumeScale >= 0 || gp.music.volumeScale >= 0) {
 						gp.btnSom.volumeSFXTemp = gp.sfx.volumeScale;
 						gp.btnSom.volumeMusicTemp = gp.music.volumeScale;
 						gp.sfx.volumeScale = 0;
 						gp.music.volumeScale = 0;
 						gp.music.checkVolume();
 						gp.btnSom.estadoBotao = false;
-						gp.btnSom.state = "disable"; // Troca para 'disable'
+						gp.btnSom.state = "disable"; // Troca para 'enable'
 						gp.btnSom.animation = true; // Inicia a animação
 						gp.btnSom.spriteNum = 0; // Reseta a animação para o início
 						gp.btnSom.spriteCounter = 0; // Reseta o contador de frames
-						gp.playSFX(6);
-
-					} else if (gp.btnSom.estadoBotao == false) {
-						gp.music.volumeScale = gp.btnSom.volumeMusicTemp;
-						gp.sfx.volumeScale = gp.btnSom.volumeSFXTemp;
-						gp.music.checkVolume();
-						gp.btnSom.estadoBotao = true;
-						gp.btnSom.state = "enable"; // Troca para 'enable'
-						gp.btnSom.animation = true; // Inicia a animação
-						gp.btnSom.spriteNum = 0; // Reseta a animação para o início
-						gp.btnSom.spriteCounter = 0; // Reseta o contador de frames
-						gp.playSFX(6);
-					}
-					if ((gp.sfx.volumeScale == 0 && gp.music.volumeScale == 0) && flag == false) {
-						gp.config.setDefaultValues();
-						gp.music.checkVolume();
-
-						gp.btnSom.state = "enable"; // Troca para 'enable'
-						gp.btnSom.animation = true; // Inicia a animação
-						gp.btnSom.spriteNum = 0; // Reseta a animação para o início
-						gp.btnSom.spriteCounter = 0; // Reseta o contador de frames
-
-						gp.btnSom.estadoBotao = true;
 						gp.config.saveConfig();
-						flag = true;
 					}
-
 				}
 
 			}
@@ -212,7 +199,7 @@ public class KeyHandler implements KeyListener {
 					gp.ui.commandNum = 9;
 					break;
 				}
-				//System.out.println("cmd: " + gp.ui.commandNum);
+				// System.out.println("cmd: " + gp.ui.commandNum);
 				gp.playSFX(6);
 			} else if (code == KeyEvent.VK_D) { // Direita
 				if (gp.ui.commandNum < 12) { // Máximo de 10 fases (0-9)
@@ -223,7 +210,7 @@ public class KeyHandler implements KeyListener {
 					gp.ui.commandNum = 11;
 					break;
 				}
-				//System.out.println("cmd: " + gp.ui.commandNum);
+				// System.out.println("cmd: " + gp.ui.commandNum);
 				gp.playSFX(6);
 			} else if (code == KeyEvent.VK_W) { // Cima
 				if (gp.ui.commandNum >= 5 && gp.ui.commandNum < 10) {
@@ -231,7 +218,7 @@ public class KeyHandler implements KeyListener {
 				} else if (gp.ui.commandNum >= 10) {
 					gp.ui.commandNum = 5; // Volta para a linha de cima
 				}
-				//System.out.println("cmd: " + gp.ui.commandNum);
+				// System.out.println("cmd: " + gp.ui.commandNum);
 				gp.playSFX(6);
 
 			} else if (code == KeyEvent.VK_S) { // Baixo
@@ -244,7 +231,7 @@ public class KeyHandler implements KeyListener {
 				} else if (gp.ui.commandNum == 10) {
 					gp.ui.commandNum = 11; // Vai para "Novo Jogo"
 				}
-				//System.out.println("cmd: " + gp.ui.commandNum);
+				// System.out.println("cmd: " + gp.ui.commandNum);
 				gp.playSFX(6);
 			}
 
@@ -285,10 +272,9 @@ public class KeyHandler implements KeyListener {
 							// Força atualização imediata
 							gp.proxima_fase = gp.faseMap[gp.currentMap];
 							gp.fase_atual = gp.currentMap;
-							
-							gp.player.setDefaultValues();
+
+							gp.playerPositions();
 							gp.changeArea();
-							gp.eHandler.playerNewGamePosition();
 						}
 					}
 				}
@@ -340,42 +326,27 @@ public class KeyHandler implements KeyListener {
 
 				// SOUND
 				if (gp.ui.commandNum == 1) {
-					if (gp.btnSom.estadoBotao == true) {
+					if (gp.sfx.volumeScale == 0 && gp.music.volumeScale == 0) {
+						gp.config.setDefaultValues();
+						gp.music.checkVolume();
+						gp.btnSom.estadoBotao = true;
+						gp.btnSom.state = "enable"; // Troca para 'enable'
+						gp.btnSom.animation = true; // Inicia a animação
+						gp.btnSom.spriteNum = 0; // Reseta a animação para o início
+						gp.btnSom.spriteCounter = 0; // Reseta o contador de frames
+						gp.config.saveConfig();
+					} else if (gp.sfx.volumeScale >= 0 || gp.music.volumeScale >= 0) {
 						gp.btnSom.volumeSFXTemp = gp.sfx.volumeScale;
 						gp.btnSom.volumeMusicTemp = gp.music.volumeScale;
 						gp.sfx.volumeScale = 0;
 						gp.music.volumeScale = 0;
 						gp.music.checkVolume();
 						gp.btnSom.estadoBotao = false;
-						gp.btnSom.state = "disable"; // Troca para 'disable'
+						gp.btnSom.state = "disable"; // Troca para 'enable'
 						gp.btnSom.animation = true; // Inicia a animação
 						gp.btnSom.spriteNum = 0; // Reseta a animação para o início
 						gp.btnSom.spriteCounter = 0; // Reseta o contador de frames
-						gp.playSFX(6);
-					} else if (gp.btnSom.estadoBotao == false) {
-						gp.music.volumeScale = gp.btnSom.volumeMusicTemp;
-						gp.sfx.volumeScale = gp.btnSom.volumeSFXTemp;
-						gp.music.checkVolume();
-						gp.btnSom.estadoBotao = true;
-						gp.btnSom.state = "enable"; // Troca para 'enable'
-						gp.btnSom.animation = true; // Inicia a animação
-						gp.btnSom.spriteNum = 0; // Reseta a animação para o início
-						gp.btnSom.spriteCounter = 0; // Reseta o contador de frames
-						gp.playSFX(6);
-					}
-					if ((gp.sfx.volumeScale == 0 && gp.music.volumeScale == 0) && flag == false) {
-						gp.config.setDefaultValues();
-
-						gp.music.checkVolume();
-
-						gp.btnSom.state = "enable"; // Troca para 'enable'
-						gp.btnSom.animation = true; // Inicia a animação
-						gp.btnSom.spriteNum = 0; // Reseta a animação para o início
-						gp.btnSom.spriteCounter = 0; // Reseta o contador de frames
-
-						gp.btnSom.estadoBotao = true;
 						gp.config.saveConfig();
-						flag = true;
 					}
 				}
 			}
@@ -387,6 +358,7 @@ public class KeyHandler implements KeyListener {
 	}
 
 	public void playState(int code, KeyEvent e) {
+
 		if (code == KeyEvent.VK_W && !upPressed) {
 			upPressed = true;
 		}
@@ -400,6 +372,7 @@ public class KeyHandler implements KeyListener {
 			rightPressed = true;
 		}
 		if (code == KeyEvent.VK_P) {
+			gp.playSFX(6);
 			gp.gameState = gp.pauseState;
 		}
 		if (code == KeyEvent.VK_ESCAPE) {
@@ -418,16 +391,16 @@ public class KeyHandler implements KeyListener {
 		if (e.isControlDown() && code == KeyEvent.VK_M) {
 			switch (gp.currentMap) {
 			case 0:
-				gp.tileM.loadMap("/maps/map01.txt", 0);
+				gp.tileM.loadMap("/assets/maps/map01.txt", 0);
 				break;
 			case 1:
-				gp.tileM.loadMap("/maps/map02.txt", 1);
+				gp.tileM.loadMap("/assets/maps/map02.txt", 1);
 				break;
 			case 2:
-				gp.tileM.loadMap("/maps/map03.txt", 2);
+				gp.tileM.loadMap("/assets/maps/map03.txt", 2);
 				break;
 			case 3:
-				gp.tileM.loadMap("/maps/map04.txt", 3);
+				gp.tileM.loadMap("/assets/maps/map04.txt", 3);
 				break;
 			}
 
@@ -440,13 +413,33 @@ public class KeyHandler implements KeyListener {
 		}
 	}
 
-	public void pauseState(int code) {
+	public void pauseState(int code, KeyEvent e) {
+
+		if (code == KeyEvent.VK_ESCAPE) {
+			gp.gameState = gp.playState;
+			gp.playSFX(6);
+		}
+		if (code == KeyEvent.VK_ENTER) {
+			enterPressed = true;
+			gp.gameState = gp.playState;
+			gp.playSFX(6);
+		}
 		if (code == KeyEvent.VK_P) {
 			gp.gameState = gp.playState;
+			gp.playSFX(6);
 		}
+
+		// DEBUG MODE
+		if (!e.isControlDown() && code == KeyEvent.VK_M) {
+			showDebug = !showDebug;
+			TileManager.debugModeOn = showDebug;
+			Entity.debugModeOn = showDebug;
+			EventHandler.debugModeOn = showDebug;
+		}
+
 	}
 
-	public void optionsState(int code) {
+	public void optionsState(int code, KeyEvent e) {
 		if (code == KeyEvent.VK_ESCAPE) {
 			gp.gameState = gp.playState;
 		}
@@ -497,6 +490,7 @@ public class KeyHandler implements KeyListener {
 				if (gp.ui.commandNum == 4) {
 					if (!gp.player.walkType.equals(walkType_1)) {
 						gp.player.walkType = walkType_1;
+						gp.player.speed = gp.player.speedAux;
 					} else {
 						gp.player.walkType = walkType_2;
 					}
@@ -518,11 +512,96 @@ public class KeyHandler implements KeyListener {
 						gp.player.walkType = walkType_2;
 					} else {
 						gp.player.walkType = walkType_1;
+						gp.player.speed = gp.player.speedAux;
 					}
 				}
 			}
 			gp.playSFX(6);
 
+		}
+
+		// DEBUG MODE
+		if (!e.isControlDown() && code == KeyEvent.VK_M) {
+			showDebug = !showDebug;
+			TileManager.debugModeOn = showDebug;
+			Entity.debugModeOn = showDebug;
+			EventHandler.debugModeOn = showDebug;
+		}
+
+	}
+
+	public void nextPhaseState(int code, KeyEvent e) {
+
+		if (code == KeyEvent.VK_SPACE) {
+			gp.ui.levelFinished = false;
+			gp.ui.gameFinished = false;
+			gp.gameState = gp.playState;
+		}
+
+		if (code == KeyEvent.VK_W) {
+			gp.ui.commandNum--;
+			if (gp.ui.commandNum < 0) {
+				gp.ui.commandNum = 1;
+			}
+			gp.playSFX(6);
+		}
+		if (code == KeyEvent.VK_S) {
+			gp.ui.commandNum++;
+			if (gp.ui.commandNum > 1) {
+				gp.ui.commandNum = 0;
+			}
+			gp.playSFX(6);
+		}
+		if (code == KeyEvent.VK_A) {
+			gp.ui.commandNum++;
+			if (gp.ui.commandNum > 1) {
+				gp.ui.commandNum = 0;
+			}
+			gp.playSFX(6);
+		}
+		if (code == KeyEvent.VK_D) {
+			gp.ui.commandNum++;
+			if (gp.ui.commandNum > 1) {
+				gp.ui.commandNum = 0;
+			}
+			gp.playSFX(6);
+		}
+		if (code == KeyEvent.VK_ENTER) {
+
+			// PROXIMA FASE
+			if (gp.ui.commandNum == 0) {
+				// Executa o teleporte pendente
+				gp.eHandler.executePendingTeleport(); // Chama o método para teleportar
+				gp.ui.playTime = 0;
+			}
+
+			// MENU INICIAL
+			if (gp.ui.commandNum == 1) {
+				gp.ui.levelFinished = false;
+				gp.ui.gameFinished = false;
+				gp.ui.commandNum = 0;
+				gp.gameState = gp.titleState;
+				gp.ui.titleScreenState = 0;
+				System.out.println("current map: " + gp.currentMap + " highestUnlockedFase: " + gp.highestUnlockedFase);
+				if (gp.currentMap == gp.highestUnlockedFase) {
+					gp.highestUnlockedFase += 1;
+				}
+				gp.saveLoad.save();
+				gp.playMusic(5);
+				gp.restart();
+			}
+
+
+			gp.playSFX(6);
+		}
+		
+
+		// DEBUG MODE
+		if (!e.isControlDown() && code == KeyEvent.VK_M) {
+			showDebug = !showDebug;
+			TileManager.debugModeOn = showDebug;
+			Entity.debugModeOn = showDebug;
+			EventHandler.debugModeOn = showDebug;
 		}
 	}
 

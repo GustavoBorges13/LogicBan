@@ -12,6 +12,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
+
+import br.ufcat.logicban.object.OBJ_Gps;
 import br.ufcat.logicban.object.OBJ_Key;
 import br.ufcat.logicban.object.OBJ_Logo;
 import br.ufcat.logicban.object.OBJ_LogoUfcat;
@@ -21,17 +23,18 @@ public class UI {
 	Graphics2D g2;
 	Font maruMonica, purisaB;
 
-	BufferedImage keyImage, logoLogicBan, logoUFCAT;
+	BufferedImage keyImage, logoLogicBan, logoUFCAT, gpsLocation;
 
 	public boolean messageOn = false;
 	public String message = "";
 	int messageCounter = 0;
 	public boolean gameFinished = false;
+	public boolean levelFinished = false;
 	public int commandNum = 0;
 	public int titleScreenState = 0; // the first screen, 1: the second screen
 	public int creditScreenState = 0; // the first screen, 1: the second screen
 	double playTime;
-	DecimalFormat dFormat = new DecimalFormat("#0.00");
+	DecimalFormat dFormat = new DecimalFormat("#0");
 	int subState = 0;
 	int counter = 0;
 	public String currentDialogue = "";
@@ -50,6 +53,8 @@ public class UI {
 	private float transitionSpeed = 0.00070f; // Ajuste para suavidade
 	public boolean creditsAnimating = false; // Flag para controlar a animação dos créditos
 
+	public boolean goToNextPhase = false;
+	
 	public UI(GamePanel gp) {
 		this.gp = gp;
 
@@ -68,6 +73,9 @@ public class UI {
 
 		OBJ_Key key = new OBJ_Key(gp);
 		keyImage = key.down1;
+
+		OBJ_Gps gps = new OBJ_Gps(gp);
+		gpsLocation = gps.down1;
 
 		OBJ_Logo logo = new OBJ_Logo(gp);
 		logoLogicBan = logo.down1;
@@ -108,7 +116,8 @@ public class UI {
 		}
 		// PLAY STATE
 		if (gp.gameState == gp.playState) {
-			drawPlayerKeys();
+//			drawPlayerKeys();
+			drawPlayerStats();
 		}
 
 		// PAUSE STATE
@@ -132,6 +141,11 @@ public class UI {
 		// TRANSITION STATE
 		if (gp.gameState == gp.transitionState) {
 			drawTransition();
+		}
+
+		// NEXT PHASE STATE
+		if (gp.gameState == gp.nextPhaseState) {
+			drawPlayerNextPhase();
 		}
 
 	}
@@ -240,6 +254,116 @@ public class UI {
 					gp.btnVoltar.draw(g2, imgX, imgY, imgW, imgH); // Chama o método draw que lida com a animação
 				} else {
 					gp.btnVoltar.draw(g2, imgX, imgY, imgW, imgH);
+				}
+			}
+		}
+	}
+
+	public void drawButtonContinuar(double x, double y, int cmd) {
+
+		BufferedImage btnImage = null;
+
+		btnImage = gp.btnContinuar.btnClick;
+
+		int imgX = gp.screenWidth - (int) (gp.tileSize * x);
+		int imgY = gp.screenHeight - (int) (gp.tileSize * y);
+
+		// Ajuste proporcional da altura
+		double scala = 1.4;
+		int imgH = (int) (btnImage.getHeight() / scala); // Mantendo a altura como estava antes
+
+		// int imgW = (int) (imgH * aspectRatio); // Mantendo a proporção entre altura e
+		// largura
+		int imgW = (int) (btnImage.getWidth() / scala);
+
+		// Define a transparência inicial (meio apagado)
+		float opacity = 0.5f;
+		if (commandNum == cmd) {
+			opacity = 1f; // Torna o botão opaco quando está selecionado
+		}
+
+		// Aplica a transparência
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+
+		// Desenha o botão com a opacidade definida
+		g2.drawImage(btnImage, imgX, imgY, imgW, imgH, null);
+
+		// Restaura a opacidade normal para os próximos elementos
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
+		// Se o botão estiver selecionado, desenha o ">"
+		if (commandNum == cmd) {
+			gp.btnContinuar.botaoSelecionado = true;
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 45F));
+			g2.setColor(Color.BLACK);
+			g2.drawString(">", imgX - 25, (int) (imgY + imgH / 1.6));
+		} else {
+			gp.btnContinuar.botaoSelecionado = false;
+		}
+
+		// Desenha o botão de som com animação (se necessário)
+		if (gp.btnContinuar.botaoSelecionado == true) {
+			if (gp.btnContinuar.estadoBotao == true) {
+				// Se a animação estiver ativada, desenha o botão com a animação
+				if (gp.btnContinuar.animation) {
+					gp.btnContinuar.draw(g2, imgX, imgY, imgW, imgH); // Chama o método draw que lida com a animação
+				} else {
+					gp.btnContinuar.draw(g2, imgX, imgY, imgW, imgH);
+				}
+			}
+		}
+	}
+
+	public void drawButtonProximaFase(double x, double y, int cmd) {
+
+		BufferedImage btnImage = null;
+
+		btnImage = gp.btnProximaFase.btnClick;
+
+		int imgX = gp.screenWidth - (int) (gp.tileSize * x);
+		int imgY = gp.screenHeight - (int) (gp.tileSize * y);
+
+		// Ajuste proporcional da altura
+		double scala = 1.4;
+		int imgH = (int) (btnImage.getHeight() / scala); // Mantendo a altura como estava antes
+
+		// int imgW = (int) (imgH * aspectRatio); // Mantendo a proporção entre altura e
+		// largura
+		int imgW = (int) (btnImage.getWidth() / scala);
+
+		// Define a transparência inicial (meio apagado)
+		float opacity = 0.5f;
+		if (commandNum == cmd) {
+			opacity = 1f; // Torna o botão opaco quando está selecionado
+		}
+
+		// Aplica a transparência
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+
+		// Desenha o botão com a opacidade definida
+		g2.drawImage(btnImage, imgX, imgY, imgW, imgH, null);
+
+		// Restaura a opacidade normal para os próximos elementos
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
+		// Se o botão estiver selecionado, desenha o ">"
+		if (commandNum == cmd) {
+			gp.btnProximaFase.botaoSelecionado = true;
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 45F));
+			g2.setColor(Color.BLACK);
+			g2.drawString(">", imgX - 25, (int) (imgY + imgH / 1.6));
+		} else {
+			gp.btnProximaFase.botaoSelecionado = false;
+		}
+
+		// Desenha o botão de som com animação (se necessário)
+		if (gp.btnProximaFase.botaoSelecionado == true) {
+			if (gp.btnProximaFase.estadoBotao == true) {
+				// Se a animação estiver ativada, desenha o botão com a animação
+				if (gp.btnProximaFase.animation) {
+					gp.btnProximaFase.draw(g2, imgX, imgY, imgW, imgH); // Chama o método draw que lida com a animação
+				} else {
+					gp.btnProximaFase.draw(g2, imgX, imgY, imgW, imgH);
 				}
 			}
 		}
@@ -354,6 +478,61 @@ public class UI {
 		}
 	}
 
+	public void drawButtonMenu(double x, double y, int cmd) {
+
+		BufferedImage btnImage = null;
+
+		btnImage = gp.btnMenu.btnClick;
+
+		int imgX = gp.screenWidth - (int) (gp.tileSize * x);
+		int imgY = gp.screenHeight - (int) (gp.tileSize * y);
+
+		// Ajuste proporcional da altura
+		double scala = 1.4;
+		int imgH = (int) (btnImage.getHeight() / scala); // Mantendo a altura como estava antes
+
+		// int imgW = (int) (imgH * aspectRatio); // Mantendo a proporção entre altura e
+		// largura
+		int imgW = (int) (btnImage.getWidth() / scala);
+
+		// Define a transparência inicial (meio apagado)
+		float opacity = 0.5f;
+		if (commandNum == cmd) {
+			opacity = 1f; // Torna o botão opaco quando está selecionado
+		}
+
+		// Aplica a transparência
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+
+		// Desenha o botão com a opacidade definida
+		g2.drawImage(btnImage, imgX, imgY, imgW, imgH, null);
+
+		// Restaura a opacidade normal para os próximos elementos
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
+		// Se o botão estiver selecionado, desenha o ">"
+		if (commandNum == cmd) {
+			gp.btnMenu.botaoSelecionado = true;
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 45F));
+			g2.setColor(Color.BLACK);
+			g2.drawString(">", imgX - 25, (int) (imgY + imgH / 1.6));
+		} else {
+			gp.btnMenu.botaoSelecionado = false;
+		}
+
+		// Desenha o botão de som com animação (se necessário)
+		if (gp.btnMenu.botaoSelecionado == true) {
+			if (gp.btnMenu.estadoBotao == true) {
+				// Se a animação estiver ativada, desenha o botão com a animação
+				if (gp.btnMenu.animation) {
+					gp.btnMenu.draw(g2, imgX, imgY, imgW, imgH); // Chama o método draw que lida com a animação
+				} else {
+					gp.btnMenu.draw(g2, imgX, imgY, imgW, imgH);
+				}
+			}
+		}
+	}
+
 	public void drawButtonExit(int x, int y) {
 		BufferedImage btnImage = null;
 
@@ -452,6 +631,117 @@ public class UI {
 		// Agora desenha a animação apenas se o botão estiver selecionado
 		if (gp.btnSom.botaoSelecionado && gp.btnSom.animation) {
 			gp.btnSom.draw(g2, imgX, imgY, imgW, imgH); // Certifique-se de que este método respeita a opacidade
+		}
+	}
+
+	public void drawPlayerStats() {
+
+		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 45F));
+		g2.setColor(Color.white);
+		g2.drawImage(gpsLocation, (int) (gp.tileSize / 1.5), gp.tileSize / 5, gp.tileSize, gp.tileSize + 7, null);
+		g2.drawString("FASE " + (gp.currentMap + 1), gp.tileSize * 2, gp.tileSize + 3);
+
+		// TIME
+		playTime += (double) 1 / 60;
+		g2.drawString("TEMPO: " + dFormat.format(playTime) + "s",
+				(gp.maxScreenCol * gp.tileSize) - (int) (gp.tileSize * 4.4), gp.tileSize);
+
+		// MESSAGE
+		if (messageOn == true) {
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 45F));
+			g2.drawString(message, gp.tileSize / 2, (int) (gp.tileSize * 2.4));
+
+			messageCounter++;
+
+			if (messageCounter > 120) {
+				messageCounter = 0;
+				messageOn = false;
+			}
+
+		}
+	}
+
+	public void drawPlayerNextPhase() {
+		
+		AlphaComposite originalComposite = (AlphaComposite) g2.getComposite();
+		float alpha =  1f; // Opacidade, ajuste conforme necessário
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+		g2.setColor(new Color(0, 0, 0, 200)); // Cor de fundo com opacidade (preto semi-transparente)
+		g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+		g2.setComposite(originalComposite); // Restaura a opacidade original
+		if (levelFinished == true) {
+
+			String text;
+			int textLengt;
+			int x;
+			int y;
+
+			// texto 1
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 80F));
+			g2.setColor(Color.white);
+			text = "Você pegou a bandeira!";
+			textLengt = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth(); // tamanho do texto
+			x = gp.screenWidth / 2 - textLengt / 2;
+			y = gp.screenHeight / 2 - (gp.tileSize * 3);
+			g2.drawString(text, x, y);
+
+			// texto 2
+			text = "Seu tempo é: " + dFormat.format(playTime) + " segundos!";
+			textLengt = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth(); // tamanho do texto
+			x = gp.screenWidth / 2 - textLengt / 2;
+			y = gp.screenHeight / 2 + (gp.tileSize * 4);
+			g2.drawString(text, x, y);
+
+			// texto 3
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 60F));
+			g2.setColor(Color.yellow);
+			text = "Parabéns!";
+			textLengt = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth(); // tamanho do texto
+			x = gp.screenWidth / 2 - textLengt / 2;
+			y = gp.screenHeight / 2 + (gp.tileSize * 2);
+			g2.drawString(text, x, y);
+			// System.out.println("A");
+			x = gp.screenWidth / 2 - (gp.tileSize * 5);
+			y = gp.tileSize;
+			// System.out.println("TESTE");
+			// Adicionando opção "Voltar"
+
+			drawButtonProximaFase(20, 2.2, 0);
+			drawButtonMenu(13.7, 2.2, 1);
+			// gp.gameState = gp.pauseState;
+			// gp.gameThread = null; // para o jogo!.
+
+			// gp.gameThread = null; // para o jogo!.
+		} else if (gameFinished == true) {
+			String text;
+			int textLengt;
+			int x;
+			int y;
+
+			// texto 1
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 80F));
+			g2.setColor(Color.white);
+			text = "Você pegou a bandeira!";
+			textLengt = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth(); // tamanho do texto
+			x = gp.screenWidth / 2 - textLengt / 2;
+			y = gp.screenHeight / 2 - (gp.tileSize * 3);
+			g2.drawString(text, x, y);
+
+			// texto 2
+			text = "Seu tempo é: " + dFormat.format(playTime) + " segundos!";
+			textLengt = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth(); // tamanho do texto
+			x = gp.screenWidth / 2 - textLengt / 2;
+			y = gp.screenHeight / 2 + (gp.tileSize * 4);
+			g2.drawString(text, x, y);
+
+			// texto 3
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 60F));
+			g2.setColor(Color.yellow);
+			text = "Parabéns!";
+			textLengt = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth(); // tamanho do texto
+			x = gp.screenWidth / 2 - textLengt / 2;
+			y = gp.screenHeight / 2 + (gp.tileSize * 2);
+			g2.drawString(text, x, y);
 		}
 	}
 
@@ -622,54 +912,106 @@ public class UI {
 		// CREDITOS
 		else if (titleScreenState == 2) {
 
-			// -----------------------------------------------------
-			// 1. LOGICBAN LOGO (NO TOPO)
-			// -----------------------------------------------------
-			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 45F));
-			int xLogo = gp.screenWidth / 2 - (logoLogicBan.getWidth() / 2);
-			int yLogoLogicBan = creditY; // Posição inicial da logo (acompanha a animação)
-			g2.drawImage(logoLogicBan, xLogo, yLogoLogicBan, logoLogicBan.getWidth(), logoLogicBan.getHeight(), null);
+		    // -----------------------------------------------------
+		    // 1. LOGICBAN LOGO (NO TOPO)
+		    // -----------------------------------------------------
+		    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 45F));
+		    int xLogo = gp.screenWidth / 2 - (logoLogicBan.getWidth() / 2);
+		    int yLogoLogicBan = creditY; // Posição inicial da logo (acompanha a animação)
+		    g2.drawImage(logoLogicBan, xLogo, yLogoLogicBan, logoLogicBan.getWidth(), logoLogicBan.getHeight(), null);
 
-			// -----------------------------------------------------
-			// 2. CRÉDITOS (EMBAIXO DA LOGO)
-			// -----------------------------------------------------
-			int y = yLogoLogicBan + logoLogicBan.getHeight() + gp.tileSize; // Começa após a logo
-			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 45F));
+		    // -----------------------------------------------------
+		    // 2. CRÉDITOS (EMBAIXO DA LOGO)
+		    // -----------------------------------------------------
+		    int y = yLogoLogicBan + logoLogicBan.getHeight() + gp.tileSize; // Começa após a logo
+		    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 45F));
 
-			String[] credits = { "Desenvolvido pela Equipe Bug Hunters!", "", "Game Design:", "Gustavo, Davi, Rafael",
-					"", "UI Menu:", "Rafael, Michael", "", "Gameplay Programming:", "Davi, Gustavo, Marcos", "",
-					"Level Design:", "Davi, Gustavo, Marcos", "", "UI & Icon Design:", "Marcos, Luis, Rafael", "",
-					"Credits Implementation:", "Marcos, Gustavo", "", "SFX:", "Rafael, Marcos, Michael", "",
-					"Quality Assurance:", "Davi, Gustavo", "", "Art Design:", "Luis", "", "Tutorial & Repository:",
-					"Gustavo", "", "Agradecemos por jogar LogicBan!", "Obrigado pelo seu apoio!" };
+		    String[] credits = {
+		    	    "","Desenvolvido pela Equipe Bug Hunters!",
+		    	    "",
+		    	    "Design do Jogo:",
+		    	    "Gustavo, Davi, Rafael",
+		    	    "",
+		    	    "Menu da Interface:",
+		    	    "Rafael, Michael",
+		    	    "",
+		    	    "Programação da Gameplay:",
+		    	    "Davi, Gustavo, Marcos",
+		    	    "",
+		    	    "Design de Fases:",
+		    	    "Davi, Gustavo, Marcos",
+		    	    "",
+		    	    "Design da UI & Ícones:",
+		    	    "Marcos, Luis, Rafael",
+		    	    "",
+		    	    "Implementação dos Créditos:",
+		    	    "Marcos, Gustavo",
+		    	    "",
+		    	    "Efeitos Sonoros:",
+		    	    "Rafael, Marcos, Michael",
+		    	    "",
+		    	    "Garantia de Qualidade:",
+		    	    "Davi, Gustavo",
+		    	    "",
+		    	    "Design de Arte:",
+		    	    "Luis",
+		    	    "",
+		    	    "Tutorial & Repositório:",
+		    	    "Gustavo",
+		    	    "",
+		    	    "Desenvolvimento:",
+		    	    "Desenvolvido manualmente em Java com Graphics2D",
+		    	    "Projeto da disciplina de Engenharia de Software 1",
+		    	    "",
+		    	    "Agradecimentos Especiais:",
+		    	    "Agradecemos a RyiSnow pela playlist",
+		    	    "de tutoriais que foram essenciais",
+		    	    "para o desenvolvimento!",
+		    	    "",
+		    	    "Efeitos Sonoros:",
+		    	    "freesound.org (Vários Artistas)",
+		    	    "",
+		    	    "Testadores Beta:",
+		    	    "Gabriel e Lucas",
+		    	    "",
+		    	    "Agradecemos por jogar LogicBan!",
+		    	    "Obrigado pelo seu apoio!"
+		    	};
+		    
+		    
+		    int lineSpacing = 80;
+		    //int y = 100; // Posição Y inicial (ajuste conforme necessário)
 
-			int lineSpacing = 80;
-			// Desenha as linhas na ordem correta (primeira linha primeiro)
-			for (String line : credits) {
-				if (!line.isEmpty()) {
-					int textWidth = g2.getFontMetrics().stringWidth(line);
-					int x = (gp.screenWidth - textWidth) / 2;
+		    // Desenha as linhas na ordem correta (primeira linha primeiro)
+		    for (String line : credits) {
+		        if (!line.isEmpty()) {
+		            int textWidth = g2.getFontMetrics().stringWidth(line);
+		            int x = (gp.screenWidth - textWidth) / 2;
 
-					if (line.endsWith(":")) {
-						drawTextWithBorder(g2, line, x, y, Color.YELLOW, Color.BLACK);
-					} else {
-						drawTextWithBorder(g2, line, x, y, Color.WHITE, Color.BLACK);
-					}
-					y += lineSpacing; // Aumenta Y para descer (não subir)
-				}
-			}
+		            if (line.endsWith(":")) {
+		                drawTextWithBorder(g2, line, x, y, Color.YELLOW, Color.BLACK);
+		                y += lineSpacing * 1; // Dobra o espaçamento após um subtítulo
+		            } else {
+		                drawTextWithBorder(g2, line, x, y, Color.WHITE, Color.BLACK);
+		                y += lineSpacing; // Aumenta Y para descer (não subir)
+		            }
+		        } else {
+		            y += lineSpacing; // Linhas vazias também recebem espaçamento
+		        }
+		    }
 
-			// -----------------------------------------------------
-			// 3. UFCAT LOGO (NO FINAL DOS CRÉDITOS)
-			// -----------------------------------------------------
-			int yLogoUFCAT = y + gp.tileSize; // Espaço após o último crédito
-			g2.drawImage(logoUFCAT, xLogo, yLogoUFCAT, logoUFCAT.getWidth(), logoUFCAT.getHeight(), null);
+		    // -----------------------------------------------------
+		    // 3. UFCAT LOGO (NO FINAL DOS CRÉDITOS)
+		    // -----------------------------------------------------
+		    int yLogoUFCAT = y + gp.tileSize; // Espaço após o último crédito
+		    xLogo = gp.screenWidth / 2 - (logoUFCAT.getWidth() / 2); // Centraliza a logoUFCAT
+		    g2.drawImage(logoUFCAT, xLogo, yLogoUFCAT, logoUFCAT.getWidth(), logoUFCAT.getHeight(), null);
 
-			// -----------------------------------------------------
-			// 4. BOTÕES (POSIÇÃO FIXA)
-			// --------------------------------------------------
-			drawButtonBack(28.8, 1.7, 0);
-			drawButtonSound(4.8, 1.7, 1);
+		    // -----------------------------------------------------
+		    // 4. BOTÕES (POSIÇÃO FIXA)
+		    // --------------------------------------------------
+		    drawButtonBack(28.8, 1.7, 0);
+		    drawButtonSound(4.8, 1.7, 1);
 		}
 	}
 
@@ -703,6 +1045,8 @@ public class UI {
 		// Desenha o texto em branco
 		g2.setColor(Color.WHITE);
 		g2.drawString(text, x, y); // Desenha o texto
+		commandNum = 0;
+		drawButtonContinuar(17, 2, 0);
 	}
 
 	// Método para desenhar o texto com borda
@@ -718,12 +1062,12 @@ public class UI {
 	}
 
 	public void updateCredits() {
-
+		speed = 2;
 		if (!animationFinished) {
 			creditY -= speed;
 
 			// Verifica se o texto saiu completamente da tela
-			if (creditY < -2450) { // Ajuste conforme a altura do seu texto
+			if (creditY < -4500) { // Ajuste conforme a altura do seu texto
 				animationFinished = true;
 				gp.gameState = gp.titleState;
 				gp.ui.titleScreenState = 0;
@@ -907,7 +1251,7 @@ public class UI {
 
 	public void options_fullScreenNotification(int frameX, int frameY) {
 
-		int textX = frameX + gp.tileSize-4;
+		int textX = frameX + gp.tileSize - 4;
 		int textY = frameY + gp.tileSize * 3;
 		g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
 		currentDialogue = "A alteração entrará em vigor\n depois de reiniciar o jogo.";
@@ -919,7 +1263,7 @@ public class UI {
 
 		// BACK
 		textY = frameY + gp.tileSize * 9;
-		g2.drawString("Back", textX+4, textY);
+		g2.drawString("Back", textX + 4, textY);
 		if (commandNum == 0) {
 			g2.drawString(">", textX - 22, textY);
 			if (gp.keyH.enterPressed == true) {
@@ -1030,15 +1374,6 @@ public class UI {
 		}
 	}
 
-	public void drawTransition2() {
-		counter++;
-		g2.setColor(new Color(0, 0, 0, counter * 5));
-		g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
-
-		if (counter == 50) {
-			counter = 0;
-		}
-	}
 
 	public void drawTransition() {
 		counter++;
@@ -1068,7 +1403,9 @@ public class UI {
 				gp.ui.currentDialogue = "The progress has been saved";
 				System.out.println("Progresso salvo. Fase[" + newMap + "]: " + gp.faseMap[newMap]);
 			}
-
+			
+			gp.restart(); // resetar tudo sempre ao entrar em novos mapas
+			
 			gp.changeArea();
 			// gp.restart();
 		}

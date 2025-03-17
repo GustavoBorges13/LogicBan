@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import br.ufcat.logicban.ui.GamePanel;
-import br.ufcat.logicban.ui.UtilityTool;
+import br.ufcat.logicban.util.UtilityTool;
 
 public class TileManager {
 
@@ -97,8 +97,11 @@ public class TileManager {
     }
 
     public void loadMap(String filePath, int map) {
-        try (InputStream is = getClass().getResourceAsStream(filePath);
-             BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+    	InputStream is = getClass().getResourceAsStream(filePath);
+    	if (is == null) {
+    	    System.out.println("Arquivo não encontrado: " + filePath);
+    	}
+        try ( BufferedReader br = new BufferedReader(new InputStreamReader(is))){
 
             int col = 0;
             int row = 0;

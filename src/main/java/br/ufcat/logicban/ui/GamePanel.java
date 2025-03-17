@@ -1,5 +1,6 @@
 package br.ufcat.logicban.ui;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -10,11 +11,16 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import br.ufcat.logicban.button.Button_Continuar;
 import br.ufcat.logicban.button.Button_Creditos;
 import br.ufcat.logicban.button.Button_Fechar;
+import br.ufcat.logicban.button.Button_Menu;
 import br.ufcat.logicban.button.Button_NovoJogo;
+import br.ufcat.logicban.button.Button_ProximaFase;
 import br.ufcat.logicban.button.Button_Som;
 import br.ufcat.logicban.button.Button_Start;
 import br.ufcat.logicban.button.Button_Voltar;
@@ -22,6 +28,7 @@ import br.ufcat.logicban.data.SaveLoad;
 import br.ufcat.logicban.entity.Entity;
 import br.ufcat.logicban.entity.NPC_Box;
 import br.ufcat.logicban.entity.Player;
+import br.ufcat.logicban.object.OBJ_Door;
 import br.ufcat.logicban.object.OBJ_Door_Iron;
 import br.ufcat.logicban.tile.TileManager;
 import br.ufcat.logicban.tile_interactive.IT_LogicalPort;
@@ -76,6 +83,9 @@ public class GamePanel extends JPanel implements Runnable {
 	Button_Creditos btnCreditos = new Button_Creditos(this);
 	Button_Fechar btnFechar = new Button_Fechar(this);
 	Button_NovoJogo btnNovoJogo = new Button_NovoJogo(this);
+	Button_Menu btnMenu = new Button_Menu(this);
+	Button_ProximaFase btnProximaFase = new Button_ProximaFase(this);
+	Button_Continuar btnContinuar = new Button_Continuar(this);
 	Thread gameThread;
 
 	// ENTITY AND OBJECT
@@ -100,6 +110,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public final int pauseState = 2;
 	public final int optionState = 4;
 	public final int transitionState = 5;
+	public final int nextPhaseState = 6;
 
 	// AREA Change
 	public int fase_atual;
@@ -122,6 +133,8 @@ public class GamePanel extends JPanel implements Runnable {
 
 	public void setupGame() {
 
+		player.speed = player.speedAux;
+
 		aSetter.setWires();
 		aSetter.setObject();
 		aSetter.setInteractiveTile();
@@ -129,6 +142,8 @@ public class GamePanel extends JPanel implements Runnable {
 
 		// fase_atual = fase1;
 		gameState = titleState;
+		System.out.println(gameState);
+		playerPositions();
 
 		playMusic(5); // tocar musica em loop
 		// stopMusic(); // debug - teste sem musica
@@ -143,6 +158,7 @@ public class GamePanel extends JPanel implements Runnable {
 	}
 
 	public void limpeza() {
+		eHandler = new EventHandler(this);
 		// Limpa o array iTile antes de redefinir os tiles interativos
 		for (int i = 0; i < iTile[currentMap].length; i++) {
 			iTile[currentMap][i] = null;
@@ -170,17 +186,39 @@ public class GamePanel extends JPanel implements Runnable {
 		proxima_fase = faseMap[currentMap];
 		fase_atual = currentMap;
 
-		eHandler.playerNewGamePosition();
-		player.setDefaultValues();
-
+		player.speed = player.speedAux;
 		limpeza();
 		aSetter.setWires();
 		aSetter.setObject(); // Garante que os objetos sejam redefinido
 		aSetter.setInteractiveTile();
 		aSetter.setNPC();
 
+		playerPositions();
 		// Restaura o estado inicial da porta
 		doorIndex = -1;
+	}
+
+	public void playerPositions() {
+		switch (currentMap) {
+		case 0:
+			player.worldX = tileSize * 11;
+			player.worldY = tileSize * 9;
+			break;
+		case 1:
+			player.worldX = tileSize * 9;
+			player.worldY = tileSize * 9;
+			break;
+		case 2:
+			player.worldX = tileSize * 1;
+			player.worldY = tileSize * 0;
+			break;
+		case 3:
+			player.worldX = tileSize * 11;
+			player.worldY = tileSize * 10;
+			break;
+		}
+		eHandler.oldSpeed = player.speed - (2 * player.speedMultiplicator);
+		player.speedMultiplicator = 0;
 	}
 
 	public void setFullScreen() {
@@ -282,35 +320,74 @@ public class GamePanel extends JPanel implements Runnable {
 
 			NPC_Box box = null;
 			for (int i = 0; i < npc[currentMap].length; i++) {
-			    if (npc[currentMap][i] instanceof NPC_Box && npc[currentMap][i] != null) {
-			        box = (NPC_Box) npc[currentMap][i];
-			        break;
-			    }
+				if (npc[currentMap][i] instanceof NPC_Box && npc[currentMap][i] != null) {
+					box = (NPC_Box) npc[currentMap][i];
+					break;
+				}
 			}
 
 			if (box != null) {
-			    for (int i = 0; i < obj[currentMap].length; i++) {
-			        if (obj[currentMap][i] instanceof OBJ_Door_Iron && obj[currentMap][i] != null) {
-			            OBJ_Door_Iron door = (OBJ_Door_Iron) obj[currentMap][i];
+				for (int i = 0; i < obj[currentMap].length; i++) {
+					if (obj[currentMap][i] instanceof OBJ_Door_Iron && obj[currentMap][i] != null) {
+						OBJ_Door_Iron door = (OBJ_Door_Iron) obj[currentMap][i];
+						for (IT_LogicalPort port : box.logicalPortList) {
+							if (port.id == door.controllingPortID) {
+								if (port.outputState) {
+									// Se a porta está fechada, abra-a
+									door.openDoor(); // Chama o método para "abrir" a porta
+									ui.showMessage("Você abriu a porta!"); // debug em UI
+									// System.out.println("Porta de ferro " + door.controllingPortID + " aberta!");
+								} else {
+									// Se a porta está aberta, feche-a
+									door.closeDoor(); // Chama o método para "fechar" a porta
+									// System.out.println("Porta de ferro " + door.controllingPortID + " fechada.");
+								}
+								break;
+							}
+						}
 
-			            for (IT_LogicalPort port : box.logicalPortList) {
-			                if (port.id == door.controllingPortID) {
-			                    if (port.outputState) {
-			                        // Se a porta está fechada, abra-a
-			                        door.openDoor(); // Chama o método para "abrir" a porta
-			                       // System.out.println("Porta de ferro " + door.controllingPortID + " aberta!");
-			                    } else {
-			                        // Se a porta está aberta, feche-a
-			                        door.closeDoor(); // Chama o método para "fechar" a porta
-			                       // System.out.println("Porta de ferro " + door.controllingPortID + " fechada.");
-			                    }
-			                    break;
-			                }
-			            }
-			        }
-			    }
+					} else if (obj[currentMap][i] instanceof OBJ_Door && obj[currentMap][i] != null) {
+						OBJ_Door door = (OBJ_Door) obj[currentMap][i];
+
+						for (IT_LogicalPort port : box.logicalPortList) {
+							if (port.id == door.controllingPortID) {
+								if (port.outputState) {
+									// Se a porta está fechada, abra-a
+									door.openDoor(); // Chama o método para "abrir" a porta
+									ui.showMessage("Você abriu a porta!"); // debug em UI
+									// System.out.println("Porta de ferro " + door.controllingPortID + " aberta!");
+								} else {
+									// Se a porta está aberta, feche-a
+									door.closeDoor(); // Chama o método para "fechar" a porta
+									// System.out.println("Porta de ferro " + door.controllingPortID + " fechada.");
+								}
+								break;
+							}
+						}
+					}
+				}
+
+				
+				for (int i = 0; i < obj[currentMap].length; i++) {
+					if (obj[currentMap][i] instanceof OBJ_Door_Iron && obj[currentMap][i] != null) {
+						OBJ_Door_Iron door = (OBJ_Door_Iron) obj[currentMap][i];
+						int plateIndex = door.controllingPlateID;
+						if (plateIndex >= 0 && plateIndex < iTile[currentMap].length
+								&& iTile[currentMap][plateIndex] instanceof IT_MetalPlate) {
+							// Obtém a placa de pressão pelo ID
+							IT_MetalPlate plate = (IT_MetalPlate) iTile[currentMap][plateIndex];
+							if (plate.isActivated()) {
+								ui.showMessage("Você abriu a porta!"); // debug em UI
+								door.openDoor();
+							} else {
+								door.closeDoor();
+							}
+						}
+
+					}
+				}
 			} else {
-			   // System.out.println("Sem caixas no mapa!");
+				// System.out.println("Sem caixas no mapa!");
 			}
 
 		}
@@ -341,13 +418,18 @@ public class GamePanel extends JPanel implements Runnable {
 			// TILE
 			tileM.draw(g2);
 
-			// ADD ENTITIES TO THE LIST - COMBINED ITILE AND WIRE ADDITION
+			// Wires fios
+			for (int i = 0; i < Math.max(iTile[currentMap].length, wire[currentMap].length); i++) {
+
+				if (i < wire[currentMap].length && wire[currentMap][i] != null) {
+					entityList.add(wire[currentMap][i]);
+				}
+			}
+
+			// ADD LIST
 			for (int i = 0; i < Math.max(iTile[currentMap].length, wire[currentMap].length); i++) {
 				if (i < iTile[currentMap].length && iTile[currentMap][i] != null) {
 					entityList.add(iTile[currentMap][i]);
-				}
-				if (i < wire[currentMap].length && wire[currentMap][i] != null) {
-					entityList.add(wire[currentMap][i]);
 				}
 			}
 
@@ -390,6 +472,16 @@ public class GamePanel extends JPanel implements Runnable {
 
 		}
 
+		// Se o debug estiver ativo, desenha o fundo com opacidade
+		if (keyH.showDebug == true) {
+			AlphaComposite originalComposite = (AlphaComposite) g2.getComposite();
+			float alpha = (gameState == optionState) ? 0.5f : 1.0f; // Opacidade, ajuste conforme necessário
+			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+			g2.setColor(new Color(0, 0, 0, 50)); // Cor de fundo com opacidade (preto semi-transparente)
+			g2.fillRect(0, 0, screenWidth, screenHeight);
+			g2.setComposite(originalComposite); // Restaura a opacidade original
+		}
+
 		// DEBUG
 		if (keyH.showDebug == true) {
 			long drawEnd = System.nanoTime();
@@ -401,73 +493,78 @@ public class GamePanel extends JPanel implements Runnable {
 			int lineHeigth = 40;
 
 			// lado esquerdo
-			g2.drawString("WorldX: " + player.worldX, x, y);
+			drawStringWithOpacity(g2, "WorldX: " + player.worldX, x, y, 1.0f);
 			y += lineHeigth;
-			g2.drawString("WorldY: " + player.worldY, x, y);
+			drawStringWithOpacity(g2, "WorldY: " + player.worldY, x, y, 1.0f);
 			y += lineHeigth;
-			g2.drawString("Col: " + (player.worldX + player.solidArea.x) / tileSize, x, y);
+			drawStringWithOpacity(g2, "Col: " + (player.worldX + player.solidArea.x) / tileSize, x, y, 1.0f);
 			y += lineHeigth;
-			g2.drawString("Row: " + (player.worldY + player.solidArea.y) / tileSize, x, y);
+			drawStringWithOpacity(g2, "Row: " + (player.worldY + player.solidArea.y) / tileSize, x, y, 1.0f);
 			y += lineHeigth;
-			g2.drawString("Draw Time: " + passed, x, y);
+			drawStringWithOpacity(g2, "Draw Time: " + passed, x, y, 1.0f);
 			y += lineHeigth;
-			g2.drawString("FPS: " + drawCount, x, y);
+			drawStringWithOpacity(g2, "FPS: " + drawCount, x, y, 1.0f);
 
-			if (gameState == playState || gameState == optionState) {
+			// lado direito
+			x = screenWidth - tileSize * 7;
+			y = screenHeight - (tileSize * 10);
+			lineHeigth = 40;
 
-				// lado direito
-				x = screenWidth - tileSize * 7;
-				y = screenHeight - (tileSize * 10);
-				lineHeigth = 40;
+			// Create a plate list
+			for (int i = 0; i < iTile[1].length; i++) {
+				if (iTile[currentMap][i] != null && iTile[currentMap][i].name != null
+						&& iTile[currentMap][i].name.equals(IT_MetalPlate.itName)) {
+					drawStringWithOpacity(g2, i + "", iTile[currentMap][i].worldX + 15, iTile[currentMap][i].worldY,
+							1.0f);
 
-				// Create a plate list
-				for (int i = 0; i < iTile[1].length; i++) {
-					if (iTile[currentMap][i] != null && iTile[currentMap][i].name != null
-							&& iTile[currentMap][i].name.equals(IT_MetalPlate.itName)) {
-						g2.drawString(i + "", iTile[currentMap][i].worldX + 15, iTile[currentMap][i].worldY);
+					// outros debugs da placa
+					drawStringWithOpacity(g2, "Placa [" + i + "]: " + iTile[currentMap][i].estadoLogico + " caixa",
+							x - 50, y, 1.0f);
+					y += lineHeigth;
+				}
+			}
 
-						// outros debugs da placa
-						g2.drawString("Placa [" + i + "]: " + iTile[currentMap][i].estadoLogico + " caixa", x - 150, y);
-						y += lineHeigth;
-					}
+			// Mostrar o estado das portas lógicas
+			NPC_Box npcBox = null;
+			for (int i = 0; i < npc[1].length; i++) {
+				if (npc[currentMap][i] instanceof NPC_Box) {
+					npcBox = (NPC_Box) npc[currentMap][i];
+					break;
+				}
+			}
+
+			if (npcBox != null) {
+				ArrayList<String> debugInfo = npcBox.getLogicalPortDebugInfo();
+
+				// Aqui também precisa ter um loop para os iTiles
+				for (String debugString : debugInfo) {
+
+					drawStringWithOpacity(g2, debugString, x - 50, y, 1.0f);
+					y += lineHeigth;
 				}
 
-				// Mostrar o estado das portas lógicas
-				NPC_Box npcBox = null;
-				for (int i = 0; i < npc[1].length; i++) {
-					if (npc[currentMap][i] instanceof NPC_Box) {
-						npcBox = (NPC_Box) npc[currentMap][i];
-						break;
-					}
-				}
+				for (int i = 0; i < iTile[currentMap].length; i++) {
 
-				if (npcBox != null) {
-					ArrayList<String> debugInfo = npcBox.getLogicalPortDebugInfo();
+					if (iTile[currentMap][i] instanceof IT_LogicalPort) {
+						IT_LogicalPort port = (IT_LogicalPort) iTile[currentMap][i];
 
-					// Aqui também precisa ter um loop para os iTiles
-					for (String debugString : debugInfo) {
+						for (String debugString : debugInfo) {
 
-						g2.drawString(debugString, x - 150, y);
-						y += lineHeigth;
-					}
-
-					for (int i = 0; i < iTile[currentMap].length; i++) {
-
-						if (iTile[currentMap][i] instanceof IT_LogicalPort) {
-							IT_LogicalPort port = (IT_LogicalPort) iTile[currentMap][i];
-
-							for (String debugString : debugInfo) {
-
-								g2.drawString(port.id + "", iTile[currentMap][i].worldX + 15,
-										iTile[currentMap][i].worldY);
-								break;
-							}
+							drawStringWithOpacity(g2, port.id + "", iTile[currentMap][i].worldX + 15,
+									iTile[currentMap][i].worldY, 1.0f);
+							break;
 						}
 					}
 				}
 			}
 		}
+	}
 
+	private void drawStringWithOpacity(Graphics2D g2, String text, int x, int y, float alpha) {
+		AlphaComposite originalComposite = (AlphaComposite) g2.getComposite();
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+		g2.drawString(text, x, y);
+		g2.setComposite(originalComposite);
 	}
 
 	public void drawToScreen() {
@@ -490,6 +587,10 @@ public class GamePanel extends JPanel implements Runnable {
 
 	public void stopMusic() {
 		music.stop();
+	}
+
+	public void stopSFX() {
+		sfx.stop();
 	}
 
 	public void playSFX(int i) {

@@ -370,8 +370,8 @@ public class NPC_Box extends Entity {
 		ArrayList<String> debugInfo = new ArrayList<>();
 		for (IT_LogicalPort port : logicalPortList) {
 			if (port != null) {
-				// boolean portStatus = verificarCondicaoLogica(port.id);
-				String debugString = "Porta " + port.tipo.toUpperCase() + " [" + port.id + "]: "; // + portStatus;
+				boolean portStatus = verificarCondicaoLogica(port.id);
+				String debugString = "Porta " + port.tipo.toUpperCase() + " [" + port.id + "]: "+portStatus; // + portStatus;
 				debugInfo.add(debugString);
 			}
 		}

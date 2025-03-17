@@ -1,6 +1,9 @@
-package br.ufcat.logicban.ui;
+package br.ufcat.logicban.util;
 
 import javax.swing.*;
+
+import br.ufcat.logicban.ui.Main;
+
 import java.awt.*;
 import java.awt.event.*;
 

@@ -1,6 +1,7 @@
 package br.ufcat.logicban.object;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 import br.ufcat.logicban.entity.Entity;
 import br.ufcat.logicban.ui.GamePanel;
@@ -8,19 +9,31 @@ import br.ufcat.logicban.ui.GamePanel;
 public class OBJ_Door_Iron extends Entity {
 	GamePanel gp;
 	public int controllingPortID;
+	public int controllingPlateID;
 	public boolean isOpen = false; // Adicione esta linha
 	public boolean originalCollision; // Adicione esta linha para salvar o estado original da colisao
 	public String originalImage; // Adicione esta linha para salvar o caminho da imagem original
+	public static final String objName = "Iron Door";
 
-	public OBJ_Door_Iron(GamePanel gp, int controllingPortID) {
+	public OBJ_Door_Iron(GamePanel gp, int controllingPortID, String option) {
 		super(gp);
 		this.gp = gp;
-		this.controllingPortID = controllingPortID;
-		name = "Iron Door";
+		switch (option) {
+		case "portaLogica":
+			this.controllingPortID = controllingPortID;
+			break;
+		case "placa":
+			this.controllingPlateID = controllingPortID;
+			break;
+		}
+
+		name = objName;
 		down1 = setup("/assets/objects/door_iron", gp.tileSize, gp.tileSize);
 		originalImage = "/assets/objects/door_iron"; // Salva o caminho da imagem original
 		collision = true;
 		originalCollision = true; // Salva o estado original da colisão
+
+		color = Color.black;
 	}
 
 	// Método para "abrir" a porta (esconder e desativar a colisão)

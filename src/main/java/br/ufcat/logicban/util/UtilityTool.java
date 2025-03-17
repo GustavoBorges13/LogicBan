@@ -1,4 +1,4 @@
-package br.ufcat.logicban.ui;
+package br.ufcat.logicban.util;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
