@@ -27,20 +27,25 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
-
       - name: Build with Maven
         run: mvn package
+
+      - name: Get version from properties file
+        id: get_version
+        shell: pwsh
+        run: |
+          $version = (Get-Content ./target/classes/version.properties | Select-String -Pattern "version=" | ForEach-Object {$_.Line.Split("=")[1]})
+          echo "version=$version" >> $env:GITHUB_OUTPUT
 
       - name: Package with jpackage (Windows)
         shell: pwsh
         run: |
-          $version = (Get-Content ./target/classes/version.properties | Select-String -Pattern "version=" | ForEach-Object {$_.Line.Split("=")[1]})
           jpackage --type exe `
                    --input target `
-                   --main-jar "LogicBan-$version-jar-with-dependencies.jar" `
+                   --main-jar "LogicBan-${{ steps.get_version.outputs.version }}-jar-with-dependencies.jar" `
                    --main-class br.ufcat.logicban.ui.Main `
                    --dest target/jpackage `
-                   --app-version $version `
+                   --app-version ${{ steps.get_version.outputs.version }} `
                    --name LogicBan `
                    --vendor "Bug Hunters" `
                    --copyright "Copyright (C) 2025" `
@@ -62,7 +67,7 @@ jobs:
           path: target/jpackage/*.exe
 
     outputs:
-      version: ${{ steps.project_version.outputs.version }}
+      version: ${{ steps.get_version.outputs.version }}
 
   build-linux:
     runs-on: ubuntu-latest
@@ -85,20 +90,17 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
-
       - name: Build with Maven
         run: mvn package
     
       - name: Verify jars targets
         run: |
           ls -lh target/*.jar
-
       - name: Read version from version.properties
         id: get_version
         run: |
           VERSION=$(sed -n 's/version=//p' ./target/classes/version.properties)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
       - name: Package with jpackage (Linux)
         run: |
           jpackage --type deb \
@@ -111,7 +113,6 @@ jobs:
              --vendor "Bug Hunters" \
              --copyright "Copyright (C) 2025" \
              --icon src/resources/assets/logos/icone.png
-
       - name: Clean up dependencies in control file
         run: |
           # Extraindo o conteúdo do pacote .deb
@@ -132,7 +133,7 @@ jobs:
           name: logicban-linux-deb
           path: ./jpackage-output/*.deb
     outputs:
-      version: ${{ steps.project_version.outputs.version }}
+      version: ${{ steps.get_version.outputs.version }}
 
   build-macos:
     runs-on: macos-latest
@@ -155,19 +156,23 @@ jobs:
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             maven-${{ runner.os }}-
-
       - name: Build with Maven
         run: mvn package
 
+      - name: Get version from properties file
+        id: get_version
+        run: |
+          VERSION=$(sed -E -n 's/version=(.*)/\1/p' ./target/classes/version.properties)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Package with jpackage (macOS)
         run: |
-          version=$(sed -E -n 's/version=(.*)/\1/p' ./target/classes/version.properties)
           jpackage --type dmg \
              --input target \
-             --main-jar "LogicBan-$version-jar-with-dependencies.jar" \
+             --main-jar "LogicBan-${{ steps.get_version.outputs.version }}-jar-with-dependencies.jar" \
              --main-class br.ufcat.logicban.ui.Main \
              --dest target/jpackage \
-             --app-version "$version" \
+             --app-version "${{ steps.get_version.outputs.version }}" \
              --name LogicBan \
              --vendor "Bug Hunters" \
              --copyright "Copyright (C) 2025" \
@@ -176,14 +181,14 @@ jobs:
       - name: List jpackage Output
         run: |
           ls -lh target/jpackage/
-
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
           name: logicban-macos
           path: target/jpackage/*.dmg
+
     outputs:
-      version: ${{ steps.project_version.outputs.version }}
+      version: ${{ steps.get_version.outputs.version }}
 
   upload-release:
     runs-on: ubuntu-latest
@@ -208,59 +213,60 @@ jobs:
           ls -lh ./artifacts/logicban-windows  # Adicionado para debug
           ls -lh ./artifacts/logicban-linux-deb  # Adicionado para debug
           ls -lh ./artifacts/logicban-macos  # Adicionado para debug
-
       - name: Verify downloaded artifacts
         run: |
           ls -lh ./artifacts/logicban-windows
           ls -lh ./artifacts/logicban-linux-deb
           ls -lh ./artifacts/logicban-macos
-
       # Calcular Hashes
       - name: Generate checksums
         id: checksums
         shell: bash
         run: |
-          VERSION="${{ steps.get_version.outputs.version }}"
-          WIN_FILE="./artifacts/logicban-windows/LogicBan-${VERSION}.exe"
-          LINUX_FILE="./artifacts/logicban-linux-deb/logicban_${VERSION}_amd64.deb"
-          MACOS_FILE="./artifacts/logicban-macos/LogicBan-${VERSION}.dmg"
+          VERSION_WIN="${{ needs.build-windows.outputs.version }}"
+          VERSION_LINUX="${{ needs.build-linux.outputs.version }}"
+          VERSION_MACOS="${{ needs.build-macos.outputs.version }}"
+
+          WIN_FILE="./artifacts/logicban-windows/LogicBan-${VERSION_WIN}.exe"
+          LINUX_FILE="./artifacts/logicban-linux-deb/logicban_${VERSION_LINUX}_amd64.deb"
+          MACOS_FILE="./artifacts/logicban-macos/LogicBan-${VERSION_MACOS}.dmg"
+
           WIN_SHA256=$(sha256sum "$WIN_FILE" | awk '{print $1}')
           LINUX_SHA256=$(sha256sum "$LINUX_FILE" | awk '{print $1}')
           MACOS_SHA256=$(sha256sum "$MACOS_FILE" | awk '{print $1}')
+
           echo "win_sha256=$WIN_SHA256" >> $GITHUB_OUTPUT
           echo "linux_sha256=$LINUX_SHA256" >> $GITHUB_OUTPUT
           echo "macos_sha256=$MACOS_SHA256" >> $GITHUB_OUTPUT
-
       - name: Verify Windows artifact
         run: |
-          VERSION="${{ steps.get_version.outputs.version }}"
-          if [ ! -f "./artifacts/logicban-windows/LogicBan-${VERSION}.exe" ]; then
-            echo "Arquivo LogicBan-${VERSION}.exe não encontrado!"
+          VERSION_WIN="${{ needs.build-windows.outputs.version }}"
+          if [ ! -f "./artifacts/logicban-windows/LogicBan-${VERSION_WIN}.exe" ]; then
+            echo "Arquivo LogicBan-${VERSION_WIN}.exe não encontrado!"
             exit 1
           fi
       - name: Verify Linux artifact
         run: |
-          VERSION="${{ steps.get_version.outputs.version }}"
-          if [ ! -f "./artifacts/logicban-linux-deb/logicban_${VERSION}_amd64.deb" ]; then
-            echo "Arquivo logicban_${VERSION}_amd64.deb não encontrado!"
+          VERSION_LINUX="${{ needs.build-linux.outputs.version }}"
+          if [ ! -f "./artifacts/logicban-linux-deb/logicban_${VERSION_LINUX}_amd64.deb" ]; then
+            echo "Arquivo logicban_${VERSION_LINUX}_amd64.deb não encontrado!"
             exit 1
           fi
       - name: Verify macOS artifact
         run: |
-          VERSION="${{ steps.get_version.outputs.version }}"
-          if [ ! -f "./artifacts/logicban-macos/LogicBan-${VERSION}.dmg" ]; then
-            echo "Arquivo LogicBan-${VERSION}.dmg não encontrado!"
+          VERSION_MACOS="${{ needs.build-macos.outputs.version }}"
+          if [ ! -f "./artifacts/logicban-macos/LogicBan-${VERSION_MACOS}.dmg" ]; then
+            echo "Arquivo LogicBan-${VERSION_MACOS}.dmg não encontrado!"
             exit 1
           fi
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}
-          release_name: Release v${{ steps.get_version.outputs.version }}
+          tag_name: v${{ needs.build-windows.outputs.version }}
+          release_name: Release v${{ needs.build-windows.outputs.version }}
           draft: false
           prerelease: false
           body: |
@@ -268,14 +274,13 @@ jobs:
             * Windows SHA256: ${{ steps.checksums.outputs.win_sha256 }}
             * Linux SHA256: ${{ steps.checksums.outputs.linux_sha256 }}
             * macOS SHA256: ${{ steps.checksums.outputs.macos_sha256 }}
-
       - name: Upload Windows artifact to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-windows/LogicBan-${{ steps.get_version.outputs.version }}.exe
+          asset_path: ./artifacts/logicban-windows/LogicBan-${{ needs.build-windows.outputs.version }}.exe
           asset_name: LogicBan-Windows.exe
           asset_content_type: application/octet-stream
 
@@ -285,7 +290,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-linux-deb/logicban_${{ steps.get_version.outputs.version }}_amd64.deb
+          asset_path: ./artifacts/logicban-linux-deb/logicban_${{ needs.build-linux.outputs.version }}_amd64.deb
           asset_name: LogicBan-Linux.deb
           asset_content_type: application/octet-stream
 
@@ -295,6 +300,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/logicban-macos/LogicBan-${{ steps.get_version.outputs.version }}.dmg
+          asset_path: ./artifacts/logicban-macos/LogicBan-${{ needs.build-macos.outputs.version }}.dmg
           asset_name: LogicBan-macOS.dmg
           asset_content_type: application/octet-stream
