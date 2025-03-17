@@ -25,12 +25,12 @@ public class Player extends Entity {
 		this.keyH = keyH;
 
 		solidArea = new Rectangle();
-		solidArea.x = 8;
-		solidArea.y = 12;
+		solidArea.x = 4;
+		solidArea.y = 4;
 		solidAreaDefaultX = solidArea.x;
 		solidAreaDefaultY = solidArea.y;
-		solidArea.width = 32;
-		solidArea.height = 32;
+		solidArea.width = 42;
+		solidArea.height = 42;
 
 		color = Color.magenta;
 
