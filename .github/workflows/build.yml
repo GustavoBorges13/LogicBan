@@ -213,8 +213,22 @@ jobs:
 
     needs: [build-windows, build-linux, build-macos]
     steps:
-      - name: Debug Needs Context
-        run: echo "${{ toJSON(needs) }}"
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Necessário para obter o histórico completo para tags
+
+      - name: Generate Changelog
+        id: changelog
+        uses: github-changelog-generator/github-changelog-generator@v1.15.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          future_release: v${{ needs.build-windows.outputs.version }}
+
+      - name: Debug Changelog
+        run: |
+          echo "Changelog:"
+          echo "${{ steps.changelog.outputs.changelog }}"
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -308,6 +322,9 @@ jobs:
             * Linux SHA256: ${{ steps.checksums.outputs.linux_sha256 }}
             * macOS SHA256: ${{ steps.checksums.outputs.macos_sha256 }}
             * JAR SHA256: ${{ steps.checksums.outputs.jar_sha256 }}
+
+            ## What's Changed
+            ${{ steps.changelog.outputs.changelog }}
 
       - name: Upload Windows artifact to release
         uses: actions/upload-release-asset@v1
