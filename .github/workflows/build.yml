@@ -61,6 +61,9 @@ jobs:
           name: logicban-windows
           path: target/jpackage/*.exe
 
+    outputs:
+      version: ${{ steps.project_version.outputs.version }}
+
   build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -128,6 +131,8 @@ jobs:
         with:
           name: logicban-linux-deb
           path: ./jpackage-output/*.deb
+    outputs:
+      version: ${{ steps.project_version.outputs.version }}
 
   build-macos:
     runs-on: macos-latest
@@ -177,6 +182,8 @@ jobs:
         with:
           name: logicban-macos
           path: target/jpackage/*.dmg
+    outputs:
+      version: ${{ steps.project_version.outputs.version }}
 
   upload-release:
     runs-on: ubuntu-latest
@@ -201,13 +208,6 @@ jobs:
           ls -lh ./artifacts/logicban-windows  # Adicionado para debug
           ls -lh ./artifacts/logicban-linux-deb  # Adicionado para debug
           ls -lh ./artifacts/logicban-macos  # Adicionado para debug
-
-      # Mova o passo de leitura da versão para aqui:
-      - name: Read version from version.properties
-        id: get_version
-        run: |
-          VERSION=$(sed -n 's/version=//p' ./artifacts/logicban-linux-deb/target/classes/version.properties)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Verify downloaded artifacts
         run: |
