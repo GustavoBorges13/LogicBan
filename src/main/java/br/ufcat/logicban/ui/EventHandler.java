@@ -56,8 +56,8 @@ public class EventHandler {
 
 	public void checkEvent() {
 		// Check if the player character is more than 1 tile away from the last event
-		int xDistance = Math.abs(gp.player.worldX - previousEventX);
-		int yDistance = Math.abs(gp.player.worldY - previousEventY);
+		int xDistance = Math.abs(gp.player.worldX + gp.tileSize);
+		int yDistance = Math.abs(gp.player.worldY + gp.tileSize);
 		int distance = Math.max(xDistance, yDistance);
 
 		if (distance > gp.tileSize || (outTile || gp.player.collisionEndWorld)) {
@@ -99,13 +99,21 @@ public class EventHandler {
 		mapAux = map;
 
 		if (map == gp.currentMap) {
-			gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
-			gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+			System.out.println("solidareax "+gp.player.solidArea.x+" solidareay "+gp.player.solidArea.y);
+			if(gp.player.walkType.equals(gp.player.stepWalk)) {
+				gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
+				gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+			}else if(gp.player.walkType.equals(gp.player.smoothWalk)) {
+				gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
+				gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+			}
+			
 			eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
 			eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
-
+			System.out.println("playersolidarea: "+gp.player.solidArea+"eventRec: "+eventRect[map][col][row]);
 			if (gp.player.solidArea.intersects(eventRect[map][col][row])
 					&& eventRect[map][col][row].eventDone == false) {
+				System.out.println("OK");
 				if (gp.player.direction.contentEquals(reqDirection) || reqDirection.contentEquals("any")) {
 					hit = true;
 					previousEventX = gp.player.worldX;
