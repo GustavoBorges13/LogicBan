@@ -8,6 +8,13 @@ import br.ufcat.logicban.ui.GamePanel;
 
 public class IT_LogicalPort extends InteractiveTile {
 	public static final String itName = "Porta Logica";
+	public static final String NOT = "NOT";
+	public static final String AND = "AND";
+	public static final String OR = "OR";
+	public static final String NOR = "NOR";
+	public static final String XOR = "XOR";
+	public static final String NAND = "NAND";
+	public static final String XNOR = "XNOR";
 	public int id; // ID único
 	public ArrayList<Integer> plateIndices = new ArrayList<>(); // Lista dos índices das placas conectadas
 	public boolean outputState = false; // Adicionado
@@ -27,7 +34,7 @@ public class IT_LogicalPort extends InteractiveTile {
 		name = itName;
 		
 		switch (tipo) {
-		case "not":
+		case NOT:
 			solidArea = new Rectangle();
 			solidArea.x = 2;
 			solidArea.y = 8;
@@ -37,7 +44,7 @@ public class IT_LogicalPort extends InteractiveTile {
 			solidAreaDefaultY = solidArea.y;
 			color = Color.black;
 			break;
-		case "and":
+		case AND:
 			solidArea = new Rectangle();
 			solidArea.x = 6;
 			solidArea.y = 10;
@@ -47,7 +54,7 @@ public class IT_LogicalPort extends InteractiveTile {
 			solidAreaDefaultY = solidArea.y;
 			color = Color.black;
 			break;
-		case "or":
+		case OR:
 			solidArea = new Rectangle();
 			solidArea.x = 6;
 			solidArea.y = 8;
@@ -57,7 +64,7 @@ public class IT_LogicalPort extends InteractiveTile {
 			solidAreaDefaultY = solidArea.y;
 			color = Color.black;
 			break;
-		case "nor":
+		case NOR:
 			solidArea = new Rectangle();
 			solidArea.x = 6;
 			solidArea.y = 8;
@@ -67,7 +74,7 @@ public class IT_LogicalPort extends InteractiveTile {
 			solidAreaDefaultY = solidArea.y;
 			color = Color.black;
 			break;
-		case "xor":
+		case XOR:
 			solidArea = new Rectangle();
 			solidArea.x = 6;
 			solidArea.y = 8;
@@ -77,7 +84,7 @@ public class IT_LogicalPort extends InteractiveTile {
 			solidAreaDefaultY = solidArea.y;
 			color = Color.black;
 			break;
-		case "nand":
+		case NAND:
 			solidArea = new Rectangle();
 			solidArea.x = 6;
 			solidArea.y = 8;
@@ -87,7 +94,7 @@ public class IT_LogicalPort extends InteractiveTile {
 			solidAreaDefaultY = solidArea.y;
 			color = Color.black;
 			break;
-		case "xnor":
+		case XNOR:
 			solidArea = new Rectangle();
 			solidArea.x = 6;
 			solidArea.y = 8;

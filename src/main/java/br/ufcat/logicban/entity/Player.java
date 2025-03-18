@@ -3,6 +3,11 @@ package br.ufcat.logicban.entity;
 import java.awt.Color;
 import java.awt.Rectangle;
 
+import br.ufcat.logicban.object.OBJ_Boots;
+import br.ufcat.logicban.object.OBJ_Chest;
+import br.ufcat.logicban.object.OBJ_Door;
+import br.ufcat.logicban.object.OBJ_Door_Iron;
+import br.ufcat.logicban.object.OBJ_Key;
 import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
 import br.ufcat.logicban.tile_interactive.InteractiveTile;
 import br.ufcat.logicban.ui.GamePanel;
@@ -64,7 +69,7 @@ public class Player extends Entity {
 			solidAreaDefaultY = solidArea.y;
 			solidArea.width = 32;
 			solidArea.height = 32;
-			
+
 			if (keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true
 					|| keyH.rightPressed == true) {
 				if (keyH.upPressed == true) {
@@ -139,14 +144,14 @@ public class Player extends Entity {
 				}
 			}
 		} else if (walkType.equals(stepWalk)) {
-			
+
 			solidArea.x = 0;
 			solidArea.y = 0;
 			solidAreaDefaultX = solidArea.x;
 			solidAreaDefaultY = solidArea.y;
 			solidArea.width = 48;
 			solidArea.height = 48;
-			
+
 			speed = gp.tileSize;
 			// Verifica se alguma tecla foi pressionada neste frame
 			if (keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true
@@ -164,7 +169,7 @@ public class Player extends Entity {
 
 				// CHECK TILE COLLISION
 				collisionOn = false;
-				//gp.cChecker.checkTile(this);
+				gp.cChecker.checkTile(this);
 
 				// CHECK OBJECT COLLISION
 				int objIndex = gp.cChecker.checkObject(this, true);
@@ -173,12 +178,10 @@ public class Player extends Entity {
 				// CHECK NPC COLLISION
 				int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
 				interactNPC(npcIndex);
-
-				int iTileIndex = gp.cChecker.checkObject(this, true);
-				interactInteractiveTile(iTileIndex);
-
+				
 				// CHECK INTERACTIVE TILE COLISION
-				gp.cChecker.checkEntity(this, gp.iTile);
+				int iTileIndex = gp.cChecker.checkEntity(this, gp.iTile);
+				interactInteractiveTile(iTileIndex);
 
 				// CHECK EVENT
 				gp.eHandler.checkEvent();
@@ -219,46 +222,63 @@ public class Player extends Entity {
 			// gp.obj[i] = null; // excluir da tela
 
 			String objectName = gp.obj[gp.currentMap][i].name;
-
+			//System.out.println(objectName);
+			
 			switch (objectName) {
-			case "Key":
+			case OBJ_Key.objName:
 				gp.playSFX(1);
 				hasKey++;
 				gp.obj[gp.currentMap][i] = null;
 				System.out.println("Chave: " + hasKey); // debug em terminal
 				gp.ui.showMessage("Voce pegou uma chave!"); // debug em UI
 				break;
-			case "Door":
-				if (hasKey > 0) {
-					gp.playSFX(3);
-					gp.obj[gp.currentMap][i] = null;
-					hasKey--;
-					System.out.println("Porta: " + hasKey); // debug em terminal
-					gp.ui.showMessage("Você abriu a porta!"); // debug em UI
+			case OBJ_Door.objName:
+
+				OBJ_Door targetDoor = (OBJ_Door) gp.obj[gp.currentMap][i];
+				System.out.println(targetDoor.messageShown);
+				if (targetDoor.messageShown) {
+					// nada a fazer
 				} else {
 					gp.ui.showMessage("Voce precisa acerta a combinação logica!");
 				}
+//				if (hasKey > 0) {
+//					gp.playSFX(3);
+//					gp.obj[gp.currentMap][i] = null;
+//					hasKey--;
+//					System.out.println("Porta: " + hasKey); // debug em terminal
+//					gp.ui.showMessage("Você abriu a porta!"); // debug em UI
+//				} else {
+////					gp.ui.showMessage("Voce precisa acerta a combinação logica!");
+//				}
 				break;
 
-			case "Door Iron":
-				if (hasKey > 0) {
-					gp.playSFX(3);
-					gp.obj[gp.currentMap][i] = null;
-					hasKey--;
-					System.out.println("Porta: " + hasKey); // debug em terminal
-					gp.ui.showMessage("Você abriu a porta!"); // debug em UI
+			case OBJ_Door_Iron.objName:
+				OBJ_Door_Iron targetIronDoor = (OBJ_Door_Iron) gp.obj[gp.currentMap][i];
+				System.out.println(targetIronDoor.messageShown);
+				if (targetIronDoor.messageShown) {
+					// nada a fazer
 				} else {
 					gp.ui.showMessage("Voce precisa acerta a combinação logica!");
 				}
+//				if (hasKey > 0) {
+//					gp.playSFX(3);
+//					gp.obj[gp.currentMap][i] = null;
+//					hasKey--;
+//					System.out.println("Porta: " + hasKey); // debug em terminal
+//					gp.ui.showMessage("Você abriu a porta!"); // debug em UI
+//				} else {
+//					// if()
+////					gp.ui.showMessage("Voce precisa acerta a combinação logica!");
+//				}
 				break;
-//			case "Door Iron":
+//			case OBJ_Door_Iron.objName:
 //				if (allRocksOn == true) {
 //					gp.ui.showMessage("Você abriu a porta!"); // debug em UI
 //				} else {
 //					gp.ui.showMessage("Voce precisa acerta a combinação logica!");
 //				}
 //				break;
-			case "Boots":
+			case OBJ_Boots.objName:
 
 				gp.playSFX(2);
 				if (walkType.equals(smoothWalk)) {
@@ -272,7 +292,7 @@ public class Player extends Entity {
 				gp.obj[gp.currentMap][i] = null;
 				gp.ui.showMessage("Speed UP!");
 				break;
-			case "Chest":
+			case OBJ_Chest.objName:
 //				gp.ui.gameFinished = true;
 				gp.stopMusic();
 				gp.playSFX(4);
@@ -327,9 +347,7 @@ public class Player extends Entity {
 	public void interactInteractiveTile(int i) {
 
 		if (i != 999) {
-
-			gp.ui.showMessage("Voce precisa acerta a combinação logica!");
-
+			//System.out.println("colisao com iteratictive tile");
 		}
 	}
 }

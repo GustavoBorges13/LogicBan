@@ -363,7 +363,11 @@ public class GamePanel extends JPanel implements Runnable {
 								break;
 							}
 						}
-					}  if (obj[currentMap][i] instanceof OBJ_Door_Iron && obj[currentMap][i] != null) {
+					}
+				}
+
+				for (int i = 0; i < obj[currentMap].length; i++) {
+					if (obj[currentMap][i] instanceof OBJ_Door_Iron && obj[currentMap][i] != null) {
 						OBJ_Door_Iron door = (OBJ_Door_Iron) obj[currentMap][i];
 						int plateIndex = door.controllingPlateID;
 						if (plateIndex >= 0 && plateIndex < iTile[currentMap].length
@@ -378,9 +382,24 @@ public class GamePanel extends JPanel implements Runnable {
 							}
 						}
 
-					}
+					} else if (obj[currentMap][i] instanceof OBJ_Door && obj[currentMap][i] != null) {
+						OBJ_Door door = (OBJ_Door) obj[currentMap][i];
+						int plateIndex = door.controllingPlateID;
+						if (plateIndex >= 0 && plateIndex < iTile[currentMap].length
+								&& iTile[currentMap][plateIndex] instanceof IT_MetalPlate) {
+							// Obtém a placa de pressão pelo ID
+							IT_MetalPlate plate = (IT_MetalPlate) iTile[currentMap][plateIndex];
+							if (plate.isActivated()) {
+								ui.showMessage("Você abriu a porta!"); // debug em UI
+								door.openDoor();
+							} else {
+								door.closeDoor();
+							}
+						}
 
+					}
 				}
+
 			} else {
 				// System.out.println("Sem caixas no mapa!");
 			}
@@ -472,7 +491,7 @@ public class GamePanel extends JPanel implements Runnable {
 			AlphaComposite originalComposite = (AlphaComposite) g2.getComposite();
 			float alpha = (gameState == optionState) ? 0.5f : 1.0f; // Opacidade, ajuste conforme necessário
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-			g2.setColor(new Color(0, 0, 0, 50)); // Cor de fundo com opacidade (preto semi-transparente)
+			g2.setColor(new Color(0, 0, 0, 20)); // Cor de fundo com opacidade (preto semi-transparente)
 			g2.fillRect(0, 0, screenWidth, screenHeight);
 			g2.setComposite(originalComposite); // Restaura a opacidade original
 		}
@@ -506,7 +525,7 @@ public class GamePanel extends JPanel implements Runnable {
 			lineHeigth = 40;
 
 			if (gameState == playState) {
-				// Create a plate list
+				// lista de placas
 				for (int i = 0; i < iTile[1].length; i++) {
 					if (iTile[currentMap][i] != null && iTile[currentMap][i].name != null
 							&& iTile[currentMap][i].name.equals(IT_MetalPlate.itName)) {
@@ -515,7 +534,7 @@ public class GamePanel extends JPanel implements Runnable {
 								iTile[currentMap][i].worldY, 1.0f);
 						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 40F));
 						drawStringWithOpacity(g2, iTile[currentMap][i].estadoLogico + "",
-								iTile[currentMap][i].worldX - 25, iTile[currentMap][i].worldY + (int) (tileSize / 1.3),
+								iTile[currentMap][i].worldX + 55, iTile[currentMap][i].worldY + (int) (tileSize / 1.3),
 								1.0f);
 
 						// outros debugs da placa
@@ -526,12 +545,14 @@ public class GamePanel extends JPanel implements Runnable {
 					}
 				}
 
-				// Mostrar o estado das portas lógicas
+				// Lista de caixas
 				NPC_Box npcBox = null;
 				for (int i = 0; i < npc[1].length; i++) {
 					if (npc[currentMap][i] instanceof NPC_Box) {
 						npcBox = (NPC_Box) npc[currentMap][i];
-						break;
+						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 25F));
+						drawStringWithOpacity(g2, "id[" + i + "]", npc[currentMap][i].worldX, npc[currentMap][i].worldY,
+								1.0f);
 					}
 				}
 
@@ -545,8 +566,8 @@ public class GamePanel extends JPanel implements Runnable {
 						y += lineHeigth;
 					}
 
+					// lista de portas logicas
 					for (int i = 0; i < iTile[currentMap].length; i++) {
-
 						if (iTile[currentMap][i] instanceof IT_LogicalPort) {
 							IT_LogicalPort port = (IT_LogicalPort) iTile[currentMap][i];
 

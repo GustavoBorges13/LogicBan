@@ -12,11 +12,12 @@ import br.ufcat.logicban.tile_interactive.IT_DryTree;
 import br.ufcat.logicban.tile_interactive.IT_LogicalPort;
 import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
 import br.ufcat.logicban.tile_interactive.IT_RedWire;
+import br.ufcat.logicban.tile_interactive.IT_Wire;
 
 public class AssetSetter {
 
 	GamePanel gp;
-
+	
 	public AssetSetter(GamePanel gp) {
 		this.gp = gp;
 	}
@@ -26,7 +27,7 @@ public class AssetSetter {
 		int mapNum = 0;
 		int i = 0;
 		// FASE 1
-		gp.obj[mapNum][i] = new OBJ_Door(gp, 0); // Porta de ferro 0 controlada pela porta AND com ID 0
+		gp.obj[mapNum][i] = new OBJ_Door(gp, 0, IT_LogicalPort.itName); // Porta de ferro 0 controlada pela porta AND com ID 0
 		gp.obj[mapNum][i].worldX = 15 * gp.tileSize;
 		gp.obj[mapNum][i].worldY = 8 * gp.tileSize;
 		i++;
@@ -41,7 +42,7 @@ public class AssetSetter {
 		gp.obj[mapNum][i].worldX = 21 * gp.tileSize;
 		gp.obj[mapNum][i].worldY = 4 * gp.tileSize;
 		i++;
-		gp.obj[mapNum][i] = new OBJ_Door_Iron(gp, 3, "placa"); // Porta de ferro 1 controlada pela placa ID 2
+		gp.obj[mapNum][i] = new OBJ_Door_Iron(gp, 3, IT_MetalPlate.itName); // Porta de ferro 1 controlada pela placa ID 2
 		gp.obj[mapNum][i].worldX = 19 * gp.tileSize;
 		gp.obj[mapNum][i].worldY = 11 * gp.tileSize;
 		i++;
@@ -92,7 +93,7 @@ public class AssetSetter {
 		gp.iTile[mapNum][i] = new IT_MetalPlate(gp, 11, 7);
 		i++;
 		
-		IT_LogicalPort andPort = new IT_LogicalPort(gp, 15, 5, "and", "right", 0);
+		IT_LogicalPort andPort = new IT_LogicalPort(gp, 15, 5, IT_LogicalPort.AND, "right", 0); // placa AND conectada na porta id = 0
 		andPort.addPlateIndex(0);
 		andPort.addPlateIndex(1);
 		gp.iTile[mapNum][i] = andPort;
@@ -140,7 +141,7 @@ public class AssetSetter {
 		
 		// FASE 1
 		// entradas
-		String cor = "red";
+		String cor = IT_Wire.RED;
 		// Primeiro conjunto de fios (rosa)
 		// gp | Coluna X | Linha Y | Imagem | Cor
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 5, "horizontal_down", cor);
@@ -158,7 +159,7 @@ public class AssetSetter {
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 5, "vertical_right", cor);
 		i++;
 
-		cor = "green";
+		cor = IT_Wire.GREEN;
 		// Primeiro conjunto de fios (vermelho)
 		// gp | Coluna X | Linha Y | Imagem | Cor
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 5, "horizontal_down", cor);
@@ -176,7 +177,7 @@ public class AssetSetter {
 		
 		// saida 
 		// Fios da saida da porta AND
-		cor = "black";
+		cor = IT_Wire.BLACK;
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 16, 5, "curve_right_up1", cor);
 		i++;
@@ -202,7 +203,7 @@ public class AssetSetter {
 		i++;
 		
 		// FASE 2
-		cor = "red";
+		cor = IT_Wire.RED;
 		mapNum = 1;
 		// Primeiro conjunto de fios (rosa)
 		// gp | Coluna X | Linha Y | Imagem | Cor
