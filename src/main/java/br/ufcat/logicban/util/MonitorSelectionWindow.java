@@ -1,16 +1,14 @@
 package br.ufcat.logicban.util;
 
 import javax.swing.*;
-
 import br.ufcat.logicban.ui.Main;
-
 import java.awt.*;
 import java.awt.event.*;
 
 public class MonitorSelectionWindow extends JFrame {
-	
-	private static final long serialVersionUID = 1L;
-	private JComboBox<String> monitorList;
+
+    private static final long serialVersionUID = 1L;
+    private JComboBox<String> monitorList;
     private JButton startButton;
     private String selectedMonitor;
 
@@ -18,7 +16,7 @@ public class MonitorSelectionWindow extends JFrame {
         // Inicialização da janela de seleção de monitor
         setTitle("Selecionar Monitor");
         setSize(300, 150);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Mudança importante aqui
         setLayout(new FlowLayout());
 
         // Obtendo os monitores disponíveis
@@ -32,26 +30,31 @@ public class MonitorSelectionWindow extends JFrame {
         }
 
         // Inicializa o monitor selecionado como o primeiro da lista
-        selectedMonitor = "Monitor 1"; // Por padrão, o monitor 1 é selecionado
+        selectedMonitor = (screens.length > 0) ? "Monitor 1" : null; // Garante que não seja nulo se não houver monitores
+        if (selectedMonitor != null) {
+            monitorList.setSelectedItem(selectedMonitor);
+        }
 
         monitorList.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Atualiza a variável 'selectedMonitor' com o valor atual do JComboBox
                 selectedMonitor = (String) monitorList.getSelectedItem();
             }
         });
 
         // Botão para iniciar o jogo
         startButton = new JButton("Iniciar Jogo");
-        // Estilização do botão "Ignorar" (fundo azul e texto branco)
         startButton.setBackground(new Color(0, 120, 215)); // Azul
         startButton.setForeground(Color.WHITE); // Texto branco
         startButton.setFocusPainted(false); // Remove o contorno de foco
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Passando a seleção para o jogo
-                Main.startGameOnSelectedMonitor(selectedMonitor);
-                dispose(); // Fecha a janela de seleção
+                if (selectedMonitor != null) {
+                    Main gameWindow = new Main(); // Cria uma nova instância de Main
+                    gameWindow.startGameOnSelectedMonitor(selectedMonitor); // Inicia o jogo no monitor selecionado
+                    dispose(); // Fecha esta janela de seleção
+                } else {
+                    JOptionPane.showMessageDialog(MonitorSelectionWindow.this, "Nenhum monitor detectado.", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
@@ -62,6 +65,5 @@ public class MonitorSelectionWindow extends JFrame {
         SwingUtilities.invokeLater(() -> startButton.requestFocusInWindow());
 
         setLocationRelativeTo(null); // Centraliza a janela
-        
     }
 }

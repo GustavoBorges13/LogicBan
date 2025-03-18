@@ -42,6 +42,7 @@ public class GamePanel extends JPanel implements Runnable {
 	final int originalTileSize = 16; // 16x16 tile
 	final int scale = 3;
 	final double proportion = 1.375; // Razão entre 22 e 16
+	private Main mainFrame; // Referência para a janela Main
 
 	public final int tileSize = originalTileSize * scale; // 48x48 tile
 	public final int maxScreenCol = (int) (22 * proportion);
@@ -100,7 +101,6 @@ public class GamePanel extends JPanel implements Runnable {
 	public int doorWorldX; // Posição X da porta no mundo
 	public int doorWorldY; // Posição Y da porta no mundo
 	public ArrayList<Entity> boxList = new ArrayList<Entity>();
-
 	// public ArrayList<Box> boxes = new ArrayList<>();
 
 	// GAME STATE
@@ -119,8 +119,8 @@ public class GamePanel extends JPanel implements Runnable {
 	public String nova_direcao_player = "down";
 	public int[] faseMap = { 50, 51, 52, 53 }; // Exemplo para 10 fases
 
-	public GamePanel() {
-
+	public GamePanel(Main mainFrame) {
+		this.mainFrame = mainFrame;
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
 		this.setBackground(Color.black);
 		this.setIgnoreRepaint(true); // Importante para fullscreen
@@ -232,10 +232,9 @@ public class GamePanel extends JPanel implements Runnable {
 		 */
 
 		// Garantir que estamos pegando o mesmo monitor onde a janela foi posicionada
-		Rectangle bounds = Main.window.getGraphicsConfiguration().getBounds();
-
-		Main.window.setBounds(bounds); // Ajusta a janela ao monitor correto
-		Main.window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		Rectangle bounds = mainFrame.getGraphicsConfiguration().getBounds();
+		mainFrame.setBounds(bounds);
+		mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		screenWidth2 = bounds.width;
 		screenHeight2 = bounds.height;
@@ -330,46 +329,41 @@ public class GamePanel extends JPanel implements Runnable {
 				for (int i = 0; i < obj[currentMap].length; i++) {
 					if (obj[currentMap][i] instanceof OBJ_Door_Iron && obj[currentMap][i] != null) {
 						OBJ_Door_Iron door = (OBJ_Door_Iron) obj[currentMap][i];
+
 						for (IT_LogicalPort port : box.logicalPortList) {
 							if (port.id == door.controllingPortID) {
 								if (port.outputState) {
-									// Se a porta está fechada, abra-a
-									door.openDoor(); // Chama o método para "abrir" a porta
-									ui.showMessage("Você abriu a porta!"); // debug em UI
-									// System.out.println("Porta de ferro " + door.controllingPortID + " aberta!");
+									if (!door.messageShown) { // Verifica se a mensagem já foi mostrada
+										door.openDoor();
+										ui.showMessage("Você abriu a porta!");
+										door.messageShown = true; // Define a flag para true
+									}
+
 								} else {
-									// Se a porta está aberta, feche-a
-									door.closeDoor(); // Chama o método para "fechar" a porta
-									// System.out.println("Porta de ferro " + door.controllingPortID + " fechada.");
+									door.closeDoor();
+									door.messageShown = false; // Reseta a flag quando a porta é fechada
 								}
 								break;
 							}
 						}
-
 					} else if (obj[currentMap][i] instanceof OBJ_Door && obj[currentMap][i] != null) {
 						OBJ_Door door = (OBJ_Door) obj[currentMap][i];
-
 						for (IT_LogicalPort port : box.logicalPortList) {
 							if (port.id == door.controllingPortID) {
 								if (port.outputState) {
-									// Se a porta está fechada, abra-a
-									door.openDoor(); // Chama o método para "abrir" a porta
-									ui.showMessage("Você abriu a porta!"); // debug em UI
-									// System.out.println("Porta de ferro " + door.controllingPortID + " aberta!");
+									if (!door.messageShown) { // Verifica se a mensagem já foi mostrada
+										door.openDoor();
+										ui.showMessage("Você abriu a porta!");
+										door.messageShown = true; // Define a flag para true
+									}
 								} else {
-									// Se a porta está aberta, feche-a
-									door.closeDoor(); // Chama o método para "fechar" a porta
-									// System.out.println("Porta de ferro " + door.controllingPortID + " fechada.");
+									door.closeDoor();
+									door.messageShown = false; // Reseta a flag quando a porta é fechada
 								}
 								break;
 							}
 						}
-					}
-				}
-
-				
-				for (int i = 0; i < obj[currentMap].length; i++) {
-					if (obj[currentMap][i] instanceof OBJ_Door_Iron && obj[currentMap][i] != null) {
+					}  if (obj[currentMap][i] instanceof OBJ_Door_Iron && obj[currentMap][i] != null) {
 						OBJ_Door_Iron door = (OBJ_Door_Iron) obj[currentMap][i];
 						int plateIndex = door.controllingPlateID;
 						if (plateIndex >= 0 && plateIndex < iTile[currentMap].length
@@ -385,6 +379,7 @@ public class GamePanel extends JPanel implements Runnable {
 						}
 
 					}
+
 				}
 			} else {
 				// System.out.println("Sem caixas no mapa!");
@@ -510,54 +505,67 @@ public class GamePanel extends JPanel implements Runnable {
 			y = screenHeight - (tileSize * 10);
 			lineHeigth = 40;
 
-			// Create a plate list
-			for (int i = 0; i < iTile[1].length; i++) {
-				if (iTile[currentMap][i] != null && iTile[currentMap][i].name != null
-						&& iTile[currentMap][i].name.equals(IT_MetalPlate.itName)) {
-					drawStringWithOpacity(g2, i + "", iTile[currentMap][i].worldX + 15, iTile[currentMap][i].worldY,
-							1.0f);
+			if (gameState == playState) {
+				// Create a plate list
+				for (int i = 0; i < iTile[1].length; i++) {
+					if (iTile[currentMap][i] != null && iTile[currentMap][i].name != null
+							&& iTile[currentMap][i].name.equals(IT_MetalPlate.itName)) {
+						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 25F));
+						drawStringWithOpacity(g2, "id[" + i + "]", iTile[currentMap][i].worldX,
+								iTile[currentMap][i].worldY, 1.0f);
+						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 40F));
+						drawStringWithOpacity(g2, iTile[currentMap][i].estadoLogico + "",
+								iTile[currentMap][i].worldX - 25, iTile[currentMap][i].worldY + (int) (tileSize / 1.3),
+								1.0f);
 
-					// outros debugs da placa
-					drawStringWithOpacity(g2, "Placa [" + i + "]: " + iTile[currentMap][i].estadoLogico + " caixa",
-							x - 50, y, 1.0f);
-					y += lineHeigth;
-				}
-			}
-
-			// Mostrar o estado das portas lógicas
-			NPC_Box npcBox = null;
-			for (int i = 0; i < npc[1].length; i++) {
-				if (npc[currentMap][i] instanceof NPC_Box) {
-					npcBox = (NPC_Box) npc[currentMap][i];
-					break;
-				}
-			}
-
-			if (npcBox != null) {
-				ArrayList<String> debugInfo = npcBox.getLogicalPortDebugInfo();
-
-				// Aqui também precisa ter um loop para os iTiles
-				for (String debugString : debugInfo) {
-
-					drawStringWithOpacity(g2, debugString, x - 50, y, 1.0f);
-					y += lineHeigth;
+						// outros debugs da placa
+						drawStringWithOpacity(g2,
+								"Placa id[" + i + "]: " + iTile[currentMap][i].estadoLogico + " caixa", x - 50, y,
+								1.0f);
+						y += lineHeigth;
+					}
 				}
 
-				for (int i = 0; i < iTile[currentMap].length; i++) {
+				// Mostrar o estado das portas lógicas
+				NPC_Box npcBox = null;
+				for (int i = 0; i < npc[1].length; i++) {
+					if (npc[currentMap][i] instanceof NPC_Box) {
+						npcBox = (NPC_Box) npc[currentMap][i];
+						break;
+					}
+				}
 
-					if (iTile[currentMap][i] instanceof IT_LogicalPort) {
-						IT_LogicalPort port = (IT_LogicalPort) iTile[currentMap][i];
+				if (npcBox != null) {
+					ArrayList<String> debugInfo = npcBox.getLogicalPortDebugInfo();
 
-						for (String debugString : debugInfo) {
+					// Aqui também precisa ter um loop para os iTiles
+					for (String debugString : debugInfo) {
 
-							drawStringWithOpacity(g2, port.id + "", iTile[currentMap][i].worldX + 15,
-									iTile[currentMap][i].worldY, 1.0f);
-							break;
+						drawStringWithOpacity(g2, debugString, x - 50, y, 1.0f);
+						y += lineHeigth;
+					}
+
+					for (int i = 0; i < iTile[currentMap].length; i++) {
+
+						if (iTile[currentMap][i] instanceof IT_LogicalPort) {
+							IT_LogicalPort port = (IT_LogicalPort) iTile[currentMap][i];
+
+							for (String debugString : debugInfo) {
+								g2.setFont(g2.getFont().deriveFont(Font.BOLD, 25F));
+								drawStringWithOpacity(g2, "id[" + port.id + "]", iTile[currentMap][i].worldX + 4,
+										iTile[currentMap][i].worldY, 1.0f);
+								g2.setFont(g2.getFont().deriveFont(Font.BOLD, 40F));
+								drawStringWithOpacity(g2, port.outputState ? "1" : "0",
+										iTile[currentMap][i].worldX + (int) (tileSize * 1.2),
+										iTile[currentMap][i].worldY + (int) (tileSize / 1.3), 1.0f);
+								break;
+							}
 						}
 					}
 				}
 			}
 		}
+
 	}
 
 	private void drawStringWithOpacity(Graphics2D g2, String text, int x, int y, float alpha) {

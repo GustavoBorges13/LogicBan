@@ -12,7 +12,6 @@ public class NPC_Box extends Entity {
 
 	public static final String npcName = "Box";
 	public String logicalOperation = "";
-	public String walkType = gp.player.walkType;
 	public ArrayList<InteractiveTile> plateList = new ArrayList<InteractiveTile>();
 	public ArrayList<IT_LogicalPort> logicalPortList = new ArrayList<>(); // Lista de Portas Lógicas
 	public static ArrayList<Entity> boxList = new ArrayList<Entity>();
@@ -26,12 +25,12 @@ public class NPC_Box extends Entity {
 		name = npcName;
 		direction = "down";
 		speed = 3;
-
+		walkType = gp.player.walkType;
 		solidArea = new Rectangle();
-		solidArea.x = 4;
-		solidArea.y = 4;
-		solidArea.width = 42;
-		solidArea.height = 42;
+		solidArea.x = 6;
+		solidArea.y = 9;
+		solidArea.width = 38;
+		solidArea.height = 32;
 		solidAreaDefaultX = solidArea.x;
 		solidAreaDefaultY = solidArea.y;
 		color = Color.ORANGE;
@@ -59,14 +58,14 @@ public class NPC_Box extends Entity {
 		detectPlate();
 		updateLogicalPorts(); // Adicione esta linha
 	}
-	
+
 	@Override
 	public void checkCollision() {
 		collisionOn = false;
 		gp.cChecker.checkTile(this);
 		gp.cChecker.checkObject(this, false);
 		gp.cChecker.checkPlayer(this);
-		//gp.cChecker.checkEntity(this, gp.npc);
+		// gp.cChecker.checkEntity(this, gp.npc);
 		gp.cChecker.checkEntity(this, gp.iTile);
 		// gp.cChecker.checkEntity(this, gp.wire);
 		// boolean contactPlayer = gp.cChecker.checkPlayer(this);
@@ -75,54 +74,108 @@ public class NPC_Box extends Entity {
 	}
 
 	public void move(String d) {
-		if (isMoving)
-			return;
+		if (gp.player.walkType.equals(gp.player.smoothWalk)) {
+			if (isMoving)
+				return;
 
-		isMoving = true;
-		this.direction = d;
+			isMoving = true;
+			this.direction = d;
 
-		// Salva a posição antiga para poder voltar se houver colisão
-		int oldWorldX = worldX;
-		int oldWorldY = worldY;
+			// Salva a posição antiga para poder voltar se houver colisão
+			int oldWorldX = worldX;
+			int oldWorldY = worldY;
 
-		// Atualiza a posição com base na direção
-		switch (direction) {
-		case "up":
-			worldY -= speed;
-			break;
-		case "down":
-			worldY += speed;
-			break;
-		case "left":
-			worldX -= speed;
-			break;
-		case "right":
-			worldX += speed;
-			break;
-		}
+			// Atualiza a posição com base na direção
+			switch (direction) {
+			case "up":
+				worldY -= speed;
+				break;
+			case "down":
+				worldY += speed;
+				break;
+			case "left":
+				worldX -= speed;
+				break;
+			case "right":
+				worldX += speed;
+				break;
+			}
 
-		// Verifica colisão com tiles
-		collisionOn = false;
-		gp.cChecker.checkTile(this); // Supondo que este método verifica a colisão com tiles
-		checkCollision();
-		if (collisionOn) {
-			worldX = oldWorldX;
-			worldY = oldWorldY;
-			isMoving = false;
-			return; // Interrompe o movimento se houver colisão com tile
-		}
-
-		// Verifica colisão com outros NPCs (incluindo caixas)
-		int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
-		if (npcIndex != 999) {
-			interactNPC(npcIndex); // Tenta interagir com o NPC
-			// Se a interação (empurrar) não for possível, volta à posição antiga
+			// Verifica colisão com tiles
+			collisionOn = false;
+			gp.cChecker.checkTile(this); // Supondo que este método verifica a colisão com tiles
+			checkCollision();
 			if (collisionOn) {
 				worldX = oldWorldX;
 				worldY = oldWorldY;
+				isMoving = false;
+				return; // Interrompe o movimento se houver colisão com tile
 			}
+
+			// Verifica colisão com outros NPCs (incluindo caixas)
+			int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
+			if (npcIndex != 999) {
+				interactNPC(npcIndex); // Tenta interagir com o NPC
+				// Se a interação (empurrar) não for possível, volta à posição antiga
+				if (collisionOn) {
+					worldX = oldWorldX;
+					worldY = oldWorldY;
+				}
+			}
+			isMoving = false; // Garante que isMoving seja false após a tentativa de movimento
+		} else if (gp.player.walkType.equals(gp.player.stepWalk)) {
+			if (isMoving)
+				return;
+			if (isMoving)
+				return;
+
+			isMoving = true;
+			this.direction = d;
+
+			// Salva a posição antiga para poder voltar se houver colisão
+			int oldWorldX = worldX;
+			int oldWorldY = worldY;
+
+			// Atualiza a posição com base na direção
+			switch (direction) {
+			case "up":
+				worldY -= gp.tileSize;
+				break;
+			case "down":
+				worldY += gp.tileSize;
+				break;
+			case "left":
+				worldX -= gp.tileSize;
+				break;
+			case "right":
+				worldX += gp.tileSize;
+				break;
+			}
+
+			// Verifica colisão com tiles
+			collisionOn = false;
+			gp.cChecker.checkTile(this); // Supondo que este método verifica a colisão com tiles
+			checkCollision();
+			if (collisionOn) {
+				worldX = oldWorldX;
+				worldY = oldWorldY;
+				isMoving = false;
+				return; // Interrompe o movimento se houver colisão com tile
+			}
+
+			// Verifica colisão com outros NPCs (incluindo caixas)
+			int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
+			if (npcIndex != 999) {
+				interactNPC(npcIndex); // Tenta interagir com o NPC
+				// Se a interação (empurrar) não for possível, volta à posição antiga
+				if (collisionOn) {
+
+					worldX = oldWorldX;
+					worldY = oldWorldY;
+				}
+			}
+			isMoving = false; // Garante que isMoving seja false após a tentativa de movimento
 		}
-		isMoving = false; // Garante que isMoving seja false após a tentativa de movimento
 	}
 
 	public void interactNPC(int i) {
@@ -131,14 +184,31 @@ public class NPC_Box extends Entity {
 
 			// Verifica se o NPC é outra caixa
 			if (targetNPC instanceof NPC_Box) {
+				NPC_Box box = (NPC_Box) targetNPC;
+
+				// Salvar a posição original do player e da caixa
+				int playerOldWorldX = worldX;
+				int playerOldWorldY = worldY;
+				int boxOldWorldX = box.worldX;
+				int boxOldWorldY = box.worldY;
+
 				// Tenta mover a outra caixa na mesma direção
-				((NPC_Box) targetNPC).move(direction);
+				//box.move(direction);
 
 				// Se a outra caixa não puder ser movida (colisão), marca a colisão
-				if (((NPC_Box) targetNPC).collisionOn) {
+				if (box.collisionOn) {
+					System.out.println("debug1");
+					box.worldX = boxOldWorldX;
+					box.worldY = boxOldWorldY;
 					collisionOn = true;
+				} else {
+					// Troca a posição do player com a posição original da caixa
+//					worldX = 200;
+//					worldY = 150;
 				}
+
 			} else {
+				System.out.println("debug3");
 				// Lógica para interagir com outros tipos de NPCs
 				collisionOn = true; // Impede o movimento se for outro tipo de NPC
 			}
@@ -183,7 +253,7 @@ public class NPC_Box extends Entity {
 			int distance = Math.max(xDistance, yDistance);
 
 			// altera 15 se quiser mexer na hitbox das placas
-			if (distance < 15) {
+			if (distance < 28) {
 				if (linkedEntity == null) {
 					linkedEntity = plate;
 					plate.estadoLogico = 1;
@@ -316,19 +386,19 @@ public class NPC_Box extends Entity {
 
 		case "nand":
 			// A porta NAND é o inverso da porta AND
-            boolean nandResult = true;
-            for (int plateIndex : port.plateIndices) {
-                if (plateIndex >= 0 && plateIndex < plateList.size()) {
-                    nandResult = nandResult && (plateList.get(plateIndex).estadoLogico == 1);
-                } else {
-                    System.out.println("Índice de placa inválido para a porta NAND.");
-                    return false;
-                }
-            }
-            for (int inputPortID : port.inputPortIDs) {
-                nandResult = nandResult && verificarCondicaoLogica(inputPortID);
-            }
-            return !nandResult;
+			boolean nandResult = true;
+			for (int plateIndex : port.plateIndices) {
+				if (plateIndex >= 0 && plateIndex < plateList.size()) {
+					nandResult = nandResult && (plateList.get(plateIndex).estadoLogico == 1);
+				} else {
+					System.out.println("Índice de placa inválido para a porta NAND.");
+					return false;
+				}
+			}
+			for (int inputPortID : port.inputPortIDs) {
+				nandResult = nandResult && verificarCondicaoLogica(inputPortID);
+			}
+			return !nandResult;
 
 		case "xnor":
 			// A porta XNOR é o inverso da porta XOR
@@ -371,7 +441,8 @@ public class NPC_Box extends Entity {
 		for (IT_LogicalPort port : logicalPortList) {
 			if (port != null) {
 				boolean portStatus = verificarCondicaoLogica(port.id);
-				String debugString = "Porta " + port.tipo.toUpperCase() + " [" + port.id + "]: "+portStatus; // + portStatus;
+				String debugString = "Porta " + port.tipo.toUpperCase() + " id[" + port.id + "]: " + portStatus; // +
+																												// portStatus;
 				debugInfo.add(debugString);
 			}
 		}

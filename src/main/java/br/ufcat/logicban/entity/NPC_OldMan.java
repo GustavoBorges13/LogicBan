@@ -14,7 +14,9 @@ public class NPC_OldMan extends Entity {
 	private boolean isMoving = false; // Controla se o NPC está se movendo
 	public String walkType = gp.player.walkType;
 	private IT_MetalPlate lastPlate = null;
-
+	public final String smoothWalk = "Smooth-Walk";
+	public final String stepWalk = "Step-by-Step";
+	
 	public NPC_OldMan(GamePanel gp) {
 		super(gp);
 
@@ -49,7 +51,7 @@ public class NPC_OldMan extends Entity {
 	@Override
 	public void setAction() {
 		walkType = gp.player.walkType;
-		if (walkType.equals("Smooth-Walk")) {
+		if (walkType.equals(smoothWalk)) {
 
 			speed = 1;
 			actionLockCounter++;
@@ -72,7 +74,7 @@ public class NPC_OldMan extends Entity {
 				}
 				actionLockCounter = 0;
 			}
-		} else if (walkType.equals("Step-by-Step")) {
+		} else if (walkType.equals(stepWalk)) {
 			speed = gp.tileSize;
 			moveTimer++;
 
@@ -108,7 +110,7 @@ public class NPC_OldMan extends Entity {
 
 	public void update() {
 		walkType = gp.player.walkType;
-		if (walkType.equals("Smooth-Walk")) {
+		if (walkType.equals(smoothWalk)) {
 			setAction();
 
 			//// CHECK TILE COLLISION
@@ -155,7 +157,7 @@ public class NPC_OldMan extends Entity {
 				spriteCounter = 0;
 			}
 
-		} else if (walkType.equals("Step-by-Step")) {
+		} else if (walkType.equals(stepWalk)) {
 			speed = gp.tileSize;
 			setAction(); // Define a ação do NPC
 

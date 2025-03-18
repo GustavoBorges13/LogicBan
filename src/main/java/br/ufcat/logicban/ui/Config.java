@@ -78,6 +78,7 @@ public class Config {
 
             // Walk Type
             s = br.readLine();
+            System.out.println(gp.player.walkType);
             gp.player.walkType = s;
 
             //System.out.println("Configuração carregada com sucesso.");
@@ -92,7 +93,7 @@ public class Config {
         gp.FullScreenOn = false;
         gp.music.volumeScale = 3; // Volume padrão
         gp.sfx.volumeScale = 3; // Volume padrão
-        gp.player.walkType = "Smooth-Walk"; // Caminhada padrão
+        gp.player.walkType = gp.player.stepWalk; // Caminhada padrão
         gp.update();
     }
 }

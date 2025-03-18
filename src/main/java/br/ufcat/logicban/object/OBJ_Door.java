@@ -11,7 +11,7 @@ public class OBJ_Door extends Entity {
 	public boolean isOpen = false; // Adicione esta linha
 	public boolean originalCollision; // Adicione esta linha para salvar o estado original da colisao
 	public String originalImage; // Adicione esta linha para salvar o caminho da imagem original
-
+	public boolean messageShown = false; // Nova flag
 	public static final String objName = "Door";
 
 	public OBJ_Door(GamePanel gp, int controllingPortID) {

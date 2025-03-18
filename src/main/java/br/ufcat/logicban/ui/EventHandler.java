@@ -3,6 +3,7 @@ package br.ufcat.logicban.ui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 
 public class EventHandler {
@@ -46,7 +47,7 @@ public class EventHandler {
 	private void carregarEventos() {
 		teleportEvents.add(new TeleportEvent(0, 16, 8, "right", 1, 9, 9, "right")); // fase1 -> fase2
 
-		teleportEvents.add(new TeleportEvent(1, 21, 12, "down", 2, 1, 0, "down")); // fase2 -> fase3
+		teleportEvents.add(new TeleportEvent(1, 21, 12, "any", 2, 1, 0, "any")); // fase2 -> fase3
 
 	}
 
@@ -56,8 +57,8 @@ public class EventHandler {
 
 	public void checkEvent() {
 		// Check if the player character is more than 1 tile away from the last event
-		int xDistance = Math.abs(gp.player.worldX - previousEventX);
-		int yDistance = Math.abs(gp.player.worldY - previousEventY);
+		int xDistance = Math.abs(gp.player.worldX + gp.tileSize);
+		int yDistance = Math.abs(gp.player.worldY + gp.tileSize);
 		int distance = Math.max(xDistance, yDistance);
 
 		if (distance > gp.tileSize || (outTile || gp.player.collisionEndWorld)) {
@@ -99,13 +100,23 @@ public class EventHandler {
 		mapAux = map;
 
 		if (map == gp.currentMap) {
-			gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
-			gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+
+			// System.out.println("solidareax " + gp.player.solidArea.x + " solidareay " +
+			// gp.player.solidArea.y);
+			if (gp.player.walkType.equals(gp.player.stepWalk)) {
+				gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x+gp.tileSize;
+				gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+			} else if (gp.player.walkType.equals(gp.player.smoothWalk)) {
+				gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
+				gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+			}
+
 			eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
 			eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
-
+			//System.out.println("playersolidarea: " + gp.player.solidArea + "eventRec: " + eventRect[map][col][row]);
 			if (gp.player.solidArea.intersects(eventRect[map][col][row])
 					&& eventRect[map][col][row].eventDone == false) {
+				System.out.println("OK");
 				if (gp.player.direction.contentEquals(reqDirection) || reqDirection.contentEquals("any")) {
 					hit = true;
 					previousEventX = gp.player.worldX;
@@ -117,12 +128,14 @@ public class EventHandler {
 			gp.player.solidArea.y = gp.player.solidAreaDefaultY;
 			eventRect[map][col][row].x = eventRect[map][col][row].eventRectDefaultX;
 			eventRect[map][col][row].y = eventRect[map][col][row].eventRectDefaultY;
+
 		}
+
 		return hit;
 	}
 
 	public void teleport(int targetMapIndex, int col, int row, String direction) {
-		
+
 		// Garante que o índice está dentro do array
 		if (targetMapIndex >= 0 && targetMapIndex < gp.faseMap.length) {
 			gp.gameState = gp.transitionState;

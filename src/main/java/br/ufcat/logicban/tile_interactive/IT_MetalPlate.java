@@ -24,8 +24,8 @@ public class IT_MetalPlate extends InteractiveTile {
         down1 = setup("/assets/tiles_interactive/metalplate", gp.tileSize, gp.tileSize);
         originalImage = down1; // Salva a imagem original para poder restaurar depois
 
-        solidArea.x = 25;
-        solidArea.y = 25;
+        solidArea.x = 24;
+        solidArea.y = 24;
         solidArea.width = 0;
         solidArea.height = 0;
         solidAreaDefaultX = solidArea.x;
