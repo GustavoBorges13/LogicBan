@@ -12,73 +12,164 @@ public class CollisionChecker {
 
 	public void checkTile(Entity entity) {
 
-		int entityLeftWorldX = entity.worldX + entity.solidArea.x;
-		int entityRightWorldX = entity.worldX + entity.solidArea.x + entity.solidArea.width;
-		int entityTopWorldY = entity.worldY + entity.solidArea.y;
-		int entityBottomWorldY = entity.worldY + entity.solidArea.y + entity.solidArea.height;
-
-		int entityLeftCol = entityLeftWorldX / gp.tileSize;
-		int entityRightCol = entityRightWorldX / gp.tileSize;
-		int entityTopRow = entityTopWorldY / gp.tileSize;
-		int entityBottomRow = entityBottomWorldY / gp.tileSize;
 
 		int tileNum1 = 0, tileNum2 = 0;
 
 		// predicao de movimento
-		try {
-			switch (entity.direction) {
-			case "up":
-				entityTopRow = (entityTopWorldY - entity.speed) / gp.tileSize;
-				tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityTopRow]; // verifica ponto esquerdo
-																							// superior da area
-				// colisao
-				tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityTopRow]; // verifica ponto direito
+		if (entity.walkType.equals(gp.player.smoothWalk)) {
+			int entityLeftWorldX = entity.worldX + entity.solidArea.x;
+			int entityRightWorldX = entity.worldX + entity.solidArea.x + entity.solidArea.width;
+			int entityTopWorldY = entity.worldY + entity.solidArea.y;
+			int entityBottomWorldY = entity.worldY + entity.solidArea.y + entity.solidArea.height;
+			
+			System.out.println("entityLeftWorldX: "+entityLeftWorldX+" entityRightWorldX: "+entityRightWorldX+" entityTopWorldY: "+entityTopWorldY+" entityBottomWorldY: "+entityBottomWorldY);
+
+			int entityLeftCol = entityLeftWorldX / gp.tileSize;
+			int entityRightCol = entityRightWorldX / gp.tileSize;
+			int entityTopRow = entityTopWorldY / gp.tileSize;
+			int entityBottomRow = entityBottomWorldY / gp.tileSize;
+
+			System.out.println("entityLeftCol: "+entityLeftCol+" entityRightCol: "+entityRightCol+" entityTopRow: "+entityTopRow+" entityBottomRow: "+entityBottomRow);
+
+			
+			try {
+				switch (entity.direction) {
+				case "up":
+					entityTopRow = (entityTopWorldY - entity.speed) / gp.tileSize;
+					tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityTopRow]; // verifica ponto
+																								// esquerdo
 																								// superior da area
-				// colisao
-				gp.eHandler.outTile = false;
-				break;
-			case "down":
-				entityBottomRow = (entityBottomWorldY + entity.speed) / gp.tileSize;
-				tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityBottomRow]; // verifica ponto
-																								// esquerdo superior da
-																								// area
-				// colisao
-				tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityBottomRow]; // verifica ponto
-																								// direito superior da
-																								// area
-				// colisao
-				gp.eHandler.outTile = false;
-				break;
-			case "left":
-				entityLeftCol = (entityLeftWorldX - entity.speed) / gp.tileSize;
-				tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityTopRow]; // verifica ponto esquerdo
-																							// superior da area
-				// colisao
-				tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityBottomRow]; // verifica ponto direito
+					// colisao
+					tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityTopRow]; // verifica ponto
+																									// direito
+																									// superior da area
+					// colisao
+					gp.eHandler.outTile = false;
+					break;
+				case "down":
+					entityBottomRow = (entityBottomWorldY + entity.speed) / gp.tileSize;
+					tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityBottomRow]; // verifica ponto
+																									// esquerdo superior
+																									// da
+																									// area
+					// colisao
+					tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityBottomRow]; // verifica ponto
+																									// direito superior
+																									// da
+																									// area
+					// colisao
+					gp.eHandler.outTile = false;
+					break;
+				case "left":
+					entityLeftCol = (entityLeftWorldX - entity.speed) / gp.tileSize;
+					tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityTopRow]; // verifica ponto
+																								// esquerdo
 																								// superior da area
-				// colisao
-				gp.eHandler.outTile = false;
-				break;
-			case "right":
-				entityRightCol = (entityRightWorldX + entity.speed) / gp.tileSize;
-				tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityTopRow]; // verifica ponto esquerdo
-																								// superior da area
-				// colisao
-				tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityBottomRow]; // verifica ponto
-																								// direito superior da
-																								// area
-				// colisao
-				gp.eHandler.outTile = false;
-				break;
+					// colisao
+					tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityBottomRow]; // verifica ponto
+																									// direito
+																									// superior da area
+					// colisao
+					gp.eHandler.outTile = false;
+					break;
+				case "right":
+					entityRightCol = (entityRightWorldX + entity.speed) / gp.tileSize;
+					tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityTopRow]; // verifica ponto
+																									// esquerdo
+																									// superior da area
+					// colisao
+					tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityBottomRow]; // verifica ponto
+																									// direito superior
+																									// da
+																									// area
+					// colisao
+					gp.eHandler.outTile = false;
+					break;
+				}
+			} catch (Exception e) {
+				// entity.collisionOn = true;
+				// gp.eHandler.outTile = true;
+				// System.out.println("Tentou atravesar o fim do mundo");
 			}
-		} catch (Exception e) {
-			// entity.collisionOn = true;
-			// gp.eHandler.outTile = true;
-			// System.out.println("Tentou atravesar o fim do mundo");
+		} else if (entity.walkType.equals(gp.player.stepWalk)) {
+			int entityLeftWorldX = entity.worldX + entity.solidArea.x;
+			int entityRightWorldX = entity.worldX + entity.solidArea.x;
+			int entityTopWorldY = entity.worldY + entity.solidArea.y;
+			int entityBottomWorldY = entity.worldY + entity.solidArea.y;
+			
+			//System.out.println("entityLeftWorldX: "+entityLeftWorldX+" entityRightWorldX: "+entityRightWorldX+" entityTopWorldY: "+entityTopWorldY+" entityBottomWorldY: "+entityBottomWorldY);
+
+			int entityLeftCol = entityLeftWorldX / gp.tileSize;
+			int entityRightCol = entityRightWorldX / gp.tileSize;
+			int entityTopRow = entityTopWorldY / gp.tileSize;
+			int entityBottomRow = entityBottomWorldY / gp.tileSize;
+
+			//System.out.println("entityLeftCol: "+entityLeftCol+" entityRightCol: "+entityRightCol+" entityTopRow: "+entityTopRow+" entityBottomRow: "+entityBottomRow);
+
+			
+			try {
+				switch (entity.direction) {
+				case "up":
+					entityTopRow = (entityTopWorldY - entity.speed) / gp.tileSize;
+					tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityTopRow]; // verifica ponto
+																								// esquerdo
+																								// superior da area
+					// colisao
+					tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityTopRow]; // verifica ponto
+																									// direito
+																									// superior da area
+					// colisao
+					gp.eHandler.outTile = false;
+					break;
+				case "down":
+					entityBottomRow = (entityBottomWorldY + entity.speed) / gp.tileSize;
+					tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityBottomRow]; // verifica ponto
+																									// esquerdo superior
+																									// da
+																									// area
+					// colisao
+					tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityBottomRow]; // verifica ponto
+																									// direito superior
+																									// da
+																									// area
+					// colisao
+					gp.eHandler.outTile = false;
+					break;
+				case "left":
+					entityLeftCol = (entityLeftWorldX - entity.speed) / gp.tileSize;
+					tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityTopRow]; // verifica ponto
+																								// esquerdo
+																								// superior da area
+					// colisao
+					tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityBottomRow]; // verifica ponto
+																									// direito
+																									// superior da area
+					// colisao
+					gp.eHandler.outTile = false;
+					break;
+				case "right":
+					entityRightCol = (entityRightWorldX + entity.speed) / gp.tileSize;
+					tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityTopRow]; // verifica ponto
+																									// esquerdo
+																									// superior da area
+					// colisao
+					tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityBottomRow]; // verifica ponto
+																									// direito superior
+																									// da
+																									// area
+					// colisao
+					gp.eHandler.outTile = false;
+					break;
+				}
+			} catch (Exception e) {
+				// entity.collisionOn = true;
+				// gp.eHandler.outTile = true;
+				// System.out.println("Tentou atravesar o fim do mundo");
+			}
 		}
 		if (gp.tileM.tile[tileNum1].collision == true || gp.tileM.tile[tileNum2].collision == true) {
 			entity.collisionOn = true;
-			//System.out.println("Colidiu com paredes ou arvores, etc");
+			// System.out.println("Colidiu com paredes ou arvores, etc");
 		}
 
 	}
@@ -199,7 +290,7 @@ public class CollisionChecker {
 
 				if (entity.solidArea.intersects(target[gp.currentMap][i].solidArea)) {
 					if (target[gp.currentMap][i] != entity) {
-						//System.out.println("Voce colidiu com ENTIDADE!");
+						// System.out.println("Voce colidiu com ENTIDADE!");
 						entity.collisionOn = true;
 						index = i;
 					}

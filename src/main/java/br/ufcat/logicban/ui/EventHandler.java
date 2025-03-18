@@ -30,12 +30,12 @@ public class EventHandler {
 			for (int col = 0; col < gp.maxScreenCol; col++) {
 				for (int row = 0; row < gp.maxScreenRow; row++) {
 					eventRect[map][col][row] = new EventRect();
-					eventRect[map][col][row].x = 4;
-					eventRect[map][col][row].y = 4;
-					eventRect[map][col][row].width = 42;
-					eventRect[map][col][row].height = 42;
-					eventRect[map][col][row].eventRectDefaultX = 4;
-					eventRect[map][col][row].eventRectDefaultY = 4;
+					eventRect[map][col][row].x = 0;
+					eventRect[map][col][row].y = 0;
+					eventRect[map][col][row].width = 48;
+					eventRect[map][col][row].height = 48;
+					eventRect[map][col][row].eventRectDefaultX = 0;
+					eventRect[map][col][row].eventRectDefaultY = 0;
 				}
 			}
 		}
@@ -100,35 +100,70 @@ public class EventHandler {
 		mapAux = map;
 
 		if (map == gp.currentMap) {
-
-			// System.out.println("solidareax " + gp.player.solidArea.x + " solidareay " +
-			// gp.player.solidArea.y);
-			if (gp.player.walkType.equals(gp.player.stepWalk)) {
-				gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x+gp.tileSize;
-				gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
-			} else if (gp.player.walkType.equals(gp.player.smoothWalk)) {
+			if (gp.player.walkType.equals(gp.player.smoothWalk)) {
 				gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
 				gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
-			}
+				eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
+				eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
 
-			eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
-			eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
-			//System.out.println("playersolidarea: " + gp.player.solidArea + "eventRec: " + eventRect[map][col][row]);
-			if (gp.player.solidArea.intersects(eventRect[map][col][row])
-					&& eventRect[map][col][row].eventDone == false) {
-				System.out.println("OK");
-				if (gp.player.direction.contentEquals(reqDirection) || reqDirection.contentEquals("any")) {
-					hit = true;
-					previousEventX = gp.player.worldX;
-					previousEventY = gp.player.worldY;
+				if (gp.player.solidArea.intersects(eventRect[map][col][row])
+						&& eventRect[map][col][row].eventDone == false) {
+					if (gp.player.direction.contentEquals(reqDirection) || reqDirection.contentEquals("any")) {
+						hit = true;
+						previousEventX = gp.player.worldX;
+						previousEventY = gp.player.worldY;
+					}
 				}
+
+				gp.player.solidArea.x = gp.player.solidAreaDefaultX;
+				gp.player.solidArea.y = gp.player.solidAreaDefaultY;
+				eventRect[map][col][row].x = eventRect[map][col][row].eventRectDefaultX;
+				eventRect[map][col][row].y = eventRect[map][col][row].eventRectDefaultY;
+			} else if (gp.player.walkType.equals(gp.player.stepWalk)) {
+				switch (gp.player.direction) {
+				case "up":
+					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
+					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+					eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
+					eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
+					break;
+				case "down":
+					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
+					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+					eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
+					eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
+					break;
+				case "left":
+					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
+					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+					eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
+					eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
+					break;
+				case "right":
+					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
+					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+					eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
+					eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
+					break;
+				}
+				
+				
+				System.out.println("playersolidarea: " + gp.player.solidArea + "eventRec: " + eventRect[map][col][row]);
+				
+				if (gp.player.solidArea.intersects(eventRect[map][col][row])
+						&& eventRect[map][col][row].eventDone == false) {
+					if (gp.player.direction.contentEquals(reqDirection) || reqDirection.contentEquals("any")) {
+						hit = true;
+						previousEventX = gp.player.worldX;
+						previousEventY = gp.player.worldY;
+					}
+				}
+
+				gp.player.solidArea.x = gp.player.solidAreaDefaultX;
+				gp.player.solidArea.y = gp.player.solidAreaDefaultY;
+				eventRect[map][col][row].x = eventRect[map][col][row].eventRectDefaultX;
+				eventRect[map][col][row].y = eventRect[map][col][row].eventRectDefaultY;
 			}
-
-			gp.player.solidArea.x = gp.player.solidAreaDefaultX;
-			gp.player.solidArea.y = gp.player.solidAreaDefaultY;
-			eventRect[map][col][row].x = eventRect[map][col][row].eventRectDefaultX;
-			eventRect[map][col][row].y = eventRect[map][col][row].eventRectDefaultY;
-
 		}
 
 		return hit;
