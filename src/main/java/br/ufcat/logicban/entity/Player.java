@@ -26,14 +26,6 @@ public class Player extends Entity {
 		this.keyH = keyH;
 		walkType = stepWalk;
 
-		solidArea = new Rectangle();
-		solidArea.x = 8;
-		solidArea.y = 12;
-		solidAreaDefaultX = solidArea.x;
-		solidAreaDefaultY = solidArea.y;
-		solidArea.width = 32;
-		solidArea.height = 32;
-
 		color = Color.magenta;
 
 		// setDefaultValues();
@@ -42,7 +34,6 @@ public class Player extends Entity {
 	}
 
 	public void setDefaultValues() {
-
 		standCounter = 0;
 		hasKey = 0;
 		worldX = gp.eHandler.newWorldX;
@@ -66,8 +57,14 @@ public class Player extends Entity {
 	}
 
 	public void update() {
-
 		if (walkType.equals(smoothWalk)) {
+			solidArea.x = 8;
+			solidArea.y = 12;
+			solidAreaDefaultX = solidArea.x;
+			solidAreaDefaultY = solidArea.y;
+			solidArea.width = 32;
+			solidArea.height = 32;
+			
 			if (keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true
 					|| keyH.rightPressed == true) {
 				if (keyH.upPressed == true) {
@@ -142,6 +139,14 @@ public class Player extends Entity {
 				}
 			}
 		} else if (walkType.equals(stepWalk)) {
+			
+			solidArea.x = 0;
+			solidArea.y = 0;
+			solidAreaDefaultX = solidArea.x;
+			solidAreaDefaultY = solidArea.y;
+			solidArea.width = 48;
+			solidArea.height = 48;
+			
 			speed = gp.tileSize;
 			// Verifica se alguma tecla foi pressionada neste frame
 			if (keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true
@@ -159,7 +164,7 @@ public class Player extends Entity {
 
 				// CHECK TILE COLLISION
 				collisionOn = false;
-				gp.cChecker.checkTile(this);
+				//gp.cChecker.checkTile(this);
 
 				// CHECK OBJECT COLLISION
 				int objIndex = gp.cChecker.checkObject(this, true);
@@ -299,7 +304,7 @@ public class Player extends Entity {
 					// Tenta mover a outra caixa na mesma direção
 					box.move(direction);
 
-					// Se a outra caixa não puder ser movida (colisão), marca a colisão
+					// Se a outra caixa não puder ser movida (colisão)m, marca a colisão
 					if (box.collisionOn) {
 						box.worldX = boxOldWorldX;
 						box.worldY = boxOldWorldY;

@@ -494,26 +494,17 @@ public class KeyHandler implements KeyListener {
 					} else {
 						gp.player.walkType = walkType_2;
 
-		                // CALCULAR O CENTRO DO TILE
-		                int tileCol = (gp.player.worldX + gp.player.solidArea.x + gp.player.solidArea.width / 2) / gp.tileSize;
-		                int tileRow = (gp.player.worldY + gp.player.solidArea.y + gp.player.solidArea.height / 2) / gp.tileSize;
+		                // Calculate the tile coordinates
+		                int tileCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
+		                int tileRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
 
-		                int tileCenterX = tileCol * gp.tileSize + gp.tileSize / 2;
-		                int tileCenterY = tileRow * gp.tileSize + gp.tileSize / 2;
+		                // Calculate the top-left corner of the tile
+		                int tileX = tileCol * gp.tileSize;
+		                int tileY = tileRow * gp.tileSize;
 
-		                // CALCULAR O DESLOCAMENTO
-		                int playerCenterX = gp.player.worldX + gp.player.solidArea.x + gp.player.solidArea.width / 2;
-		                int playerCenterY = gp.player.worldY + gp.player.solidArea.y + gp.player.solidArea.height / 2;
-
-		                int offsetX = tileCenterX - playerCenterX;
-		                int offsetY = tileCenterY - playerCenterY;
-
-		                // AJUSTAR A POSICAO
-		                gp.player.worldX += offsetX;
-		                gp.player.worldY += offsetY;
-
-		                System.out.println("Player hitbox width: " + gp.player.solidArea.width
-		                        + " Player hitbox height " + gp.player.solidArea.height);
+		                // Set the new world coordinates to align the player's solidArea
+		                gp.player.worldX = tileX;
+		                gp.player.worldY = tileY;
 					}
 				}
 			}
@@ -529,34 +520,26 @@ public class KeyHandler implements KeyListener {
 					gp.sfx.volumeScale++;
 				}
 				if (gp.ui.commandNum == 4) {
-					if (!gp.player.walkType.equals(walkType_2)) {
-						gp.player.walkType = walkType_2;
+		            if (!gp.player.walkType.equals(walkType_2)) {
+		                gp.player.walkType = walkType_2;
 
-		                // CALCULAR O CENTRO DO TILE
-		                int tileCol = (gp.player.worldX + gp.player.solidArea.x + gp.player.solidArea.width / 2) / gp.tileSize;
-		                int tileRow = (gp.player.worldY + gp.player.solidArea.y + gp.player.solidArea.height / 2) / gp.tileSize;
+		                // Calculate the tile coordinates
+		                int tileCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
+		                int tileRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
 
-		                int tileCenterX = tileCol * gp.tileSize + gp.tileSize / 2;
-		                int tileCenterY = tileRow * gp.tileSize + gp.tileSize / 2;
+		                // Calculate the top-left corner of the tile
+		                int tileX = tileCol * gp.tileSize;
+		                int tileY = tileRow * gp.tileSize;
 
-		                // CALCULAR O DESLOCAMENTO
-		                int playerCenterX = gp.player.worldX + gp.player.solidArea.x + gp.player.solidArea.width / 2;
-		                int playerCenterY = gp.player.worldY + gp.player.solidArea.y + gp.player.solidArea.height / 2;
+		                // Set the new world coordinates to align the player's solidArea
+		                gp.player.worldX = tileX;
+		                gp.player.worldY = tileY;
 
-		                int offsetX = tileCenterX - playerCenterX;
-		                int offsetY = tileCenterY - playerCenterY;
-
-		                // AJUSTAR A POSICAO
-		                gp.player.worldX += offsetX;
-		                gp.player.worldY += offsetY;
-
-		                System.out.println("Player hitbox width: " + gp.player.solidArea.width
-		                        + " Player hitbox height " + gp.player.solidArea.height);
-					} else {
-						gp.player.walkType = walkType_1;
-						gp.player.speed = gp.player.speedAux;
-					}
-				}
+		            } else {
+		                gp.player.walkType = walkType_1;
+		                gp.player.speed = gp.player.speedAux;
+		            }
+		        }
 			}
 			gp.playSFX(6);
 
