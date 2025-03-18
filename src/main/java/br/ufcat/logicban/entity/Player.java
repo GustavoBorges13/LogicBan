@@ -12,7 +12,8 @@ public class Player extends Entity {
 	KeyHandler keyH;
 	public int hasKey;
 	int standCounter;
-	public String walkType = "Smooth-Walk";
+	public final String smoothWalk = "Smooth-Walk";
+	public final String stepWalk = "Step-by-Step";
 	public int speedAux = 3;
 	public int speedMultiplicator = 0;
 
@@ -23,14 +24,15 @@ public class Player extends Entity {
 		super(gp);
 
 		this.keyH = keyH;
+		walkType = smoothWalk;
 
 		solidArea = new Rectangle();
-		solidArea.x = 4;
-		solidArea.y = 4;
+		solidArea.x = 8;
+		solidArea.y = 12;
 		solidAreaDefaultX = solidArea.x;
 		solidAreaDefaultY = solidArea.y;
-		solidArea.width = 42;
-		solidArea.height = 42;
+		solidArea.width = 32;
+		solidArea.height = 32;
 
 		color = Color.magenta;
 
@@ -65,7 +67,7 @@ public class Player extends Entity {
 
 	public void update() {
 
-		if (walkType.equals("Smooth-Walk")) {
+		if (walkType.equals(smoothWalk)) {
 			if (keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true
 					|| keyH.rightPressed == true) {
 				if (keyH.upPressed == true) {
@@ -139,7 +141,7 @@ public class Player extends Entity {
 					standCounter = 0;
 				}
 			}
-		} else if (walkType.equals("Step-by-Step")) {
+		} else if (walkType.equals(stepWalk)) {
 			speed = gp.tileSize;
 			// Verifica se alguma tecla foi pressionada neste frame
 			if (keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true
@@ -254,7 +256,7 @@ public class Player extends Entity {
 			case "Boots":
 
 				gp.playSFX(2);
-				if (walkType.equals("Smooth-Walk")) {
+				if (walkType.equals(smoothWalk)) {
 					speedMultiplicator += 1;
 					speed += 2;
 					// gp.eHandler.teleport(1, 3,8);
@@ -277,11 +279,46 @@ public class Player extends Entity {
 	}
 
 	public void interactNPC(int i) {
+		if (walkType.equals(smoothWalk)) {
+			if (i != 999) {
+				// Obtém a entidade que o player está interagindo
+				gp.npc[gp.currentMap][i].move(direction);
+			}
+		} else if (walkType.equals(stepWalk)) {
+			if (i != 999) {
+				Entity targetNPC = gp.npc[gp.currentMap][i];
 
-		if (i != 999) {
-			// Obtém a entidade que o player está interagindo
-			gp.npc[gp.currentMap][i].move(direction);
+				// Verifica se o NPC é outra caixa
+				if (targetNPC instanceof NPC_Box) {
+					NPC_Box box = (NPC_Box) targetNPC;
+
+					// Salvar a posição original do player e da caixa
+					int playerOldWorldX = worldX;
+					int playerOldWorldY = worldY;
+					int boxOldWorldX = box.worldX;
+					int boxOldWorldY = box.worldY;
+
+					// Tenta mover a outra caixa na mesma direção
+					box.move(direction);
+
+					// Se a outra caixa não puder ser movida (colisão), marca a colisão
+					if (box.collisionOn) {
+						box.worldX = boxOldWorldX;
+						box.worldY = boxOldWorldY;
+						collisionOn = true;
+					} else {
+						// Troca a posição do player com a posição original da caixa
+						worldX = boxOldWorldX;
+						worldY = boxOldWorldY;
+					}
+
+				} else {
+					// Lógica para interagir com outros tipos de NPCs
+					collisionOn = true; // Impede o movimento se for outro tipo de NPC
+				}
+			}
 		}
+
 	}
 
 	public void interactInteractiveTile(int i) {

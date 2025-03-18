@@ -39,7 +39,9 @@ public class Entity {
 	
 	// NPC
 	public int actionLockCounter = 0;
-
+	
+	
+	public String walkType;
 	// WIRES
 //    public int wireSetId;       // Identificador do conjunto de fios
 //    public boolean isHead = false;      // Indica se é a "cabeça" do fio
