@@ -30,6 +30,10 @@ public class AssetSetter {
 		gp.obj[mapNum][i].worldX = 15 * gp.tileSize;
 		gp.obj[mapNum][i].worldY = 8 * gp.tileSize;
 		i++;
+//		gp.obj[mapNum][i] = new OBJ_Chest(gp); // Porta de ferro 0 controlada pela porta AND com ID 0
+//		gp.obj[mapNum][i].worldX = 16 * gp.tileSize;
+//		gp.obj[mapNum][i].worldY = 8 * gp.tileSize;
+//		i++;
 		
 		// FASE 2
 		mapNum = 1;

@@ -24,7 +24,7 @@ public class Player extends Entity {
 		super(gp);
 
 		this.keyH = keyH;
-		walkType = smoothWalk;
+		walkType = stepWalk;
 
 		solidArea = new Rectangle();
 		solidArea.x = 8;
@@ -293,8 +293,6 @@ public class Player extends Entity {
 					NPC_Box box = (NPC_Box) targetNPC;
 
 					// Salvar a posição original do player e da caixa
-					int playerOldWorldX = worldX;
-					int playerOldWorldY = worldY;
 					int boxOldWorldX = box.worldX;
 					int boxOldWorldY = box.worldY;
 

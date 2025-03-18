@@ -30,7 +30,7 @@ public class NPC_Box extends Entity {
 		solidArea.x = 6;
 		solidArea.y = 9;
 		solidArea.width = 38;
-		solidArea.height = 38;
+		solidArea.height = 32;
 		solidAreaDefaultX = solidArea.x;
 		solidAreaDefaultY = solidArea.y;
 		color = Color.ORANGE;
@@ -112,16 +112,16 @@ public class NPC_Box extends Entity {
 				return; // Interrompe o movimento se houver colisão com tile
 			}
 
-//			// Verifica colisão com outros NPCs (incluindo caixas)
-//			int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
-//			if (npcIndex != 999) {
-//				interactNPC(npcIndex); // Tenta interagir com o NPC
-//				// Se a interação (empurrar) não for possível, volta à posição antiga
-//				if (collisionOn) {
-//					worldX = oldWorldX;
-//					worldY = oldWorldY;
-//				}
-//			}
+			// Verifica colisão com outros NPCs (incluindo caixas)
+			int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
+			if (npcIndex != 999) {
+				interactNPC(npcIndex); // Tenta interagir com o NPC
+				// Se a interação (empurrar) não for possível, volta à posição antiga
+				if (collisionOn) {
+					worldX = oldWorldX;
+					worldY = oldWorldY;
+				}
+			}
 			isMoving = false; // Garante que isMoving seja false após a tentativa de movimento
 		} else if (gp.player.walkType.equals(gp.player.stepWalk)) {
 			if (isMoving)
@@ -157,82 +157,62 @@ public class NPC_Box extends Entity {
 			gp.cChecker.checkTile(this); // Supondo que este método verifica a colisão com tiles
 			checkCollision();
 			if (collisionOn) {
-				System.out.println("debug3");
 				worldX = oldWorldX;
 				worldY = oldWorldY;
 				isMoving = false;
 				return; // Interrompe o movimento se houver colisão com tile
 			}
 
-//			// Verifica colisão com outros NPCs (incluindo caixas)
-//			int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
-//			if (npcIndex != 999) {
-//				interactNPC(npcIndex); // Tenta interagir com o NPC
-//				// Se a interação (empurrar) não for possível, volta à posição antiga
-//				if (collisionOn) {
-//					System.out.println("debug2");
-//					worldX = oldWorldX*2;
-//					worldY = oldWorldY*2;
-//				}
-//			}
+			// Verifica colisão com outros NPCs (incluindo caixas)
+			int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
+			if (npcIndex != 999) {
+				interactNPC(npcIndex); // Tenta interagir com o NPC
+				// Se a interação (empurrar) não for possível, volta à posição antiga
+				if (collisionOn) {
+
+					worldX = oldWorldX;
+					worldY = oldWorldY;
+				}
+			}
 			isMoving = false; // Garante que isMoving seja false após a tentativa de movimento
 		}
 	}
 
 	public void interactNPC(int i) {
-		if (gp.player.walkType.equals(gp.player.smoothWalk)) {
-			if (i != 999) {
-				Entity targetNPC = gp.npc[gp.currentMap][i];
+		if (i != 999) {
+			Entity targetNPC = gp.npc[gp.currentMap][i];
 
-				// Verifica se o NPC é outra caixa
-				if (targetNPC instanceof NPC_Box) {
-					// Tenta mover a outra caixa na mesma direção
-					((NPC_Box) targetNPC).move(direction);
+			// Verifica se o NPC é outra caixa
+			if (targetNPC instanceof NPC_Box) {
+				NPC_Box box = (NPC_Box) targetNPC;
 
-					// Se a outra caixa não puder ser movida (colisão), marca a colisão
-					if (((NPC_Box) targetNPC).collisionOn) {
-						collisionOn = true;
-					}
+				// Salvar a posição original do player e da caixa
+				int playerOldWorldX = worldX;
+				int playerOldWorldY = worldY;
+				int boxOldWorldX = box.worldX;
+				int boxOldWorldY = box.worldY;
+
+				// Tenta mover a outra caixa na mesma direção
+				//box.move(direction);
+
+				// Se a outra caixa não puder ser movida (colisão), marca a colisão
+				if (box.collisionOn) {
+					System.out.println("debug1");
+					box.worldX = boxOldWorldX;
+					box.worldY = boxOldWorldY;
+					collisionOn = true;
 				} else {
-					// Lógica para interagir com outros tipos de NPCs
-					collisionOn = true; // Impede o movimento se for outro tipo de NPC
+					// Troca a posição do player com a posição original da caixa
+//					worldX = 200;
+//					worldY = 150;
 				}
-			}
-		} else if (gp.player.walkType.equals(gp.player.stepWalk)) {
-			if (i != 999) {
-				Entity targetNPC = gp.npc[gp.currentMap][i];
 
-				// Verifica se o NPC é outra caixa
-				if (targetNPC instanceof NPC_Box) {
-					NPC_Box box = (NPC_Box) targetNPC;
-
-					// Salvar a posição original do player e da caixa
-					int playerOldWorldX = worldX;
-					int playerOldWorldY = worldY;
-					int boxOldWorldX = box.worldX;
-					int boxOldWorldY = box.worldY;
-
-					// Tenta mover a outra caixa na mesma direção
-					box.move(direction);
-
-					// Se a outra caixa não puder ser movida (colisão), marca a colisão
-					if (box.collisionOn) {
-						box.worldX = boxOldWorldX;
-						box.worldY = boxOldWorldY;
-						collisionOn = true;
-					} else {
-						// Troca a posição do player com a posição original da caixa
-						worldX = boxOldWorldX;
-						worldY = boxOldWorldY;
-					}
-
-				} else {
-					// Lógica para interagir com outros tipos de NPCs
-					collisionOn = true; // Impede o movimento se for outro tipo de NPC
-				}
+			} else {
+				System.out.println("debug3");
+				// Lógica para interagir com outros tipos de NPCs
+				collisionOn = true; // Impede o movimento se for outro tipo de NPC
 			}
 		}
-
 	}
 
 	public void detectPlate() {
