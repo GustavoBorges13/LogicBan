@@ -3,12 +3,14 @@ package br.ufcat.logicban.ui;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import br.ufcat.logicban.entity.Entity;
+import br.ufcat.logicban.entity.NPC_Box;
 import br.ufcat.logicban.tile.TileManager;
 
 public class KeyHandler implements KeyListener {
 
 	GamePanel gp;
 	public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed, rPressed, back_spacePressed = false;
+
 	int countAux = 0;
 	// Cooldown para o Undo
 	public int undoCooldown = 0;
@@ -449,8 +451,6 @@ public class KeyHandler implements KeyListener {
 		}
 
 		int maxCommandNum = 0;
-		String walkType_1 = gp.player.smoothWalk;
-		String walkType_2 = gp.player.stepWalk;
 
 		switch (gp.ui.subState) {
 		case 0:
@@ -488,24 +488,7 @@ public class KeyHandler implements KeyListener {
 					gp.sfx.volumeScale--;
 				}
 				if (gp.ui.commandNum == 4) {
-					if (!gp.player.walkType.equals(walkType_1)) {
-						gp.player.walkType = walkType_1;
-						gp.player.speed = gp.player.speedAux;
-					} else {
-						gp.player.walkType = walkType_2;
-
-		                // Calculate the tile coordinates
-		                int tileCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
-		                int tileRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
-
-		                // Calculate the top-left corner of the tile
-		                int tileX = tileCol * gp.tileSize;
-		                int tileY = tileRow * gp.tileSize;
-
-		                // Set the new world coordinates to align the player's solidArea
-		                gp.player.worldX = tileX;
-		                gp.player.worldY = tileY;
-					}
+					handleWalkTypeChange();
 				}
 			}
 			gp.playSFX(6);
@@ -520,26 +503,8 @@ public class KeyHandler implements KeyListener {
 					gp.sfx.volumeScale++;
 				}
 				if (gp.ui.commandNum == 4) {
-		            if (!gp.player.walkType.equals(walkType_2)) {
-		                gp.player.walkType = walkType_2;
-
-		                // Calculate the tile coordinates
-		                int tileCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
-		                int tileRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
-
-		                // Calculate the top-left corner of the tile
-		                int tileX = tileCol * gp.tileSize;
-		                int tileY = tileRow * gp.tileSize;
-
-		                // Set the new world coordinates to align the player's solidArea
-		                gp.player.worldX = tileX;
-		                gp.player.worldY = tileY;
-
-		            } else {
-		                gp.player.walkType = walkType_1;
-		                gp.player.speed = gp.player.speedAux;
-		            }
-		        }
+					handleWalkTypeChange();
+				}
 			}
 			gp.playSFX(6);
 
@@ -616,10 +581,8 @@ public class KeyHandler implements KeyListener {
 				gp.restart();
 			}
 
-
 			gp.playSFX(6);
 		}
-		
 
 		// DEBUG MODE
 		if (!e.isControlDown() && code == KeyEvent.VK_M) {
@@ -663,6 +626,92 @@ public class KeyHandler implements KeyListener {
 	public void update() {
 		if (undoCooldown > 0) {
 			undoCooldown--; // Reduz o cooldown a cada frame
+		}
+	}
+
+	private void centralizeBoxes(int playerTileCol, int playerTileRow) {
+		for (int i = 0; i < gp.npc[1].length; i++) {
+			if (gp.npc[gp.currentMap][i] != null && gp.npc[gp.currentMap][i].name != null
+					&& gp.npc[gp.currentMap][i].name.equals(NPC_Box.npcName)) {
+
+				// 3. Calcular as coordenadas do mundo da caixa
+				int boxLeftWorldX = gp.npc[gp.currentMap][i].worldX + gp.npc[gp.currentMap][i].solidArea.x;
+				int boxRightWorldX = gp.npc[gp.currentMap][i].worldX + gp.npc[gp.currentMap][i].solidArea.x
+						+ gp.npc[gp.currentMap][i].solidArea.width;
+				int boxTopWorldY = gp.npc[gp.currentMap][i].worldY + gp.npc[gp.currentMap][i].solidArea.y;
+				int boxBottomWorldY = gp.npc[gp.currentMap][i].worldY + gp.npc[gp.currentMap][i].solidArea.y
+						+ gp.npc[gp.currentMap][i].solidArea.height;
+
+				// 4. Calcular as colunas e linhas dos tiles da caixa
+				int boxLeftCol = boxLeftWorldX / gp.tileSize;
+				int boxRightCol = boxRightWorldX / gp.tileSize;
+				int boxTopRow = boxTopWorldY / gp.tileSize;
+				int boxBottomRow = boxBottomWorldY / gp.tileSize;
+
+				// 5. Determinar qual tile a caixa está "pendendo" mais
+				int boxTileCol = (boxLeftCol + boxRightCol) / 2; // Média das colunas
+				int boxTileRow = (boxTopRow + boxBottomRow) / 2; // Média das linhas
+
+				// 6. Ajustar a posição da caixa para o tile correto
+				int newBoxWorldX = boxTileCol * gp.tileSize;
+				int newBoxWorldY = boxTileRow * gp.tileSize;
+
+				// 7. Verificar se o novo tile é o mesmo do jogador
+				if (boxTileCol == playerTileCol && boxTileRow == playerTileRow) {
+//					System.out.println("Box " + i + " está no mesmo tile do jogador, movendo para um tile adjacente.");
+					adjustBoxPosition(i, newBoxWorldX, newBoxWorldY);
+
+				} else {
+					// 8. Mover a caixa para o tile mais próximo
+//					System.out.println("Box " + i + " - Antes - WorldX: " + gp.npc[gp.currentMap][i].worldX
+//							+ ", WorldY: " + gp.npc[gp.currentMap][i].worldY);
+					gp.npc[gp.currentMap][i].worldX = newBoxWorldX;
+					gp.npc[gp.currentMap][i].worldY = newBoxWorldY;
+//					System.out.println("Box " + i + " - Depois - WorldX: " + gp.npc[gp.currentMap][i].worldX
+//							+ ", WorldY: " + gp.npc[gp.currentMap][i].worldY);
+				}
+			}
+		}
+	}
+
+	private void adjustBoxPosition(int boxIndex, int newBoxWorldX, int newBoxWorldY) {
+		switch (gp.player.direction) {
+		case "up":
+			gp.npc[gp.currentMap][boxIndex].worldY = newBoxWorldY - gp.tileSize;
+			break;
+		case "down":
+			gp.npc[gp.currentMap][boxIndex].worldY = newBoxWorldY + gp.tileSize;
+			break;
+		case "left":
+			gp.npc[gp.currentMap][boxIndex].worldX = newBoxWorldX - gp.tileSize;
+			break;
+		case "right":
+			gp.npc[gp.currentMap][boxIndex].worldX = newBoxWorldX + gp.tileSize;
+			break;
+		}
+	}
+
+	private void handleWalkTypeChange() {
+		if (!gp.player.walkType.equals(gp.player.smoothWalk)) {
+			gp.player.walkType = gp.player.smoothWalk;
+			gp.player.speed = gp.player.speedAux;
+		} else {
+			gp.player.walkType = gp.player.stepWalk;
+
+
+			// 1. Calcular a posição do jogador em tiles
+			int playerTileCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
+			int playerTileRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
+//			System.out.println("Player - Inicial - WorldX: " + gp.player.worldX + ", WorldY: " + gp.player.worldY);
+//			System.out.println("Player - Tile - Col: " + playerTileCol + ", Row: " + playerTileRow);
+
+			// 2. Centralizar as caixas no tile
+			centralizeBoxes(playerTileCol, playerTileRow);
+
+			// 3. Centralizar o jogador no tile DEPOIS de tratar das caixas
+			gp.player.worldX = playerTileCol * gp.tileSize;
+			gp.player.worldY = playerTileRow * gp.tileSize;
+//			Syste.out.println("Player - Final - WorldX: " + gp.player.worldX + ", WorldY: " + gp.player.worldY);
 		}
 	}
 }

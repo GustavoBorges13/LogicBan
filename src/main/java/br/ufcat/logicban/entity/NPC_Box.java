@@ -26,15 +26,14 @@ public class NPC_Box extends Entity {
 		direction = "down";
 		speed = 3;
 		walkType = gp.player.walkType;
-		solidArea = new Rectangle();
+
+		color = Color.ORANGE;
 		solidArea.x = 6;
 		solidArea.y = 9;
 		solidArea.width = 38;
 		solidArea.height = 32;
 		solidAreaDefaultX = solidArea.x;
 		solidAreaDefaultY = solidArea.y;
-		color = Color.ORANGE;
-
 		getImage();
 	}
 
@@ -55,6 +54,22 @@ public class NPC_Box extends Entity {
 	}
 
 	public void update() {
+		if (gp.player.walkType.equals(gp.player.smoothWalk)) {
+			solidArea.x = 6;
+			solidArea.y = 9;
+			solidAreaDefaultX = solidArea.x;
+			solidAreaDefaultY = solidArea.y;
+			solidArea.width = 38;
+			solidArea.height = 32;
+		} else if (gp.player.walkType.equals(gp.player.stepWalk)) {
+			solidArea.x = 3;
+			solidArea.y = 3;
+			solidAreaDefaultX = solidArea.x;
+			solidAreaDefaultY = solidArea.y;
+			solidArea.width = 42;
+			solidArea.height = 42;
+
+		}
 		detectPlate();
 		updateLogicalPorts(); // Adicione esta linha
 	}
@@ -101,10 +116,8 @@ public class NPC_Box extends Entity {
 				break;
 			}
 
-			// Verifica colisão com tiles
-			collisionOn = false;
-			gp.cChecker.checkTile(this); // Supondo que este método verifica a colisão com tiles
 			checkCollision();
+			
 			if (collisionOn) {
 				worldX = oldWorldX;
 				worldY = oldWorldY;
@@ -124,6 +137,7 @@ public class NPC_Box extends Entity {
 			}
 			isMoving = false; // Garante que isMoving seja false após a tentativa de movimento
 		} else if (gp.player.walkType.equals(gp.player.stepWalk)) {
+
 			if (isMoving)
 				return;
 			if (isMoving)
@@ -152,10 +166,8 @@ public class NPC_Box extends Entity {
 				break;
 			}
 
-			// Verifica colisão com tiles
-			collisionOn = false;
-			gp.cChecker.checkTile(this); // Supondo que este método verifica a colisão com tiles
 			checkCollision();
+			
 			if (collisionOn) {
 				worldX = oldWorldX;
 				worldY = oldWorldY;
@@ -193,11 +205,10 @@ public class NPC_Box extends Entity {
 				int boxOldWorldY = box.worldY;
 
 				// Tenta mover a outra caixa na mesma direção
-				//box.move(direction);
+				// box.move(direction);
 
 				// Se a outra caixa não puder ser movida (colisão), marca a colisão
 				if (box.collisionOn) {
-					System.out.println("debug1");
 					box.worldX = boxOldWorldX;
 					box.worldY = boxOldWorldY;
 					collisionOn = true;
@@ -208,7 +219,6 @@ public class NPC_Box extends Entity {
 				}
 
 			} else {
-				System.out.println("debug3");
 				// Lógica para interagir com outros tipos de NPCs
 				collisionOn = true; // Impede o movimento se for outro tipo de NPC
 			}
@@ -303,7 +313,7 @@ public class NPC_Box extends Entity {
 		}
 
 		switch (port.tipo) {
-		case "not":
+		case IT_LogicalPort.NOT:
 			// A porta NOT inverte a entrada da placa conectada
 			if (port.plateIndices.size() > 0) {
 				int plateIndex = port.plateIndices.get(0);
@@ -318,7 +328,7 @@ public class NPC_Box extends Entity {
 				return false;
 			}
 
-		case "and":
+		case IT_LogicalPort.AND:
 			// A porta AND requer que todas as entradas sejam verdadeiras
 			boolean andResult = true;
 			// Verifica as placas conectadas
@@ -338,7 +348,7 @@ public class NPC_Box extends Entity {
 			}
 			return andResult;
 
-		case "or":
+		case IT_LogicalPort.OR:
 			// A porta OR requer que pelo menos uma entrada seja verdadeira
 			boolean orResult = false;
 
@@ -359,7 +369,7 @@ public class NPC_Box extends Entity {
 
 			return orResult;
 
-		case "xor":
+		case IT_LogicalPort.XOR:
 			// A porta XOR requer que exatamente uma entrada seja verdadeira
 			int trueCount = 0;
 
@@ -384,7 +394,7 @@ public class NPC_Box extends Entity {
 
 			return trueCount == 1; // Retorna verdadeiro se exatamente uma entrada for verdadeira
 
-		case "nand":
+		case IT_LogicalPort.NAND:
 			// A porta NAND é o inverso da porta AND
 			boolean nandResult = true;
 			for (int plateIndex : port.plateIndices) {
@@ -400,7 +410,7 @@ public class NPC_Box extends Entity {
 			}
 			return !nandResult;
 
-		case "xnor":
+		case IT_LogicalPort.XNOR:
 			// A porta XNOR é o inverso da porta XOR
 			int xnorTrueCount = 0;
 
@@ -442,7 +452,7 @@ public class NPC_Box extends Entity {
 			if (port != null) {
 				boolean portStatus = verificarCondicaoLogica(port.id);
 				String debugString = "Porta " + port.tipo.toUpperCase() + " id[" + port.id + "]: " + portStatus; // +
-																												// portStatus;
+																													// portStatus;
 				debugInfo.add(debugString);
 			}
 		}

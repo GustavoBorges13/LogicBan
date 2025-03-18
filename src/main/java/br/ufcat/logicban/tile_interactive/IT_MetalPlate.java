@@ -8,11 +8,10 @@ import br.ufcat.logicban.ui.GamePanel;
 public class IT_MetalPlate extends InteractiveTile {
 
     GamePanel gp;
-    public static final String itName = "Metal Plate";
+    public static final String itName = "Placa Binaria";
     public boolean soundPlayed = false;
     private boolean activated = false; // Adiciona um estado para controlar a ativação
-    private BufferedImage originalImage; // Para restaurar a imagem original
-
+	
     public IT_MetalPlate(GamePanel gp, int col, int row) {
         super(gp, col, row);
         this.gp = gp;
@@ -22,7 +21,6 @@ public class IT_MetalPlate extends InteractiveTile {
 
         name = itName;
         down1 = setup("/assets/tiles_interactive/metalplate", gp.tileSize, gp.tileSize);
-        originalImage = down1; // Salva a imagem original para poder restaurar depois
 
         solidArea.x = 24;
         solidArea.y = 24;

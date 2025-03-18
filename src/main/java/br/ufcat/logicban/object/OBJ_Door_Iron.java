@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import br.ufcat.logicban.entity.Entity;
+import br.ufcat.logicban.tile_interactive.IT_LogicalPort;
+import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
 import br.ufcat.logicban.ui.GamePanel;
 
 public class OBJ_Door_Iron extends Entity {
@@ -20,10 +22,10 @@ public class OBJ_Door_Iron extends Entity {
 		super(gp);
 		this.gp = gp;
 		switch (option) {
-		case "portaLogica":
+		case IT_LogicalPort.itName:
 			this.controllingPortID = controllingPortID;
 			break;
-		case "placa":
+		case  IT_MetalPlate.itName:
 			this.controllingPlateID = controllingPortID;
 			break;
 		}
@@ -34,7 +36,7 @@ public class OBJ_Door_Iron extends Entity {
 		collision = true;
 		originalCollision = true; // Salva o estado original da colisão
 
-		color = Color.black;
+		color = Color.white;
 	}
 
 	// Método para "abrir" a porta (esconder e desativar a colisão)

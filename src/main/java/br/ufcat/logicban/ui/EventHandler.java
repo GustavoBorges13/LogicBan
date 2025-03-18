@@ -148,7 +148,7 @@ public class EventHandler {
 				}
 				
 				
-				System.out.println("playersolidarea: " + gp.player.solidArea + "eventRec: " + eventRect[map][col][row]);
+				//System.out.println("playersolidarea: " + gp.player.solidArea + "eventRec: " + eventRect[map][col][row]);
 				
 				if (gp.player.solidArea.intersects(eventRect[map][col][row])
 						&& eventRect[map][col][row].eventDone == false) {

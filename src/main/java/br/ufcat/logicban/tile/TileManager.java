@@ -142,7 +142,7 @@ public class TileManager {
 
             if (debugModeOn) {
                 // Área de debug de colisão
-                g2.setColor(Color.green);
+            	g2.setColor(new Color(0, 100, 0)); // Verde Escuro (RGB)
                 g2.setStroke(new BasicStroke(1));
                 g2.drawRect(x - gp.tileSize, y, gp.tileSize, gp.tileSize);
             }

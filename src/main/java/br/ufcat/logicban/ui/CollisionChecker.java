@@ -21,15 +21,15 @@ public class CollisionChecker {
 			int entityRightWorldX = entity.worldX + entity.solidArea.x + entity.solidArea.width;
 			int entityTopWorldY = entity.worldY + entity.solidArea.y;
 			int entityBottomWorldY = entity.worldY + entity.solidArea.y + entity.solidArea.height;
-			
-			System.out.println("entityLeftWorldX: "+entityLeftWorldX+" entityRightWorldX: "+entityRightWorldX+" entityTopWorldY: "+entityTopWorldY+" entityBottomWorldY: "+entityBottomWorldY);
+
+			//System.out.println("entityLeftWorldX: "+entityLeftWorldX+" entityRightWorldX: "+entityRightWorldX+" entityTopWorldY: "+entityTopWorldY+" entityBottomWorldY: "+entityBottomWorldY);
 
 			int entityLeftCol = entityLeftWorldX / gp.tileSize;
 			int entityRightCol = entityRightWorldX / gp.tileSize;
 			int entityTopRow = entityTopWorldY / gp.tileSize;
 			int entityBottomRow = entityBottomWorldY / gp.tileSize;
 
-			System.out.println("entityLeftCol: "+entityLeftCol+" entityRightCol: "+entityRightCol+" entityTopRow: "+entityTopRow+" entityBottomRow: "+entityBottomRow);
+			//System.out.println("entityLeftCol: "+entityLeftCol+" entityRightCol: "+entityRightCol+" entityTopRow: "+entityTopRow+" entityBottomRow: "+entityBottomRow);
 
 			
 			try {

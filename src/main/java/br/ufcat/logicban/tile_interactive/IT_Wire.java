@@ -6,20 +6,27 @@ import br.ufcat.logicban.ui.GamePanel;
 
 public class IT_Wire extends InteractiveTile {
 	GamePanel gp;
-//	public static final String itName = "wire";
+	public static final String itName = "wire";
+	public static final String RED = "red";
+	public static final String GREEN = "green";
+	public static final String BLUE = "blue";
+	public static final String PINK = "pink";
+	public static final String BLACK = "black";
+	public static final String WHITE = "white";
+	
 	public String direction = "horizontal_down";
 	public BufferedImage vertical, horizontal, curve_left_up, curve_right_up, curve_left_down, curve_right_down;
 	public boolean destructible = false;
 	public int estadoLogico;
 
-	public IT_Wire(GamePanel gp, int col, int row, String direction, String wireName) {
+	public IT_Wire(GamePanel gp, int col, int row, String direction, String wireColor) {
 		super(gp, col, row);
 		this.gp = gp;
 		this.worldX = gp.tileSize * col;
 		this.worldY = gp.tileSize * row;
 		this.direction = direction;
 
-		name = wireName;
+		name = wireColor;
 
 		carregarTextura();
 
