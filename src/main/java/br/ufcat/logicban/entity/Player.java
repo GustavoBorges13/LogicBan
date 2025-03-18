@@ -169,7 +169,7 @@ public class Player extends Entity {
 
 				// CHECK TILE COLLISION
 				collisionOn = false;
-				// gp.cChecker.checkTile(this);
+				gp.cChecker.checkTile(this);
 
 				// CHECK OBJECT COLLISION
 				int objIndex = gp.cChecker.checkObject(this, true);
