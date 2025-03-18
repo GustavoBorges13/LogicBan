@@ -14,6 +14,7 @@ public class OBJ_Door_Iron extends Entity {
 	public boolean originalCollision; // Adicione esta linha para salvar o estado original da colisao
 	public String originalImage; // Adicione esta linha para salvar o caminho da imagem original
 	public static final String objName = "Iron Door";
+	public boolean messageShown = false; // Nova flag
 
 	public OBJ_Door_Iron(GamePanel gp, int controllingPortID, String option) {
 		super(gp);
