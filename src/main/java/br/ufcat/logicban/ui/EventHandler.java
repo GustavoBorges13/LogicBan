@@ -51,10 +51,6 @@ public class EventHandler {
 
 	}
 
-	public void playerNewGamePosition() {
-
-	}
-
 	public void checkEvent() {
 		// Check if the player character is more than 1 tile away from the last event
 		int xDistance = Math.abs(gp.player.worldX + gp.tileSize);
@@ -120,27 +116,28 @@ public class EventHandler {
 				eventRect[map][col][row].x = eventRect[map][col][row].eventRectDefaultX;
 				eventRect[map][col][row].y = eventRect[map][col][row].eventRectDefaultY;
 			} else if (gp.player.walkType.equals(gp.player.stepWalk)) {
+
 				switch (gp.player.direction) {
 				case "up":
 					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
-					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y-gp.tileSize;
 					eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
 					eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
 					break;
 				case "down":
 					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
-					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y+gp.tileSize;
 					eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
 					eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
 					break;
 				case "left":
-					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
+					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x-gp.tileSize;
 					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
 					eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
 					eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
 					break;
 				case "right":
-					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
+					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x+gp.tileSize;
 					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
 					eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
 					eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;

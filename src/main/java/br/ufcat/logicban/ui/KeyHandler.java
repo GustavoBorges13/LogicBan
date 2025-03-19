@@ -577,6 +577,8 @@ public class KeyHandler implements KeyListener {
 					gp.highestUnlockedFase += 1;
 				}
 				gp.saveLoad.save();
+				gp.stopSFX();
+				gp.stopMusic();
 				gp.playMusic(5);
 				gp.restart();
 			}

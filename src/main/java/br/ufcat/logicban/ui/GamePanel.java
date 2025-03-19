@@ -451,6 +451,13 @@ public class GamePanel extends JPanel implements Runnable {
 					entityList.add(iTile[currentMap][i]);
 				}
 			}
+			
+			for (int i = 0; i < obj[1].length; i++) {
+				if (obj[currentMap][i] != null) {
+					entityList.add(obj[currentMap][i]);
+				}
+			}
+
 
 			// ADD ENTITIES TO THE LIST
 			entityList.add(player);
@@ -458,11 +465,6 @@ public class GamePanel extends JPanel implements Runnable {
 			for (int i = 0; i < npc[1].length; i++) {
 				if (npc[currentMap][i] != null) {
 					entityList.add(npc[currentMap][i]);
-				}
-			}
-			for (int i = 0; i < obj[1].length; i++) {
-				if (obj[currentMap][i] != null) {
-					entityList.add(obj[currentMap][i]);
 				}
 			}
 
@@ -618,6 +620,7 @@ public class GamePanel extends JPanel implements Runnable {
 		music.play();
 		music.loop();
 	}
+	
 
 	public void stopMusic() {
 		music.stop();

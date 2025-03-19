@@ -7,6 +7,7 @@ import br.ufcat.logicban.object.OBJ_Boots;
 import br.ufcat.logicban.object.OBJ_Chest;
 import br.ufcat.logicban.object.OBJ_Door;
 import br.ufcat.logicban.object.OBJ_Door_Iron;
+import br.ufcat.logicban.object.OBJ_Flag;
 import br.ufcat.logicban.object.OBJ_Key;
 import br.ufcat.logicban.tile_interactive.IT_DryTree;
 import br.ufcat.logicban.tile_interactive.IT_LogicalPort;
@@ -31,6 +32,10 @@ public class AssetSetter {
 		gp.obj[mapNum][i].worldX = 15 * gp.tileSize;
 		gp.obj[mapNum][i].worldY = 8 * gp.tileSize;
 		i++;
+		gp.obj[mapNum][i] = new OBJ_Flag(gp, OBJ_Flag.RED); // Porta de ferro controlada pela porta logica ID 0
+		gp.obj[mapNum][i].worldX = 16 * gp.tileSize;
+		gp.obj[mapNum][i].worldY = 8 * gp.tileSize;
+		i++;
 //		gp.obj[mapNum][i] = new OBJ_Chest(gp); // Porta de ferro 0 controlada pela porta AND com ID 0
 //		gp.obj[mapNum][i].worldX = 16 * gp.tileSize;
 //		gp.obj[mapNum][i].worldY = 8 * gp.tileSize;
@@ -45,6 +50,10 @@ public class AssetSetter {
 		gp.obj[mapNum][i] = new OBJ_Door_Iron(gp, 3, IT_MetalPlate.itName); // Porta de ferro 1 controlada pela placa ID 2
 		gp.obj[mapNum][i].worldX = 19 * gp.tileSize;
 		gp.obj[mapNum][i].worldY = 11 * gp.tileSize;
+		i++;
+		gp.obj[mapNum][i] = new OBJ_Flag(gp, OBJ_Flag.YELLOW); // Porta de ferro controlada pela porta logica ID 0
+		gp.obj[mapNum][i].worldX = 21 * gp.tileSize;
+		gp.obj[mapNum][i].worldY = 12 * gp.tileSize;
 		i++;
 
 	}
