@@ -27,7 +27,7 @@ public class AssetSetter {
 		int mapNum = 0;
 		int i = 0;
 		// FASE 1
-		gp.obj[mapNum][i] = new OBJ_Door(gp, 0, IT_LogicalPort.itName); // Porta de ferro 0 controlada pela porta AND com ID 0
+		gp.obj[mapNum][i] = new OBJ_Door(gp, 0, IT_LogicalPort.itName); // Porta de ferro controlada pela porta logica ID 0
 		gp.obj[mapNum][i].worldX = 15 * gp.tileSize;
 		gp.obj[mapNum][i].worldY = 8 * gp.tileSize;
 		i++;
@@ -93,7 +93,7 @@ public class AssetSetter {
 		gp.iTile[mapNum][i] = new IT_MetalPlate(gp, 11, 7);
 		i++;
 		
-		IT_LogicalPort andPort = new IT_LogicalPort(gp, 15, 5, IT_LogicalPort.AND, "right", 0); // placa AND conectada na porta id = 0
+		IT_LogicalPort andPort = new IT_LogicalPort(gp, 15, 5, IT_LogicalPort.AND, "right", 0); // placa AND id = 0
 		andPort.addPlateIndex(0);
 		andPort.addPlateIndex(1);
 		gp.iTile[mapNum][i] = andPort;

@@ -329,7 +329,27 @@ public class GamePanel extends JPanel implements Runnable {
 				for (int i = 0; i < obj[currentMap].length; i++) {
 					if (obj[currentMap][i] instanceof OBJ_Door_Iron && obj[currentMap][i] != null) {
 						OBJ_Door_Iron door = (OBJ_Door_Iron) obj[currentMap][i];
-
+						
+						
+						int plateIndex = door.controllingPlateID;
+						if (plateIndex >= 0 && plateIndex < iTile[currentMap].length
+								&& iTile[currentMap][plateIndex] instanceof IT_MetalPlate) {
+							// Obtém a placa de pressão pelo ID
+							IT_MetalPlate plate = (IT_MetalPlate) iTile[currentMap][plateIndex];
+							if (plate.isActivated()) {
+								if (!door.messageShown) { // Verifica se a mensagem já foi mostrada
+									door.openDoor();
+									ui.showMessage("Você abriu a porta!");
+									door.messageShown = true; // Define a flag para true
+								}
+								door.openDoor();
+							} else {
+								door.closeDoor();
+								door.messageShown = false; // Reseta a flag quando a porta é fechada
+							}
+						}
+						
+						
 						for (IT_LogicalPort port : box.logicalPortList) {
 							if (port.id == door.controllingPortID) {
 								if (port.outputState) {
@@ -348,6 +368,25 @@ public class GamePanel extends JPanel implements Runnable {
 						}
 					} else if (obj[currentMap][i] instanceof OBJ_Door && obj[currentMap][i] != null) {
 						OBJ_Door door = (OBJ_Door) obj[currentMap][i];
+						
+						int plateIndex = door.controllingPlateID;
+						if (plateIndex >= 0 && plateIndex < iTile[currentMap].length
+								&& iTile[currentMap][plateIndex] instanceof IT_MetalPlate) {
+							// Obtém a placa de pressão pelo ID
+							IT_MetalPlate plate = (IT_MetalPlate) iTile[currentMap][plateIndex];
+							if (plate.isActivated()) {
+								if (!door.messageShown) { // Verifica se a mensagem já foi mostrada
+									door.openDoor();
+									ui.showMessage("Você abriu a porta!");
+									door.messageShown = true; // Define a flag para true
+								}
+								door.openDoor();
+							} else {
+								door.closeDoor();
+								door.messageShown = false; // Reseta a flag quando a porta é fechada
+							}
+						}
+						
 						for (IT_LogicalPort port : box.logicalPortList) {
 							if (port.id == door.controllingPortID) {
 								if (port.outputState) {
@@ -363,40 +402,6 @@ public class GamePanel extends JPanel implements Runnable {
 								break;
 							}
 						}
-					}
-				}
-
-				for (int i = 0; i < obj[currentMap].length; i++) {
-					if (obj[currentMap][i] instanceof OBJ_Door_Iron && obj[currentMap][i] != null) {
-						OBJ_Door_Iron door = (OBJ_Door_Iron) obj[currentMap][i];
-						int plateIndex = door.controllingPlateID;
-						if (plateIndex >= 0 && plateIndex < iTile[currentMap].length
-								&& iTile[currentMap][plateIndex] instanceof IT_MetalPlate) {
-							// Obtém a placa de pressão pelo ID
-							IT_MetalPlate plate = (IT_MetalPlate) iTile[currentMap][plateIndex];
-							if (plate.isActivated()) {
-								ui.showMessage("Você abriu a porta!"); // debug em UI
-								door.openDoor();
-							} else {
-								door.closeDoor();
-							}
-						}
-
-					} else if (obj[currentMap][i] instanceof OBJ_Door && obj[currentMap][i] != null) {
-						OBJ_Door door = (OBJ_Door) obj[currentMap][i];
-						int plateIndex = door.controllingPlateID;
-						if (plateIndex >= 0 && plateIndex < iTile[currentMap].length
-								&& iTile[currentMap][plateIndex] instanceof IT_MetalPlate) {
-							// Obtém a placa de pressão pelo ID
-							IT_MetalPlate plate = (IT_MetalPlate) iTile[currentMap][plateIndex];
-							if (plate.isActivated()) {
-								ui.showMessage("Você abriu a porta!"); // debug em UI
-								door.openDoor();
-							} else {
-								door.closeDoor();
-							}
-						}
-
 					}
 				}
 
@@ -551,7 +556,7 @@ public class GamePanel extends JPanel implements Runnable {
 					if (npc[currentMap][i] instanceof NPC_Box) {
 						npcBox = (NPC_Box) npc[currentMap][i];
 						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 25F));
-						drawStringWithOpacity(g2, "id[" + i + "]", npc[currentMap][i].worldX, npc[currentMap][i].worldY,
+						drawStringWithOpacity(g2, "id[" + i + "]", npc[currentMap][i].worldX-tileSize, npc[currentMap][i].worldY+(int)(tileSize/1.5),
 								1.0f);
 					}
 				}
