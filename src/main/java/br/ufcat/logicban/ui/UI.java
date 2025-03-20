@@ -55,8 +55,8 @@ public class UI {
 	private boolean isDay = true;
 	private float transitionSpeed = 0.00070f; // Ajuste para suavidade
 	public boolean creditsAnimating = false; // Flag para controlar a animação dos créditos
-
 	public boolean goToNextPhase = false;
+	
 
 	public UI(GamePanel gp) {
 		this.gp = gp;
@@ -526,15 +526,20 @@ public class UI {
 		// Desenha o botão de som com animação (se necessário)
 		if (gp.btnMenu.botaoSelecionado == true) {
 			if (gp.btnMenu.estadoBotao == true) {
+		
 				// Se a animação estiver ativada, desenha o botão com a animação
+				System.out.println("debug 1");
 				if (gp.btnMenu.animation) {
 					gp.btnMenu.draw(g2, imgX, imgY, imgW, imgH); // Chama o método draw que lida com a animação
 				} else {
+					System.out.println("debug 2");
 					gp.btnMenu.draw(g2, imgX, imgY, imgW, imgH);
 				}
 			}
 		}
 	}
+	
+	
 
 	public void drawButtonExit(int x, int y) {
 		BufferedImage btnImage = null;
@@ -746,11 +751,13 @@ public class UI {
 			// texto 3
 			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 60F));
 			g2.setColor(Color.yellow);
-			text = "Parabéns!";
+			text = "Parabéns! Você finalizou o jogo!";
 			textLengt = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth(); // tamanho do texto
 			x = gp.screenWidth / 2 - textLengt / 2;
 			y = gp.screenHeight / 2 + (gp.tileSize * 2);
 			g2.drawString(text, x, y);
+			
+			drawButtonContinuar(17, 2.2, 0);
 		}
 	}
 

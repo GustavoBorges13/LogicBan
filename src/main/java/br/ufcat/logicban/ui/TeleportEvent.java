@@ -5,9 +5,10 @@ public class TeleportEvent {
 	String direction;
 	int targetMap, targetCol, targetRow;
 	String targetDirection;
-
+	boolean ultima_fase;
+	
 	public TeleportEvent(int currentMap, int col, int row, String direction, int targetMap, int targetCol,
-			int targetRow, String targetDirection) {
+			int targetRow, String targetDirection, boolean ultima_fase) {
 		this.currentMap = currentMap;
 		this.col = col;
 		this.row = row;
@@ -16,5 +17,6 @@ public class TeleportEvent {
 		this.targetCol = targetCol;
 		this.targetRow = targetRow;
 		this.targetDirection = targetDirection;
+		this.ultima_fase = ultima_fase;
 	}
 }

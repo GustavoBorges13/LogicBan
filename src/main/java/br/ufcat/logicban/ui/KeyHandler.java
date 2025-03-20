@@ -560,27 +560,24 @@ public class KeyHandler implements KeyListener {
 
 			// PROXIMA FASE
 			if (gp.ui.commandNum == 0) {
-				// Executa o teleporte pendente
-				gp.eHandler.executePendingTeleport(); // Chama o método para teleportar
-				gp.ui.playTime = 0;
+				if(gp.ui.levelFinished) {
+					// Executa o teleporte pendente
+					gp.eHandler.executePendingTeleport(); // Chama o método para teleportar
+					gp.ui.playTime = 0;
+				}else if(gp.ui.gameFinished) {
+					gp.ui.animationFinished = false;
+					gp.ui.titleScreenState = 2;
+					gp.gameState = gp.ui.creditScreenState;
+					gp.playMusic(5);
+				}
 			}
 
 			// MENU INICIAL
 			if (gp.ui.commandNum == 1) {
-				gp.ui.levelFinished = false;
-				gp.ui.gameFinished = false;
-				gp.ui.commandNum = 0;
-				gp.gameState = gp.titleState;
-				gp.ui.titleScreenState = 0;
-				System.out.println("current map: " + gp.currentMap + " highestUnlockedFase: " + gp.highestUnlockedFase);
-				if (gp.currentMap == gp.highestUnlockedFase) {
-					gp.highestUnlockedFase += 1;
-				}
-				gp.saveLoad.save();
-				gp.stopSFX();
-				gp.stopMusic();
-				gp.playMusic(5);
-				gp.restart();
+				gp.btnMenu.state = "enable"; // Troca para 'disable'
+				gp.btnMenu.animation = true; // Inicia a animação
+				gp.btnMenu.spriteNum = 0; // Reseta a animação para o início
+				gp.btnMenu.spriteCounter = 0; // Reseta o contador de frames
 			}
 
 			gp.playSFX(6);

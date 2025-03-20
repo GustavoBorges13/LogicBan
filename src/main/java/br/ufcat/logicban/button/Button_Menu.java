@@ -59,6 +59,10 @@ public class Button_Menu extends Button {
 				animation = false; // Para a animação após completar
 				gp.ui.titleScreenState = 1;
 				gp.ui.commandNum = gp.currentMap;
+				gp.gameState = gp.titleState;
+				gp.ui.titleScreenState = 0;
+				gp.restart();
+				gp.playMusic(5);
 			}
 		}
 	}

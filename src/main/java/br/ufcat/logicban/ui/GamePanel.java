@@ -417,6 +417,10 @@ public class GamePanel extends JPanel implements Runnable {
 		if (gameState == optionState) {
 
 		}
+		
+		if (gameState == nextPhaseState) {
+			btnMenu.update();
+		}
 	}
 
 	public void drawToTempScreen() {
