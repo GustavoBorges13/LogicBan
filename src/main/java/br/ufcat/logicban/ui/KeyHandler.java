@@ -261,6 +261,7 @@ public class KeyHandler implements KeyListener {
 					gp.ui.titleScreenState = 1;
 					gp.gameState = gp.playState;
 					gp.currentMap = 0;
+					gp.playerPositions();
 					gp.highestUnlockedFase = 0; // Reset para fase inicial
 					gp.saveLoad.save();
 					gp.stopMusic();
