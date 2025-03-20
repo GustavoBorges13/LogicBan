@@ -15,12 +15,18 @@ public class IT_LogicalPort extends InteractiveTile {
 	public static final String XOR = "XOR";
 	public static final String NAND = "NAND";
 	public static final String XNOR = "XNOR";
+	
+	public static final String GRAY = "gray";
+	public static final String WHITE = "white";
+	
+	public String cor;
+	
 	public int id; // ID único
 	public ArrayList<Integer> plateIndices = new ArrayList<>(); // Lista dos índices das placas conectadas
 	public boolean outputState = false; // Adicionado
 	public ArrayList<Integer> inputPortIDs = new ArrayList<>(); // Adicionado
 	
-	public IT_LogicalPort(GamePanel gp, int col, int row, String tipo, String direction, int id) {
+	public IT_LogicalPort(GamePanel gp, int col, int row, String tipo, String direction, String cor, int id) {
 		super(gp, col, row);
 		this.gp = gp;
 
@@ -30,78 +36,39 @@ public class IT_LogicalPort extends InteractiveTile {
 		this.tipo = tipo;
 		this.direction = direction;
 		this.id = id;
-
+		this.cor = cor;
+		
+		solidArea = new Rectangle();
+		solidArea.x = 0;
+		solidArea.y = 0;
+		solidArea.width = 48;
+		solidArea.height = 48;
+		solidAreaDefaultX = solidArea.x;
+		solidAreaDefaultY = solidArea.y;
+		
 		name = itName;
 		
 		switch (tipo) {
 		case NOT:
-			solidArea = new Rectangle();
-			solidArea.x = 2;
-			solidArea.y = 8;
-			solidArea.width = 36;
-			solidArea.height = 30;
-			solidAreaDefaultX = solidArea.x;
-			solidAreaDefaultY = solidArea.y;
+
 			color = Color.black;
 			break;
 		case AND:
-			solidArea = new Rectangle();
-			solidArea.x = 6;
-			solidArea.y = 10;
-			solidArea.width = 36;
-			solidArea.height = 38;
-			solidAreaDefaultX = solidArea.x;
-			solidAreaDefaultY = solidArea.y;
 			color = Color.black;
 			break;
 		case OR:
-			solidArea = new Rectangle();
-			solidArea.x = 6;
-			solidArea.y = 8;
-			solidArea.width = 36;
-			solidArea.height = 38;
-			solidAreaDefaultX = solidArea.x;
-			solidAreaDefaultY = solidArea.y;
 			color = Color.black;
 			break;
 		case NOR:
-			solidArea = new Rectangle();
-			solidArea.x = 6;
-			solidArea.y = 8;
-			solidArea.width = 36;
-			solidArea.height = 38;
-			solidAreaDefaultX = solidArea.x;
-			solidAreaDefaultY = solidArea.y;
 			color = Color.black;
 			break;
 		case XOR:
-			solidArea = new Rectangle();
-			solidArea.x = 6;
-			solidArea.y = 8;
-			solidArea.width = 36;
-			solidArea.height = 38;
-			solidAreaDefaultX = solidArea.x;
-			solidAreaDefaultY = solidArea.y;
 			color = Color.black;
 			break;
 		case NAND:
-			solidArea = new Rectangle();
-			solidArea.x = 6;
-			solidArea.y = 8;
-			solidArea.width = 36;
-			solidArea.height = 38;
-			solidAreaDefaultX = solidArea.x;
-			solidAreaDefaultY = solidArea.y;
 			color = Color.black;
 			break;
 		case XNOR:
-			solidArea = new Rectangle();
-			solidArea.x = 6;
-			solidArea.y = 8;
-			solidArea.width = 36;
-			solidArea.height = 38;
-			solidAreaDefaultX = solidArea.x;
-			solidAreaDefaultY = solidArea.y;
 			color = Color.black;
 			break;
 		}
@@ -115,19 +82,19 @@ public class IT_LogicalPort extends InteractiveTile {
 	}
 
 	public void getImage(String tipo) {
-
+		tipo = tipo.toLowerCase();
 		switch (direction) {
 		case "left":
-			left1 = setup("/assets/wires_connections/" + tipo + "_left", gp.tileSize, gp.tileSize);
+			left1 = setup("/assets/wires_connections/" + tipo + "_left_"+cor, gp.tileSize, gp.tileSize);
 			break;
 		case "right":
-			right1 = setup("/assets/wires_connections/" + tipo + "_right", gp.tileSize, gp.tileSize);
+			right1 = setup("/assets/wires_connections/" + tipo + "_right_"+cor, gp.tileSize, gp.tileSize);
 			break;
 		case "up":
-			up1 = setup("/assets/wires_connections/" + tipo + "_up", gp.tileSize, gp.tileSize);
+			up1 = setup("/assets/wires_connections/" + tipo + "_up_"+cor, gp.tileSize, gp.tileSize);
 			break;
 		case "down":
-			down1 = setup("/assets/wires_connections/" + tipo + "_down", gp.tileSize, gp.tileSize);
+			down1 = setup("/assets/wires_connections/" + tipo + "_down_"+cor, gp.tileSize, gp.tileSize);
 			break;
 		}
 	}

@@ -528,18 +528,14 @@ public class UI {
 			if (gp.btnMenu.estadoBotao == true) {
 		
 				// Se a animação estiver ativada, desenha o botão com a animação
-				System.out.println("debug 1");
 				if (gp.btnMenu.animation) {
 					gp.btnMenu.draw(g2, imgX, imgY, imgW, imgH); // Chama o método draw que lida com a animação
 				} else {
-					System.out.println("debug 2");
 					gp.btnMenu.draw(g2, imgX, imgY, imgW, imgH);
 				}
 			}
 		}
 	}
-	
-	
 
 	public void drawButtonExit(int x, int y) {
 		BufferedImage btnImage = null;

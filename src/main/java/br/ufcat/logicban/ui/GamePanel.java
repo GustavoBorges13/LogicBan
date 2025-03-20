@@ -15,6 +15,7 @@ import java.util.Comparator;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import ai.PathFinder;
 import br.ufcat.logicban.button.Button_Continuar;
 import br.ufcat.logicban.button.Button_Creditos;
 import br.ufcat.logicban.button.Button_Fechar;
@@ -68,7 +69,7 @@ public class GamePanel extends JPanel implements Runnable {
 	int drawCount = 0;
 
 	// SYSTEM
-	TileManager tileM = new TileManager(this);
+	public TileManager tileM = new TileManager(this);
 	public KeyHandler keyH = new KeyHandler(this);
 	public Sound music = new Sound();
 	public Sound sfx = new Sound();
@@ -87,6 +88,7 @@ public class GamePanel extends JPanel implements Runnable {
 	Button_Menu btnMenu = new Button_Menu(this);
 	Button_ProximaFase btnProximaFase = new Button_ProximaFase(this);
 	Button_Continuar btnContinuar = new Button_Continuar(this);
+	public PathFinder pFinder = new PathFinder(this);
 	Thread gameThread;
 
 	// ENTITY AND OBJECT
@@ -96,7 +98,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public InteractiveTile iTile[][] = new InteractiveTile[maxMap][50];
 	ArrayList<Entity> entityList = new ArrayList<>();
 	ParticleManager particleManager = new ParticleManager(this);; // Instância do ParticleManager
-	public Entity wire[][] = new Entity[maxMap][70];
+	public Entity wire[][] = new Entity[maxMap][100];
 	public int doorIndex = -1; // Índice da porta no array gp.obj (inicializado como -1)
 	public int doorWorldX; // Posição X da porta no mundo
 	public int doorWorldY; // Posição Y da porta no mundo
@@ -117,7 +119,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public int proxima_fase;
 	public int highestUnlockedFase; // Adicione esta linha
 	public String nova_direcao_player = "down";
-	public int[] faseMap = { 50, 51, 52, 53 }; // Exemplo para 10 fases
+	public int[] faseMap = { 50, 51, 52, 53, 54}; // Exemplo para 10 fases
 
 	public GamePanel(Main mainFrame) {
 		this.mainFrame = mainFrame;
@@ -209,11 +211,15 @@ public class GamePanel extends JPanel implements Runnable {
 			player.worldY = tileSize * 9;
 			break;
 		case 2:
-			player.worldX = tileSize * 1;
-			player.worldY = tileSize * 0;
+			player.worldX = tileSize * 9;
+			player.worldY = tileSize * 9;
 			break;
 		case 3:
-			player.worldX = tileSize * 11;
+			player.worldX = tileSize * 16;
+			player.worldY = tileSize * 8;
+			break;
+		case 4:
+			player.worldX = tileSize * 14;
 			player.worldY = tileSize * 10;
 			break;
 		}
@@ -511,11 +517,11 @@ public class GamePanel extends JPanel implements Runnable {
 		if (keyH.showDebug == true) {
 			long drawEnd = System.nanoTime();
 			long passed = drawEnd - drawStart;
-			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 40F));
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 30F));
 			g2.setColor(Color.white);
 			int x = 10;
-			int y = screenHeight - (tileSize * 5);
-			int lineHeigth = 40;
+			int y = screenHeight - (int)(tileSize * 3.5);
+			int lineHeigth = 30;
 
 			// lado esquerdo
 			drawStringWithOpacity(g2, "WorldX: " + player.worldX, x, y, 1.0f);
@@ -531,28 +537,32 @@ public class GamePanel extends JPanel implements Runnable {
 			drawStringWithOpacity(g2, "FPS: " + drawCount, x, y, 1.0f);
 
 			// lado direito
-			x = screenWidth - tileSize * 7;
-			y = screenHeight - (tileSize * 10);
-			lineHeigth = 40;
-
+			x = screenWidth - tileSize * 5;
+			y = screenHeight - (int)(tileSize * 5.5);
+			lineHeigth = 30;
+		
+			int count = 0;
 			if (gameState == playState) {
 				// lista de placas
 				for (int i = 0; i < iTile[1].length; i++) {
 					if (iTile[currentMap][i] != null && iTile[currentMap][i].name != null
 							&& iTile[currentMap][i].name.equals(IT_MetalPlate.itName)) {
-						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 25F));
-						drawStringWithOpacity(g2, "id[" + i + "]", iTile[currentMap][i].worldX,
+						
+						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 20F));
+						drawStringWithOpacity(g2, "id[" +count + "]", iTile[currentMap][i].worldX+7,
 								iTile[currentMap][i].worldY, 1.0f);
-						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 40F));
+						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 30F));
 						drawStringWithOpacity(g2, iTile[currentMap][i].estadoLogico + "",
 								iTile[currentMap][i].worldX + 55, iTile[currentMap][i].worldY + (int) (tileSize / 1.3),
 								1.0f);
 
 						// outros debugs da placa
+						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 30F));
 						drawStringWithOpacity(g2,
-								"Placa id[" + i + "]: " + iTile[currentMap][i].estadoLogico + " caixa", x - 50, y,
+								"Placa id[" + count + "]: " + iTile[currentMap][i].estadoLogico + " caixa", x - 50, y,
 								1.0f);
 						y += lineHeigth;
+						count += 1;
 					}
 				}
 
@@ -561,8 +571,8 @@ public class GamePanel extends JPanel implements Runnable {
 				for (int i = 0; i < npc[1].length; i++) {
 					if (npc[currentMap][i] instanceof NPC_Box) {
 						npcBox = (NPC_Box) npc[currentMap][i];
-						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 25F));
-						drawStringWithOpacity(g2, "id[" + i + "]", npc[currentMap][i].worldX-tileSize, npc[currentMap][i].worldY+(int)(tileSize/1.5),
+						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 20F));
+						drawStringWithOpacity(g2, "id[" + i + "]", npc[currentMap][i].worldX-(int)(tileSize/1.2), npc[currentMap][i].worldY+(int)(tileSize/1.5),
 								1.0f);
 					}
 				}
@@ -572,7 +582,7 @@ public class GamePanel extends JPanel implements Runnable {
 
 					// Aqui também precisa ter um loop para os iTiles
 					for (String debugString : debugInfo) {
-
+						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 30F));
 						drawStringWithOpacity(g2, debugString, x - 50, y, 1.0f);
 						y += lineHeigth;
 					}
@@ -583,10 +593,10 @@ public class GamePanel extends JPanel implements Runnable {
 							IT_LogicalPort port = (IT_LogicalPort) iTile[currentMap][i];
 
 							for (String debugString : debugInfo) {
-								g2.setFont(g2.getFont().deriveFont(Font.BOLD, 25F));
+								g2.setFont(g2.getFont().deriveFont(Font.BOLD, 20F));
 								drawStringWithOpacity(g2, "id[" + port.id + "]", iTile[currentMap][i].worldX + 4,
 										iTile[currentMap][i].worldY, 1.0f);
-								g2.setFont(g2.getFont().deriveFont(Font.BOLD, 40F));
+								g2.setFont(g2.getFont().deriveFont(Font.BOLD, 30F));
 								drawStringWithOpacity(g2, port.outputState ? "1" : "0",
 										iTile[currentMap][i].worldX + (int) (tileSize * 1.2),
 										iTile[currentMap][i].worldY + (int) (tileSize / 1.3), 1.0f);
@@ -661,6 +671,9 @@ public class GamePanel extends JPanel implements Runnable {
 				break;
 			case 3:
 				playMusic(9);
+				break;
+			case 4:
+				playMusic(10);
 				break;
 			}
 

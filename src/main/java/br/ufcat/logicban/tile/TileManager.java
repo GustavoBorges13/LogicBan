@@ -16,143 +16,159 @@ import br.ufcat.logicban.util.UtilityTool;
 
 public class TileManager {
 
-    private GamePanel gp;
-    public Tile[] tile;
-    public int mapTileNum[][][];
-    private ArrayList<String> fileNames = new ArrayList<>();
-    private ArrayList<String> collisionStatus = new ArrayList<>();
+	private GamePanel gp;
+	public Tile[] tile;
+	public int mapTileNum[][][];
+	private ArrayList<String> fileNames = new ArrayList<>();
+	private ArrayList<String> collisionStatus = new ArrayList<>();
+	boolean drawPath = true;
 
-    public static boolean debugModeOn = false;
+	public static boolean debugModeOn = false;
 
-    public TileManager(GamePanel gp) {
-        this.gp = gp;
+	public TileManager(GamePanel gp) {
+		this.gp = gp;
 
-        // Ler dados do arquivo de tiles
-        loadTileData("/assets/maps/tiledata.txt");
+		// Ler dados do arquivo de tiles
+		loadTileData("/assets/maps/tiledata.txt");
 
-        // Inicializar o array de tiles baseado no tamanho de fileNames
-        tile = new Tile[fileNames.size()];
-        getTileImage();
+		// Inicializar o array de tiles baseado no tamanho de fileNames
+		tile = new Tile[fileNames.size()];
+		getTileImage();
 
-        // Obter as dimensões do mapa
-        loadMapDimensions("/assets/maps/map01.txt");
+		// Obter as dimensões do mapa
+		loadMapDimensions("/assets/maps/map01.txt");
 
-        // Carregar mapas
-        loadMap("/assets/maps/map01.txt", 0);
-        loadMap("/assets/maps/map02.txt", 1);
-        loadMap("/assets/maps/map03.txt", 2);
-        loadMap("/assets/maps/map04.txt", 3);
-    }
+		// Carregar mapas
+		loadMap("/assets/maps/map01.txt", 0);
+		loadMap("/assets/maps/map02.txt", 1);
+		loadMap("/assets/maps/map03.txt", 2);
+		loadMap("/assets/maps/map04.txt", 3);
+		loadMap("/assets/maps/map05.txt", 4);
+	}
 
-    private void loadTileData(String filePath) {
-        try (InputStream is = getClass().getResourceAsStream(filePath);
-             BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+	private void loadTileData(String filePath) {
+		try (InputStream is = getClass().getResourceAsStream(filePath);
+				BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
 
-            String line;
-            while ((line = br.readLine()) != null) {
-                fileNames.add(line);
-                collisionStatus.add(br.readLine());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+			String line;
+			while ((line = br.readLine()) != null) {
+				fileNames.add(line);
+				collisionStatus.add(br.readLine());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-    private void loadMapDimensions(String filePath) {
-        try (InputStream is = getClass().getResourceAsStream(filePath);
-             BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+	private void loadMapDimensions(String filePath) {
+		try (InputStream is = getClass().getResourceAsStream(filePath);
+				BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
 
-            String line = br.readLine();
-            String[] maxTile = line.split(" ");
+			String line = br.readLine();
+			String[] maxTile = line.split(" ");
 
-            gp.maxWorldCol = maxTile.length;
-            gp.maxWorldRow = maxTile.length;
+			gp.maxWorldCol = maxTile.length;
+			gp.maxWorldRow = maxTile.length;
 
-            mapTileNum = new int[gp.maxMap][gp.maxWorldCol][gp.maxWorldRow];
-        } catch (IOException e) {
-            System.out.println("Erro ao carregar as dimensões do mapa!");
-        }
-    }
+			mapTileNum = new int[gp.maxMap][gp.maxWorldCol][gp.maxWorldRow];
+		} catch (IOException e) {
+			System.out.println("Erro ao carregar as dimensões do mapa!");
+		}
+	}
 
-    public void getTileImage() {
-        UtilityTool uTool = new UtilityTool();
-        
-        for (int i = 0; i < fileNames.size(); i++) {
-            String fileName = fileNames.get(i);
-            boolean collision = collisionStatus.get(i).equals("true");
+	public void getTileImage() {
+		UtilityTool uTool = new UtilityTool();
 
-            setup(i, fileName, collision, uTool);
-        }
-    }
+		for (int i = 0; i < fileNames.size(); i++) {
+			String fileName = fileNames.get(i);
+			boolean collision = collisionStatus.get(i).equals("true");
 
-    private void setup(int index, String imageName, boolean collision, UtilityTool uTool) {
-        try {
-            tile[index] = new Tile();
-            tile[index].image = ImageIO.read(getClass().getResourceAsStream("/assets/tiles/" + imageName));
-            tile[index].image = uTool.scaleImage(tile[index].image, gp.tileSize, gp.tileSize);
-            tile[index].collision = collision;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+			setup(i, fileName, collision, uTool);
+		}
+	}
 
-    public void loadMap(String filePath, int map) {
-    	InputStream is = getClass().getResourceAsStream(filePath);
-    	if (is == null) {
-    	    System.out.println("Arquivo não encontrado: " + filePath);
-    	}
-        try ( BufferedReader br = new BufferedReader(new InputStreamReader(is))){
+	private void setup(int index, String imageName, boolean collision, UtilityTool uTool) {
+		try {
+			tile[index] = new Tile();
+			tile[index].image = ImageIO.read(getClass().getResourceAsStream("/assets/tiles/" + imageName));
+			tile[index].image = uTool.scaleImage(tile[index].image, gp.tileSize, gp.tileSize);
+			tile[index].collision = collision;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-            int col = 0;
-            int row = 0;
+	public void loadMap(String filePath, int map) {
+		InputStream is = getClass().getResourceAsStream(filePath);
+		if (is == null) {
+			System.out.println("Arquivo não encontrado: " + filePath);
+		}
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
 
-            while (col < gp.maxScreenCol && row < gp.maxScreenRow) {
-                String line = br.readLine();
+			int col = 0;
+			int row = 0;
 
-                while (col < gp.maxScreenCol) {
-                    String[] numbers = line.split(" ");
-                    int num = Integer.parseInt(numbers[col]);
-                    mapTileNum[map][col][row] = num;
-                    col++;
-                }
+			while (col < gp.maxScreenCol && row < gp.maxScreenRow) {
+				String line = br.readLine();
 
-                if (col == gp.maxScreenCol) {
-                    col = 0;
-                    row++;
-                }
-            }
+				while (col < gp.maxScreenCol) {
+					String[] numbers = line.split(" ");
+					int num = Integer.parseInt(numbers[col]);
+					mapTileNum[map][col][row] = num;
+					col++;
+				}
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+				if (col == gp.maxScreenCol) {
+					col = 0;
+					row++;
+				}
+			}
 
-    public void draw(Graphics2D g2) {
-        int worldCol = 0;
-        int worldRow = 0;
-        int x = 0;
-        int y = 0;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-        while (worldCol < gp.maxScreenCol && worldRow < gp.maxScreenRow) {
-            int tileNum = mapTileNum[gp.currentMap][worldCol][worldRow];
-            g2.drawImage(tile[tileNum].image, x, y, null);
+	public void draw(Graphics2D g2) {
+		int worldCol = 0;
+		int worldRow = 0;
+		int x = 0;
+		int y = 0;
 
-            worldCol++;
-            x += gp.tileSize;
+		while (worldCol < gp.maxScreenCol && worldRow < gp.maxScreenRow) {
+			int tileNum = mapTileNum[gp.currentMap][worldCol][worldRow];
+			g2.drawImage(tile[tileNum].image, x, y, null);
 
-            if (debugModeOn) {
-                // Área de debug de colisão
-            	g2.setColor(new Color(0, 100, 0)); // Verde Escuro (RGB)
-                g2.setStroke(new BasicStroke(1));
-                g2.drawRect(x - gp.tileSize, y, gp.tileSize, gp.tileSize);
-            }
+			worldCol++;
+			x += gp.tileSize;
 
-            if (worldCol == gp.maxScreenCol) {
-                worldCol = 0;
-                x = 0;
-                worldRow++;
-                y += gp.tileSize;
-            }
-        }
-    }
+			if (debugModeOn) {
+				// Área de debug de colisão
+				g2.setColor(new Color(0, 100, 0)); // Verde Escuro (RGB)
+				g2.setStroke(new BasicStroke(1));
+				g2.drawRect(x - gp.tileSize, y, gp.tileSize, gp.tileSize);
+			}
+
+			if (worldCol == gp.maxScreenCol) {
+				worldCol = 0;
+				x = 0;
+				worldRow++;
+				y += gp.tileSize;
+			}
+		}
+		if (debugModeOn) {
+			if (drawPath == true) {
+				g2.setColor(new Color(255, 0, 0, 70));
+
+				for (int i = 0; i < gp.pFinder.pathList.size(); i++) {
+					int worldX = gp.pFinder.pathList.get(i).col * gp.tileSize;
+					int worldY = gp.pFinder.pathList.get(i).row * gp.tileSize;
+					int screenX = worldX;
+					int screenY = worldY;
+
+					g2.fillRect(screenX, screenY, gp.tileSize, gp.tileSize);
+				}
+			}
+		}
+	}
 }

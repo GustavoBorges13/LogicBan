@@ -48,7 +48,9 @@ public class EventHandler {
 	private void carregarEventos() {
 		teleportEvents.add(new TeleportEvent(0, 16, 8, "any", 1, 9, 9, "any", false)); // fase1 -> fase2
 		teleportEvents.add(new TeleportEvent(1, 21, 12, "any", 2, 1, 0, "any", false)); // fase2 -> fase3
-
+		teleportEvents.add(new TeleportEvent(2, 22, 7, "any", 3, 1, 1, "any", false)); // fase3 -> fase4
+		teleportEvents.add(new TeleportEvent(3, 20, 6, "any", 4, 1, 1, "any", false)); // fase4 -> fase5
+		teleportEvents.add(new TeleportEvent(4, 14, 14, "any", 5, 1, 1, "any", true)); // fase5 -> endGame
 	}
 
 	public void checkEvent() {
@@ -68,8 +70,9 @@ public class EventHandler {
 					if(event.ultima_fase == false){
 						// Armazena as informações do teleporte pendente
 						pendingTeleport = event;
-
+						
 						// Abre a tela de escolha
+						gp.ui.commandNum = 0;
 						gp.gameState = gp.nextPhaseState;
 						gp.ui.levelFinished = true;
 						gp.stopMusic();
@@ -78,6 +81,7 @@ public class EventHandler {
 					}else {
 						// Abre a tela de escolha
 						gp.gameState = gp.nextPhaseState;
+						gp.ui.commandNum = 0;
 						gp.ui.levelFinished = false;
 						gp.ui.gameFinished = true;
 						gp.stopMusic();

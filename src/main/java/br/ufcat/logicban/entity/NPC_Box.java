@@ -84,7 +84,8 @@ public class NPC_Box extends Entity {
 		gp.cChecker.checkEntity(this, gp.iTile);
 		// gp.cChecker.checkEntity(this, gp.wire);
 		// boolean contactPlayer = gp.cChecker.checkPlayer(this);
-
+		collisionEndWorld = false;
+		gp.cChecker.checkEnd(this);
 		// gp.cChecker.checkEntity(this, gp.monster);
 	}
 
@@ -263,7 +264,7 @@ public class NPC_Box extends Entity {
 			int distance = Math.max(xDistance, yDistance);
 
 			// altera 15 se quiser mexer na hitbox das placas
-			if (distance < 28) {
+			if (distance < 20) {
 				if (linkedEntity == null) {
 					linkedEntity = plate;
 					plate.estadoLogico = 1;
@@ -314,7 +315,7 @@ public class NPC_Box extends Entity {
 
 		switch (port.tipo) {
 		case IT_LogicalPort.NOT:
-			// A porta NOT inverte a entrada da placa conectada
+			// A porta NOT inverte a entrada, que pode vir de uma placa ou de outra porta
 			if (port.plateIndices.size() > 0) {
 				int plateIndex = port.plateIndices.get(0);
 				if (plateIndex >= 0 && plateIndex < plateList.size()) {
@@ -323,8 +324,11 @@ public class NPC_Box extends Entity {
 					System.out.println("Índice de placa inválido para a porta NOT.");
 					return false;
 				}
+			} else if (port.inputPortIDs.size() > 0) {
+				int inputPortID = port.inputPortIDs.get(0);
+				return !verificarCondicaoLogica(inputPortID); // Inverte o estado da porta de entrada
 			} else {
-				System.out.println("Porta NOT sem placa conectada.");
+				System.out.println("Porta NOT sem placa ou porta lógica conectada.");
 				return false;
 			}
 
@@ -351,9 +355,10 @@ public class NPC_Box extends Entity {
 		case IT_LogicalPort.OR:
 			// A porta OR requer que pelo menos uma entrada seja verdadeira
 			boolean orResult = false;
-
+			
 			// Verifica as placas conectadas
 			for (int plateIndex : port.plateIndices) {
+				
 				if (plateIndex >= 0 && plateIndex < plateList.size()) {
 					orResult = orResult || (plateList.get(plateIndex).estadoLogico == 1);
 				} else {

@@ -57,12 +57,18 @@ public class Button_Menu extends Button {
 			if (spriteNum >= totalFrames) {
 				spriteNum = 0; // Reinicia a animação
 				animation = false; // Para a animação após completar
-				gp.ui.titleScreenState = 1;
+				if(gp.currentMap >= gp.highestUnlockedFase) {
+					System.out.println("gp.currentmap "+gp.currentMap+" gp.highestUnlockfase "+gp.highestUnlockedFase);
+					gp.highestUnlockedFase = gp.currentMap + 1;
+					gp.saveLoad.save();
+					System.out.println("gp.currentmap "+gp.currentMap+" gp.highestUnlockfase "+gp.highestUnlockedFase);
+				}
 				gp.ui.commandNum = gp.currentMap;
 				gp.gameState = gp.titleState;
 				gp.ui.titleScreenState = 0;
-				gp.restart();
+				gp.stopMusic();
 				gp.playMusic(5);
+				gp.restart();
 			}
 		}
 	}
