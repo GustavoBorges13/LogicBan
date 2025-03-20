@@ -34,7 +34,10 @@ public class UI {
 	public int titleScreenState = 0; // the first screen, 1: the second screen
 	public int creditScreenState = 0; // the first screen, 1: the second screen
 	double playTime;
-	DecimalFormat dFormat = new DecimalFormat("#0");
+	DecimalFormat dFormat = new DecimalFormat("#00"); // Use #00 para garantir dois dígitos
+	String timeString;
+	int minutes;
+	double seconds; 
 	int subState = 0;
 	int counter = 0;
 	public String currentDialogue = "";
@@ -52,9 +55,9 @@ public class UI {
 	private boolean isDay = true;
 	private float transitionSpeed = 0.00070f; // Ajuste para suavidade
 	public boolean creditsAnimating = false; // Flag para controlar a animação dos créditos
-
 	public boolean goToNextPhase = false;
 	
+
 	public UI(GamePanel gp) {
 		this.gp = gp;
 
@@ -523,6 +526,7 @@ public class UI {
 		// Desenha o botão de som com animação (se necessário)
 		if (gp.btnMenu.botaoSelecionado == true) {
 			if (gp.btnMenu.estadoBotao == true) {
+		
 				// Se a animação estiver ativada, desenha o botão com a animação
 				if (gp.btnMenu.animation) {
 					gp.btnMenu.draw(g2, imgX, imgY, imgW, imgH); // Chama o método draw que lida com a animação
@@ -643,8 +647,12 @@ public class UI {
 
 		// TIME
 		playTime += (double) 1 / 60;
-		g2.drawString("TEMPO: " + dFormat.format(playTime) + "s",
-				(gp.maxScreenCol * gp.tileSize) - (int) (gp.tileSize * 4.4), gp.tileSize);
+		minutes = (int) (playTime / 60); // Calcula os minutos
+		seconds = playTime % 60; // Calcula os segundos restantes
+
+		timeString = String.format("%dm:%ss", minutes, dFormat.format(seconds));
+
+		g2.drawString("TEMPO: " + timeString, (gp.maxScreenCol * gp.tileSize) - (int) (gp.tileSize * 5.7), gp.tileSize);
 
 		// MESSAGE
 		if (messageOn == true) {
@@ -662,9 +670,9 @@ public class UI {
 	}
 
 	public void drawPlayerNextPhase() {
-		
+
 		AlphaComposite originalComposite = (AlphaComposite) g2.getComposite();
-		float alpha =  1f; // Opacidade, ajuste conforme necessário
+		float alpha = 1f; // Opacidade, ajuste conforme necessário
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
 		g2.setColor(new Color(0, 0, 0, 200)); // Cor de fundo com opacidade (preto semi-transparente)
 		g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
@@ -686,7 +694,8 @@ public class UI {
 			g2.drawString(text, x, y);
 
 			// texto 2
-			text = "Seu tempo é: " + dFormat.format(playTime) + " segundos!";
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 50F));
+			text = "Seu tempo é: " + timeString + "!";
 			textLengt = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth(); // tamanho do texto
 			x = gp.screenWidth / 2 - textLengt / 2;
 			y = gp.screenHeight / 2 + (gp.tileSize * 4);
@@ -728,7 +737,8 @@ public class UI {
 			g2.drawString(text, x, y);
 
 			// texto 2
-			text = "Seu tempo é: " + dFormat.format(playTime) + " segundos!";
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 50F));
+			text = "Seu tempo é: " + timeString + "!";
 			textLengt = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth(); // tamanho do texto
 			x = gp.screenWidth / 2 - textLengt / 2;
 			y = gp.screenHeight / 2 + (gp.tileSize * 4);
@@ -737,11 +747,13 @@ public class UI {
 			// texto 3
 			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 60F));
 			g2.setColor(Color.yellow);
-			text = "Parabéns!";
+			text = "Parabéns! Você finalizou o jogo!";
 			textLengt = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth(); // tamanho do texto
 			x = gp.screenWidth / 2 - textLengt / 2;
 			y = gp.screenHeight / 2 + (gp.tileSize * 2);
 			g2.drawString(text, x, y);
+			
+			drawButtonContinuar(17, 2.2, 0);
 		}
 	}
 
@@ -912,106 +924,67 @@ public class UI {
 		// CREDITOS
 		else if (titleScreenState == 2) {
 
-		    // -----------------------------------------------------
-		    // 1. LOGICBAN LOGO (NO TOPO)
-		    // -----------------------------------------------------
-		    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 45F));
-		    int xLogo = gp.screenWidth / 2 - (logoLogicBan.getWidth() / 2);
-		    int yLogoLogicBan = creditY; // Posição inicial da logo (acompanha a animação)
-		    g2.drawImage(logoLogicBan, xLogo, yLogoLogicBan, logoLogicBan.getWidth(), logoLogicBan.getHeight(), null);
+			// -----------------------------------------------------
+			// 1. LOGICBAN LOGO (NO TOPO)
+			// -----------------------------------------------------
+			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 45F));
+			int xLogo = gp.screenWidth / 2 - (logoLogicBan.getWidth() / 2);
+			int yLogoLogicBan = creditY; // Posição inicial da logo (acompanha a animação)
+			g2.drawImage(logoLogicBan, xLogo, yLogoLogicBan, logoLogicBan.getWidth(), logoLogicBan.getHeight(), null);
 
-		    // -----------------------------------------------------
-		    // 2. CRÉDITOS (EMBAIXO DA LOGO)
-		    // -----------------------------------------------------
-		    int y = yLogoLogicBan + logoLogicBan.getHeight() + gp.tileSize; // Começa após a logo
-		    g2.setFont(g2.getFont().deriveFont(Font.BOLD, 45F));
+			// -----------------------------------------------------
+			// 2. CRÉDITOS (EMBAIXO DA LOGO)
+			// -----------------------------------------------------
+			int y = yLogoLogicBan + logoLogicBan.getHeight() + gp.tileSize; // Começa após a logo
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 45F));
 
-		    String[] credits = {
-		    	    "","Desenvolvido pela Equipe Bug Hunters!",
-		    	    "",
-		    	    "Design do Jogo:",
-		    	    "Gustavo, Davi, Rafael",
-		    	    "",
-		    	    "Menu da Interface:",
-		    	    "Rafael, Michael",
-		    	    "",
-		    	    "Programação da Gameplay:",
-		    	    "Davi, Gustavo, Marcos",
-		    	    "",
-		    	    "Design de Fases:",
-		    	    "Davi, Gustavo, Marcos",
-		    	    "",
-		    	    "Design da UI & Ícones:",
-		    	    "Marcos, Luis, Rafael",
-		    	    "",
-		    	    "Implementação dos Créditos:",
-		    	    "Marcos, Gustavo",
-		    	    "",
-		    	    "Efeitos Sonoros:",
-		    	    "Rafael, Marcos, Michael",
-		    	    "",
-		    	    "Garantia de Qualidade:",
-		    	    "Davi, Gustavo",
-		    	    "",
-		    	    "Design de Arte:",
-		    	    "Luis",
-		    	    "",
-		    	    "Tutorial & Repositório:",
-		    	    "Gustavo",
-		    	    "",
-		    	    "Desenvolvimento:",
-		    	    "Desenvolvido manualmente em Java com Graphics2D",
-		    	    "Projeto da disciplina de Engenharia de Software 1",
-		    	    "",
-		    	    "Agradecimentos Especiais:",
-		    	    "Agradecemos a RyiSnow pela playlist",
-		    	    "de tutoriais que foram essenciais",
-		    	    "para o desenvolvimento!",
-		    	    "",
-		    	    "Efeitos Sonoros:",
-		    	    "freesound.org (Vários Artistas)",
-		    	    "",
-		    	    "Testadores Beta:",
-		    	    "Gabriel e Lucas",
-		    	    "",
-		    	    "Agradecemos por jogar LogicBan!",
-		    	    "Obrigado pelo seu apoio!"
-		    	};
-		    
-		    
-		    int lineSpacing = 80;
-		    //int y = 100; // Posição Y inicial (ajuste conforme necessário)
+			String[] credits = { "", "Desenvolvido pela Equipe Bug Hunters!", "", "Design do Jogo:",
+					"Gustavo, Davi, Rafael", "", "Menu da Interface:", "Rafael, Michael", "",
+					"Programação da Gameplay:", "Davi, Gustavo, Marcos", "", "Design de Fases:",
+					"Davi, Gustavo, Marcos", "", "Design da UI & Ícones:", "Marcos, Luis, Rafael", "",
+					"Implementação dos Créditos:", "Marcos, Gustavo", "", "Efeitos Sonoros:", "Rafael, Marcos, Michael",
+					"", "Garantia de Qualidade:", "Davi, Gustavo", "", "Design de Arte:", "Luis", "",
+					"Tutorial & Repositório:", "Gustavo", "", "Desenvolvimento:",
+					"Desenvolvido manualmente em Java com Graphics2D",
+					"Projeto da disciplina de Engenharia de Software 1", "", "Agradecimentos Especiais:",
+					"Agradecemos a RyiSnow pela playlist", "de tutoriais que foram essenciais",
+					"para o desenvolvimento!", "", "Efeitos Sonoros:", "freesound.org (Vários Artistas)", "",
+					"Testadores Beta:", "Gabriel e Lucas", "", "Agradecemos por jogar LogicBan!",
+					"Obrigado pelo seu apoio!" };
 
-		    // Desenha as linhas na ordem correta (primeira linha primeiro)
-		    for (String line : credits) {
-		        if (!line.isEmpty()) {
-		            int textWidth = g2.getFontMetrics().stringWidth(line);
-		            int x = (gp.screenWidth - textWidth) / 2;
+			int lineSpacing = 80;
+			// int y = 100; // Posição Y inicial (ajuste conforme necessário)
 
-		            if (line.endsWith(":")) {
-		                drawTextWithBorder(g2, line, x, y, Color.YELLOW, Color.BLACK);
-		                y += lineSpacing * 1; // Dobra o espaçamento após um subtítulo
-		            } else {
-		                drawTextWithBorder(g2, line, x, y, Color.WHITE, Color.BLACK);
-		                y += lineSpacing; // Aumenta Y para descer (não subir)
-		            }
-		        } else {
-		            y += lineSpacing; // Linhas vazias também recebem espaçamento
-		        }
-		    }
+			// Desenha as linhas na ordem correta (primeira linha primeiro)
+			for (String line : credits) {
+				if (!line.isEmpty()) {
+					int textWidth = g2.getFontMetrics().stringWidth(line);
+					int x = (gp.screenWidth - textWidth) / 2;
 
-		    // -----------------------------------------------------
-		    // 3. UFCAT LOGO (NO FINAL DOS CRÉDITOS)
-		    // -----------------------------------------------------
-		    int yLogoUFCAT = y + gp.tileSize; // Espaço após o último crédito
-		    xLogo = gp.screenWidth / 2 - (logoUFCAT.getWidth() / 2); // Centraliza a logoUFCAT
-		    g2.drawImage(logoUFCAT, xLogo, yLogoUFCAT, logoUFCAT.getWidth(), logoUFCAT.getHeight(), null);
+					if (line.endsWith(":")) {
+						drawTextWithBorder(g2, line, x, y, Color.YELLOW, Color.BLACK);
+						y += lineSpacing * 1; // Dobra o espaçamento após um subtítulo
+					} else {
+						drawTextWithBorder(g2, line, x, y, Color.WHITE, Color.BLACK);
+						y += lineSpacing; // Aumenta Y para descer (não subir)
+					}
+				} else {
+					y += lineSpacing; // Linhas vazias também recebem espaçamento
+				}
+			}
 
-		    // -----------------------------------------------------
-		    // 4. BOTÕES (POSIÇÃO FIXA)
-		    // --------------------------------------------------
-		    drawButtonBack(28.8, 1.7, 0);
-		    drawButtonSound(4.8, 1.7, 1);
+			// -----------------------------------------------------
+			// 3. UFCAT LOGO (NO FINAL DOS CRÉDITOS)
+			// -----------------------------------------------------
+			int yLogoUFCAT = y + gp.tileSize; // Espaço após o último crédito
+			xLogo = gp.screenWidth / 2 - (logoUFCAT.getWidth() / 2); // Centraliza a logoUFCAT
+			g2.drawImage(logoUFCAT, xLogo, yLogoUFCAT, logoUFCAT.getWidth(), logoUFCAT.getHeight(), null);
+
+			// -----------------------------------------------------
+			// 4. BOTÕES (POSIÇÃO FIXA)
+			// --------------------------------------------------
+			drawButtonBack(28.8, 1.7, 0);
+			drawButtonSound(4.8, 1.7, 1);
 		}
 	}
 
@@ -1374,7 +1347,6 @@ public class UI {
 		}
 	}
 
-
 	public void drawTransition() {
 		counter++;
 		g2.setColor(new Color(0, 0, 0, counter * 5));
@@ -1403,9 +1375,9 @@ public class UI {
 				gp.ui.currentDialogue = "The progress has been saved";
 				System.out.println("Progresso salvo. Fase[" + newMap + "]: " + gp.faseMap[newMap]);
 			}
-			
+
 			gp.restart(); // resetar tudo sempre ao entrar em novos mapas
-			
+
 			gp.changeArea();
 			// gp.restart();
 		}

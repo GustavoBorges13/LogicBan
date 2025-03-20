@@ -14,6 +14,7 @@ public class EventHandler {
 
 	int previousEventX, previousEventY;
 	boolean canTouchEvent = true;
+	public boolean ultimaFase;
 	public int tempMap, tempCol, tempRow;
 	public boolean outTile = false;
 	public int newWorldX, newWorldY, oldSpeed = 3;
@@ -45,14 +46,11 @@ public class EventHandler {
 
 	// Aqui onde fica eventos de teleporte, TP inicial X TP final
 	private void carregarEventos() {
-		teleportEvents.add(new TeleportEvent(0, 16, 8, "right", 1, 9, 9, "right")); // fase1 -> fase2
-
-		teleportEvents.add(new TeleportEvent(1, 21, 12, "any", 2, 1, 0, "any")); // fase2 -> fase3
-
-	}
-
-	public void playerNewGamePosition() {
-
+		teleportEvents.add(new TeleportEvent(0, 16, 8, "any", 1, 9, 9, "any", false)); // fase1 -> fase2
+		teleportEvents.add(new TeleportEvent(1, 21, 12, "any", 2, 1, 0, "any", false)); // fase2 -> fase3
+		teleportEvents.add(new TeleportEvent(2, 22, 7, "any", 3, 1, 1, "any", false)); // fase3 -> fase4
+		teleportEvents.add(new TeleportEvent(3, 20, 6, "any", 4, 1, 1, "any", false)); // fase4 -> fase5
+		teleportEvents.add(new TeleportEvent(4, 14, 14, "any", 5, 1, 1, "any", true)); // fase5 -> endGame
 	}
 
 	public void checkEvent() {
@@ -68,15 +66,28 @@ public class EventHandler {
 		if (canTouchEvent) {
 			for (TeleportEvent event : teleportEvents) {
 				if (hit(event.currentMap, event.col, event.row, event.direction)) {
-					// Armazena as informações do teleporte pendente
-					pendingTeleport = event;
-
-					// Abre a tela de escolha
-					gp.gameState = gp.nextPhaseState;
-					gp.ui.levelFinished = true;
-					gp.stopMusic();
-					gp.playSFX(4);
-					break; // Importante: Evita múltiplos eventos
+//					System.out.println(event.ultima_fase);
+					if(event.ultima_fase == false){
+						// Armazena as informações do teleporte pendente
+						pendingTeleport = event;
+						
+						// Abre a tela de escolha
+						gp.ui.commandNum = 0;
+						gp.gameState = gp.nextPhaseState;
+						gp.ui.levelFinished = true;
+						gp.stopMusic();
+						gp.playSFX(4);
+						break; // Importante: Evita múltiplos eventos
+					}else {
+						// Abre a tela de escolha
+						gp.gameState = gp.nextPhaseState;
+						gp.ui.commandNum = 0;
+						gp.ui.levelFinished = false;
+						gp.ui.gameFinished = true;
+						gp.stopMusic();
+						gp.playSFX(4);
+					}
+					
 				}
 			}
 		}
@@ -86,7 +97,7 @@ public class EventHandler {
 	public void executePendingTeleport() {
 		if (pendingTeleport != null) {
 			teleport(pendingTeleport.targetMap, pendingTeleport.targetCol, pendingTeleport.targetRow,
-					pendingTeleport.targetDirection);
+					pendingTeleport.targetDirection, pendingTeleport.ultima_fase);
 			pendingTeleport = null; // Limpa o teleporte pendente
 			gp.ui.levelFinished = false; // Reseta pra nao bugar a tela e só aparecer 1 vez
 		}
@@ -120,27 +131,28 @@ public class EventHandler {
 				eventRect[map][col][row].x = eventRect[map][col][row].eventRectDefaultX;
 				eventRect[map][col][row].y = eventRect[map][col][row].eventRectDefaultY;
 			} else if (gp.player.walkType.equals(gp.player.stepWalk)) {
+				
 				switch (gp.player.direction) {
 				case "up":
 					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
-					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y-gp.tileSize;
 					eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
 					eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
 					break;
 				case "down":
 					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
-					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
+					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y+gp.tileSize;
 					eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
 					eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
 					break;
 				case "left":
-					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
+					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x-gp.tileSize;
 					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
 					eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
 					eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
 					break;
 				case "right":
-					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x;
+					gp.player.solidArea.x = gp.player.worldX + gp.player.solidArea.x+gp.tileSize;
 					gp.player.solidArea.y = gp.player.worldY + gp.player.solidArea.y;
 					eventRect[map][col][row].x = col * gp.tileSize + eventRect[map][col][row].x;
 					eventRect[map][col][row].y = row * gp.tileSize + eventRect[map][col][row].y;
@@ -169,7 +181,7 @@ public class EventHandler {
 		return hit;
 	}
 
-	public void teleport(int targetMapIndex, int col, int row, String direction) {
+	public void teleport(int targetMapIndex, int col, int row, String direction, boolean ultima_fase) {
 
 		// Garante que o índice está dentro do array
 		if (targetMapIndex >= 0 && targetMapIndex < gp.faseMap.length) {
@@ -179,6 +191,7 @@ public class EventHandler {
 			tempRow = row;
 			canTouchEvent = false;
 			gp.nova_direcao_player = direction;
+			ultimaFase = ultima_fase;
 
 			// Atualiza imediatamente a fase atual
 			// gp.currentMap = targetMapIndex; // Opcional, depende do fluxo

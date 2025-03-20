@@ -169,6 +169,8 @@ public class Player extends Entity {
 
 				// CHECK TILE COLLISION
 				collisionOn = false;
+				collisionEndWorld = false;
+				gp.cChecker.checkEnd(this);
 				gp.cChecker.checkTile(this);
 
 				// CHECK OBJECT COLLISION
@@ -235,7 +237,7 @@ public class Player extends Entity {
 			case OBJ_Door.objName:
 
 				OBJ_Door targetDoor = (OBJ_Door) gp.obj[gp.currentMap][i];
-				System.out.println(targetDoor.messageShown);
+				//System.out.println(targetDoor.messageShown);
 				if (targetDoor.messageShown) {
 					// nada a fazer
 				} else {
@@ -254,7 +256,7 @@ public class Player extends Entity {
 
 			case OBJ_Door_Iron.objName:
 				OBJ_Door_Iron targetIronDoor = (OBJ_Door_Iron) gp.obj[gp.currentMap][i];
-				System.out.println(targetIronDoor.messageShown);
+				//System.out.println(targetIronDoor.messageShown);
 				if (targetIronDoor.messageShown) {
 					// nada a fazer
 				} else {

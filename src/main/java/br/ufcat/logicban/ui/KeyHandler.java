@@ -4,7 +4,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import br.ufcat.logicban.entity.Entity;
 import br.ufcat.logicban.entity.NPC_Box;
+import br.ufcat.logicban.entity.NPC_OldMan;
 import br.ufcat.logicban.tile.TileManager;
+import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
 
 public class KeyHandler implements KeyListener {
 
@@ -521,7 +523,7 @@ public class KeyHandler implements KeyListener {
 	}
 
 	public void nextPhaseState(int code, KeyEvent e) {
-
+		System.out.println(gp.ui.commandNum);
 		if (code == KeyEvent.VK_SPACE) {
 			gp.ui.levelFinished = false;
 			gp.ui.gameFinished = false;
@@ -560,25 +562,24 @@ public class KeyHandler implements KeyListener {
 
 			// PROXIMA FASE
 			if (gp.ui.commandNum == 0) {
-				// Executa o teleporte pendente
-				gp.eHandler.executePendingTeleport(); // Chama o método para teleportar
-				gp.ui.playTime = 0;
+				if (gp.ui.levelFinished) {
+					// Executa o teleporte pendente
+					gp.eHandler.executePendingTeleport(); // Chama o método para teleportar
+					gp.ui.playTime = 0;
+				} else if (gp.ui.gameFinished) {
+					gp.ui.animationFinished = false;
+					gp.ui.titleScreenState = 2;
+					gp.gameState = gp.ui.creditScreenState;
+					gp.playMusic(5);
+				}
 			}
 
 			// MENU INICIAL
 			if (gp.ui.commandNum == 1) {
-				gp.ui.levelFinished = false;
-				gp.ui.gameFinished = false;
-				gp.ui.commandNum = 0;
-				gp.gameState = gp.titleState;
-				gp.ui.titleScreenState = 0;
-				System.out.println("current map: " + gp.currentMap + " highestUnlockedFase: " + gp.highestUnlockedFase);
-				if (gp.currentMap == gp.highestUnlockedFase) {
-					gp.highestUnlockedFase += 1;
-				}
-				gp.saveLoad.save();
-				gp.playMusic(5);
-				gp.restart();
+				gp.btnMenu.state = "enable"; // Troca para 'disable'
+				gp.btnMenu.animation = true; // Inicia a animação
+				gp.btnMenu.spriteNum = 0; // Reseta a animação para o início
+				gp.btnMenu.spriteCounter = 0; // Reseta o contador de frames
 			}
 
 			gp.playSFX(6);
@@ -698,20 +699,32 @@ public class KeyHandler implements KeyListener {
 		} else {
 			gp.player.walkType = gp.player.stepWalk;
 
-
-			// 1. Calcular a posição do jogador em tiles
+			// 1.1 Calcular a posição do jogador em tiles
 			int playerTileCol = (gp.player.worldX + gp.player.solidArea.x) / gp.tileSize;
 			int playerTileRow = (gp.player.worldY + gp.player.solidArea.y) / gp.tileSize;
-//			System.out.println("Player - Inicial - WorldX: " + gp.player.worldX + ", WorldY: " + gp.player.worldY);
-//			System.out.println("Player - Tile - Col: " + playerTileCol + ", Row: " + playerTileRow);
 
 			// 2. Centralizar as caixas no tile
 			centralizeBoxes(playerTileCol, playerTileRow);
 
-			// 3. Centralizar o jogador no tile DEPOIS de tratar das caixas
+			// 3.1 Centralizar o jogador no tile DEPOIS de tratar das caixas
 			gp.player.worldX = playerTileCol * gp.tileSize;
 			gp.player.worldY = playerTileRow * gp.tileSize;
-//			Syste.out.println("Player - Final - WorldX: " + gp.player.worldX + ", WorldY: " + gp.player.worldY);
+
+			// 3.2 Centralizar each NPC that matches the name individually
+			for (int i = 0; i < gp.npc[1].length; i++) {
+				if (gp.npc[gp.currentMap][i] != null && gp.npc[gp.currentMap][i].name != null
+						&& gp.npc[gp.currentMap][i].name.equals(NPC_OldMan.npcName)) {
+					// Calculate the tile position for *this* NPC
+					int npcTileCol = (gp.npc[gp.currentMap][i].worldX + gp.npc[gp.currentMap][i].solidArea.x)
+							/ gp.tileSize;
+					int npcTileRow = (gp.npc[gp.currentMap][i].worldY + gp.npc[gp.currentMap][i].solidArea.y)
+							/ gp.tileSize;
+
+					// Centralize the NPC on the tile
+					gp.npc[gp.currentMap][i].worldX = npcTileCol * gp.tileSize;
+					gp.npc[gp.currentMap][i].worldY = npcTileRow * gp.tileSize;
+				}
+			}
 		}
 	}
 }
