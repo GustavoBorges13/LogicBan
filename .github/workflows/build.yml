@@ -42,7 +42,7 @@ jobs:
           jpackage --type exe `
                    --input target `
                    --main-jar "LogicBan-${{ steps.get_version.outputs.version }}-jar-with-dependencies.jar" `
-                   --main-class br.ufcat.logicban.ui.Main `
+                   --main-class br.ufcat.logicban.main.Main `
                    --dest target/jpackage `
                    --app-version ${{ steps.get_version.outputs.version }} `
                    --name LogicBan `
@@ -111,7 +111,7 @@ jobs:
           jpackage --type deb \
              --input target \
              --main-jar "LogicBan-${{ steps.get_version.outputs.version }}-jar-with-dependencies.jar" \
-             --main-class br.ufcat.logicban.ui.Main \
+             --main-class br.ufcat.logicban.main.Main \
              --dest ./jpackage-output \
              --app-version "${{ steps.get_version.outputs.version }}" \
              --name LogicBan \
@@ -175,7 +175,7 @@ jobs:
           jpackage --type dmg \
              --input target \
              --main-jar "LogicBan-${{ steps.get_version.outputs.version }}-jar-with-dependencies.jar" \
-             --main-class br.ufcat.logicban.ui.Main \
+             --main-class br.ufcat.logicban.main.Main \
              --dest target/jpackage \
              --app-version "${{ steps.get_version.outputs.version }}" \
              --name LogicBan \
