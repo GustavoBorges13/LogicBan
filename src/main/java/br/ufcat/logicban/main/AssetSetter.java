@@ -90,13 +90,10 @@ public class AssetSetter {
 		// FASE 5
 		mapNum = 4;
 		gp.obj[mapNum][i] = new OBJ_Flag(gp, OBJ_Flag.YELLOW);
-		gp.obj[mapNum][i].worldX = 14 * gp.tileSize;
-		gp.obj[mapNum][i].worldY = 14 * gp.tileSize;
+		gp.obj[mapNum][i].worldX = 25 * gp.tileSize;
+		gp.obj[mapNum][i].worldY = 7 * gp.tileSize;
 		i++;
-		gp.obj[mapNum][i] = new OBJ_Door_Iron(gp, 10, IT_LogicalPort.itName); // Porta de ferro 3 controlada pela placa
-		gp.obj[mapNum][i].worldX = 12 * gp.tileSize;
-		gp.obj[mapNum][i].worldY = 12 * gp.tileSize;
-		i++;
+
 	}
 
 	public void setNPC() {
@@ -171,21 +168,10 @@ public class AssetSetter {
 		gp.npc[mapNum][i].worldX = 16 * gp.tileSize;
 		gp.npc[mapNum][i].worldY = 9 * gp.tileSize;
 		i++;
-		
+
 		// FASE 5
 		mapNum = 4;
-		gp.npc[mapNum][i] = new NPC_OldMan(gp);
-		gp.npc[mapNum][i].worldX = 9 * gp.tileSize;
-		gp.npc[mapNum][i].worldY = 3 * gp.tileSize;
-		i++;
-		gp.npc[mapNum][i] = new NPC_OldPlayer(gp);
-		gp.npc[mapNum][i].worldX = 19 * gp.tileSize;
-		gp.npc[mapNum][i].worldY = 3 * gp.tileSize;
-		i++;
-		gp.npc[mapNum][i] = new NPC_Box(gp);
-		gp.npc[mapNum][i].worldX = 9 * gp.tileSize;
-		gp.npc[mapNum][i].worldY = 10 * gp.tileSize;
-		i++;
+
 	}
 
 	public void setInteractiveTile() {
@@ -281,24 +267,11 @@ public class AssetSetter {
 		portaLogica.inputPortIDs.add(7);
 		gp.iTile[mapNum][i] = portaLogica;
 		i++;
-		
+
 		// FASE 5
 		mapNum = 4;
-		gp.iTile[mapNum][i] = new IT_MetalPlate(gp, 7, 11);
-		i++;
-		gp.iTile[mapNum][i] = new IT_MetalPlate(gp, 7, 13);
-		i++;
-		portaLogica = new IT_LogicalPort(gp, 9, 11, IT_LogicalPort.AND, "right", IT_LogicalPort.GRAY, 9);
-		portaLogica.addPlateIndex(0);
-		portaLogica.inputPortIDs.add(10); // Adiciona o ID da porta OR como entrada da porta AND
-		gp.iTile[mapNum][i] = portaLogica;
-		i++;
-		portaLogica = new IT_LogicalPort(gp, 9, 13, IT_LogicalPort.OR, "right", IT_LogicalPort.GRAY, 10);
-		portaLogica.addPlateIndex(1);
-		portaLogica.inputPortIDs.add(9); // Aqui está adicionando o ID da porta AND na porta OR, cuidado com isso.
-		gp.iTile[mapNum][i] = portaLogica;
-		i++;
-	
+
+		
 	}
 
 	public void setWires() {
@@ -431,7 +404,7 @@ public class AssetSetter {
 		i++;
 
 		// FASE 4
-		cor = IT_Wire.BLACK;
+		cor = IT_Wire.BLUE;
 		mapNum = 3;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 11, "vertical_right", cor);
 		i++;
@@ -462,22 +435,22 @@ public class AssetSetter {
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 18, 10, "vertical_right", cor);
 		i++;
-		cor = IT_Wire.BLACK;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 8, 11, "curve_left_down2", cor);
+		cor = IT_Wire.RED;
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 8, 11, "curve_left_down3", cor);
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 9, 11, "curve_right_up1", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 9, 12, "curve_left_down2", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 9, 12, "curve_left_down3", cor);
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 12, "horizontal_up", cor);
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 11, 12, "horizontal_up", cor);
 		i++;
 
-		cor = IT_Wire.BLACK;
+		cor = IT_Wire.GREEN;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 11, "vertical_right", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 12, "curve_left_down2", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 12, "curve_left_down3", cor);
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 13, 12, "horizontal_up", cor);
 		i++;
@@ -485,12 +458,12 @@ public class AssetSetter {
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 12, "horizontal_up", cor);
 		i++;
-		cor = IT_Wire.BLACK;
+		cor = IT_Wire.BLUE;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 11, "vertical_left", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 12, "curve_left_down2", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 12, "curve_left_down1", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 12, "horizontal_up", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 12, "horizontal_down", cor);
 		i++;
 
 		cor = IT_Wire.BLACK;
