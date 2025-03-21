@@ -118,52 +118,40 @@ jobs:
              --vendor "Bug Hunters" \
              --copyright "Copyright (C) 2025" \
              --icon src/resources/assets/logos/icone.png
-             
-      - name: Clean up dependencies in control file and Rename
+
+      - name: Clean up dependencies in control file
         run: |
-          # Encontra o arquivo .deb no diretório jpackage-output
-          DEB_FILE=$(find ./jpackage-output/ -name "logicban_*.deb")
-  
+          # Extraindo o conteúdo do pacote .deb
+          version="${{ steps.get_version.outputs.version }}"
+          ls -lh ./jpackage-output/
+          
+          # O nome do arquivo .deb gerado inclui a revisão, por exemplo, logicban_2.2.1-1_amd64.deb
+          DEB_FILE=$(ls ./jpackage-output/logicban_${version}-*_amd64.deb)
+          
           # Verifica se o arquivo foi encontrado
           if [ -z "$DEB_FILE" ]; then
-            echo "Erro: Arquivo .deb não encontrado em ./jpackage-output/"
+            echo "Arquivo .deb não encontrado!"
             exit 1
           fi
-  
-          # Extraindo o conteúdo do pacote .deb
+          
+          # Extrai o conteúdo do pacote .deb
           dpkg-deb -x "$DEB_FILE" /tmp/logicban
           dpkg-deb -e "$DEB_FILE" /tmp/logicban/DEBIAN
-  
+          
           # Removendo as dependências desnecessárias do arquivo control
           sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
           sed -i '/libmd0/d' /tmp/logicban/DEBIAN/control
           sed -i '/libx11-6/d' /tmp/logicban/DEBIAN/control
-  
+          
           # Removendo o campo "Depends" se não for necessário
           sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
-  
-          # Recriar o pacote .deb com o arquivo control modificado
-          dpkg-deb -b /tmp/logicban ./jpackage-output/$(basename "$DEB_FILE")
-          if [ $? -ne 0 ]; then
-            echo "Cleaning dependencies failed!"
-            exit 1
-          fi
-  
-          # Extrai a versão original (com o sufixo -1)
-          ORIGINAL_VERSION=$(echo "$DEB_FILE" | sed -E 's/.*logicban_([0-9.]+-[0-9]+)_amd64\.deb/\1/')
-  
-          # Calcula o novo nome do arquivo
-          NEW_NAME="logicban_${ORIGINAL_VERSION}_amd64.deb"
-  
-          # Renomeia o arquivo
-          mv "./jpackage-output/$(basename "$DEB_FILE")" "./jpackage-output/$NEW_NAME"
-          if [ $? -ne 0 ]; then
-            echo "Renaming the file failed!"
-            exit 1
-          fi
-  
-          echo "Renamed to $NEW_NAME"
           
+          # Recriar o pacote .deb com o arquivo control modificado
+          dpkg-deb -b /tmp/logicban "$DEB_FILE"
+          
+          # Renomear o arquivo .deb para remover a revisão
+          mv "$DEB_FILE" ./jpackage-output/logicban_${version}_amd64.deb
+                
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
