@@ -122,6 +122,7 @@ jobs:
         run: |
           # Extraindo o conteúdo do pacote .deb
           version="${{ steps.get_version.outputs.version }}"
+          ls -lh ./jpackage-output/
           dpkg-deb -x ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban
           dpkg-deb -e ./jpackage-output/logicban_${version}_amd64.deb /tmp/logicban/DEBIAN
           # Removendo as dependências desnecessárias do arquivo control
