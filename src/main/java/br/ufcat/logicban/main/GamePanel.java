@@ -225,8 +225,8 @@ public class GamePanel extends JPanel implements Runnable {
 			player.worldY = tileSize * 8;
 			break;
 		case 4:
-			player.worldX = tileSize * 14;
-			player.worldY = tileSize * 10;
+			player.worldX = tileSize * 18;
+			player.worldY = tileSize * 7;
 			break;
 		}
 		eHandler.oldSpeed = player.speed - (2 * player.speedMultiplicator);
@@ -339,13 +339,20 @@ public class GamePanel extends JPanel implements Runnable {
 
 			if (box != null) {
 				for (int i = 0; i < obj[currentMap].length; i++) {
+					if((iTile[currentMap][i] instanceof IT_MetalPlate)) {
+						System.out.println("placa = "+ i);
+					}
+					
 					if (obj[currentMap][i] instanceof OBJ_Door_Iron && obj[currentMap][i] != null) {
 						OBJ_Door_Iron door = (OBJ_Door_Iron) obj[currentMap][i];
-
 						if (door.option.equals(IT_LogicalPort.itName)) {
 							// faz nada
+							
 						} else {
+							
 							int plateIndex = door.controllingPlateID;
+							System.out.println("plateIndex "+plateIndex+ "instancia sim?"+(iTile[currentMap][plateIndex] instanceof IT_MetalPlate));
+							System.out.println("plate= "+iTile[currentMap][i]);
 							if (plateIndex >= 0 && plateIndex < iTile[currentMap].length
 									&& iTile[currentMap][plateIndex] instanceof IT_MetalPlate) {
 								// Obtém a placa de pressão pelo ID
@@ -353,11 +360,13 @@ public class GamePanel extends JPanel implements Runnable {
 								if (plate.isActivated()) {
 									if (!door.messageShown) { // Verifica se a mensagem já foi mostrada
 										door.openDoor();
+										System.out.println("dbg1");
 										ui.showMessage("Você abriu a porta!");
 										door.messageShown = true; // Define a flag para true
 									}
 									door.openDoor();
 								} else {
+									System.out.println("dbg2");
 									door.closeDoor();
 									door.messageShown = false; // Reseta a flag quando a porta é fechada
 								}
@@ -365,15 +374,18 @@ public class GamePanel extends JPanel implements Runnable {
 						}
 
 						for (IT_LogicalPort port : box.logicalPortList) {
+							
 							if (port.id == door.controllingPortID) {
 								if (port.outputState) {
 									if (!door.messageShown) { // Verifica se a mensagem já foi mostrada
 										door.openDoor();
+										System.out.println("dbg3");
 										ui.showMessage("Você abriu a porta!");
 										door.messageShown = true; // Define a flag para true
 									}
 
 								} else {
+									System.out.println("dbg4");
 									door.closeDoor();
 									door.messageShown = false; // Reseta a flag quando a porta é fechada
 								}
@@ -382,7 +394,6 @@ public class GamePanel extends JPanel implements Runnable {
 						}
 					} else if (obj[currentMap][i] instanceof OBJ_Door && obj[currentMap][i] != null) {
 						OBJ_Door door = (OBJ_Door) obj[currentMap][i];
-
 						if (door.option.equals(IT_LogicalPort.itName)) {
 							// faz nada
 						} else {

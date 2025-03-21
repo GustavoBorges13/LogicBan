@@ -50,7 +50,7 @@ public class EventHandler {
 		teleportEvents.add(new TeleportEvent(1, 21, 12, "any", 2, 1, 0, "any", false)); // fase2 -> fase3
 		teleportEvents.add(new TeleportEvent(2, 22, 7, "any", 3, 1, 1, "any", false)); // fase3 -> fase4
 		teleportEvents.add(new TeleportEvent(3, 20, 6, "any", 4, 1, 1, "any", false)); // fase4 -> fase5
-		teleportEvents.add(new TeleportEvent(4, 14, 14, "any", 5, 1, 1, "any", true)); // fase5 -> endGame
+		teleportEvents.add(new TeleportEvent(4, 25, 7, "any", 5, 1, 1, "any", true)); // fase5 -> endGame
 	}
 
 	public void checkEvent() {
