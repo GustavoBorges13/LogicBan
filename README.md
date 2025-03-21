@@ -90,9 +90,9 @@ Este jogo foi desenvolvido usando:
 - [x] Desenvolvimento da historia
 - [x] Desenvolvimento de tutorial interativo no jogo
 - [ ] Desenvolvimento de tutorial interativo no github
-- [ ] Testes e correções
-- [ ] Finalização
-- [ ] Entrega
+- [x] Testes e correções
+- [x] Finalização
+- [x] Entrega
 
 ## 👥 Colaboradores
 Desenvolvido por:
