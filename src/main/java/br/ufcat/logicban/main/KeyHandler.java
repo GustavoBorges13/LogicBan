@@ -274,25 +274,28 @@ public class KeyHandler implements KeyListener {
 					gp.ui.commandNum = 0;
 
 				} else if (gp.ui.commandNum == 11) { // "Novo Jogo"
+					//System.out.println("pass");
 					gp.gameState = gp.cutsceneState;
 					gp.csManager.sceneNum = gp.csManager.init;
-				} else {
-					for (int i = 0; i <= gp.highestUnlockedFase; i++) {
-						if (gp.ui.commandNum < gp.highestUnlockedFase || gp.ui.commandNum == i) {
-							// System.out.println("cmd: "+gp.ui.commandNum+" HighUnlockFase: "+
-							// gp.highestUnlockedFase);
-							gp.currentMap = gp.ui.commandNum;
-							gp.gameState = gp.playState;
+				} else if (gp.ui.commandNum <= gp.highestUnlockedFase && gp.ui.commandNum < 10) {
+					if(gp.ui.commandNum == 0 && gp.highestUnlockedFase == 0) {
+						gp.gameState = gp.cutsceneState;
+						gp.csManager.sceneNum = gp.csManager.init;
+					}else {
+						// System.out.println("cmd: "+gp.ui.commandNum+" HighUnlockFase: "+
+						// gp.highestUnlockedFase);
+						gp.currentMap = gp.ui.commandNum;
+						gp.gameState = gp.playState;
 
-							// Força atualização imediata
-							gp.proxima_fase = gp.faseMap[gp.currentMap];
-							gp.fase_atual = gp.currentMap;
-
-							gp.playerPositions();
-							gp.changeArea();
-						}
+						// Força atualização imediata
+						gp.proxima_fase = gp.faseMap[gp.currentMap];
+						gp.fase_atual = gp.currentMap;
+						gp.playerPositions();
+						gp.changeArea();
 					}
 				}
+				gp.playSFX(13);
+
 			}
 
 			// DEBUG MODE
@@ -557,7 +560,7 @@ public class KeyHandler implements KeyListener {
 			if (gp.ui.commandNum < 0) {
 				gp.ui.commandNum = 1;
 			}
-			gp.stopSFX();
+//			gp.stopSFX();
 			gp.playSFX(6);
 		}
 		if (code == KeyEvent.VK_S) {
@@ -565,7 +568,7 @@ public class KeyHandler implements KeyListener {
 			if (gp.ui.commandNum > 1) {
 				gp.ui.commandNum = 0;
 			}
-			gp.stopSFX();
+//			gp.stopSFX();
 			gp.playSFX(6);
 		}
 		if (code == KeyEvent.VK_A) {
@@ -573,7 +576,7 @@ public class KeyHandler implements KeyListener {
 			if (gp.ui.commandNum > 1) {
 				gp.ui.commandNum = 0;
 			}
-			gp.stopSFX();
+//			gp.stopSFX();
 			gp.playSFX(6);
 		}
 		if (code == KeyEvent.VK_D) {
@@ -581,7 +584,7 @@ public class KeyHandler implements KeyListener {
 			if (gp.ui.commandNum > 1) {
 				gp.ui.commandNum = 0;
 			}
-			gp.stopSFX();
+//			gp.stopSFX();
 			gp.playSFX(6);
 		}
 		if (code == KeyEvent.VK_ENTER) {
@@ -592,11 +595,15 @@ public class KeyHandler implements KeyListener {
 					// Executa o teleporte pendente
 					gp.eHandler.executePendingTeleport(); // Chama o método para teleportar
 					gp.ui.playTime = 0;
+					gp.playSFX(13);
 				} else if (gp.ui.gameFinished) {
 					gp.ui.animationFinished = false;
 					gp.ui.titleScreenState = 2;
 					gp.gameState = gp.ui.creditScreenState;
+
 					gp.stopMusic();
+					gp.stopSFX();
+					gp.playSFX(6);
 					gp.playMusic(5);
 				}
 			}
@@ -608,7 +615,6 @@ public class KeyHandler implements KeyListener {
 				gp.btnMenu.spriteNum = 0; // Reseta a animação para o início
 				gp.btnMenu.spriteCounter = 0; // Reseta o contador de frames
 			}
-			gp.stopSFX();
 			gp.playSFX(6);
 		}
 
@@ -620,10 +626,14 @@ public class KeyHandler implements KeyListener {
 			EventHandler.debugModeOn = showDebug;
 		}
 	}
-	
+
 	public void cutsceneState(int code, KeyEvent e) {
 		if (code == KeyEvent.VK_ENTER) {
 			gp.keyH.enterPressed = true;
+		}
+		// DEBUG MODE
+		else if (!e.isControlDown() && code == KeyEvent.VK_M) {
+			showDebug = !showDebug;
 		}
 	}
 

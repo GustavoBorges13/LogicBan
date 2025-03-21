@@ -26,7 +26,10 @@ public class NPC_Box extends Entity {
 		name = npcName;
 		direction = "down";
 		speed = 3;
-		walkType = gp.player.walkType;
+	
+		if (gp.player != null && gp.player.walkType != null) {
+		    walkType = gp.player.walkType;
+		}
 
 		color = Color.ORANGE;
 		solidArea.x = 6;

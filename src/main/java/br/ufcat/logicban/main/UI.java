@@ -1365,15 +1365,14 @@ public class UI {
 			gp.player.worldY = gp.tileSize * gp.eHandler.tempRow;
 			gp.eHandler.previousEventX = gp.player.worldX;
 			gp.eHandler.previousEventY = gp.player.worldY;
-			gp.playSFX(8);
 
-			System.out.println("new Map: " + newMap + " HighetsUnlockedFase " + gp.highestUnlockedFase);
+			//System.out.println("new Map: " + newMap + " HighetsUnlockedFase " + gp.highestUnlockedFase);
 			// Se atingiu uma nova fase (índice) maior, atualiza highestUnlockedFase
 			if (newMap > gp.highestUnlockedFase) {
 				gp.highestUnlockedFase = newMap;
 				gp.saveLoad.save(); // Salva apenas se desbloqueou nova fase
 				gp.ui.currentDialogue = "The progress has been saved";
-				System.out.println("Progresso salvo. Fase[" + newMap + "]: " + gp.faseMap[newMap]);
+				//System.out.println("Progresso salvo. Fase[" + newMap + "]: " + gp.faseMap[newMap]);
 			}
 
 			gp.restart(); // resetar tudo sempre ao entrar em novos mapas

@@ -76,7 +76,7 @@ public class EventHandler {
 						gp.gameState = gp.nextPhaseState;
 						gp.ui.levelFinished = true;
 						gp.stopMusic();
-						gp.playSFX(4);
+						gp.playSFX(12);
 						break; // Importante: Evita múltiplos eventos
 					}else {
 						// Abre a tela de escolha
@@ -85,7 +85,7 @@ public class EventHandler {
 						gp.ui.levelFinished = false;
 						gp.ui.gameFinished = true;
 						gp.stopMusic();
-						gp.playSFX(4);
+						gp.playSFX(12);
 					}
 					
 				}

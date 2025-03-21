@@ -115,13 +115,13 @@ public class GamePanel extends JPanel implements Runnable {
 	public final int transitionState = 5;
 	public final int nextPhaseState = 6;
 	public final int cutsceneState = 7;
-	
+
 	// AREA Change
 	public int fase_atual;
 	public int proxima_fase;
 	public int highestUnlockedFase; // Adicione esta linha
 	public String nova_direcao_player = "down";
-	public int[] faseMap = { 50, 51, 52, 53, 54}; // Exemplo para 10 fases
+	public int[] faseMap = { 50, 51, 52, 53, 54 }; // Exemplo para 10 fases
 
 	public GamePanel(Main mainFrame) {
 		this.mainFrame = mainFrame;
@@ -199,10 +199,9 @@ public class GamePanel extends JPanel implements Runnable {
 		aSetter.setInteractiveTile();
 		aSetter.setNPC();
 
-
 		// Restaura o estado inicial da porta
 		doorIndex = -1;
-		
+
 //		music.closeAllClips(); // Fecha todos os Clips de música
 //        sfx.closeAllClips();   // Fecha todos os Clips de efeitos sonoros
 	}
@@ -342,27 +341,29 @@ public class GamePanel extends JPanel implements Runnable {
 				for (int i = 0; i < obj[currentMap].length; i++) {
 					if (obj[currentMap][i] instanceof OBJ_Door_Iron && obj[currentMap][i] != null) {
 						OBJ_Door_Iron door = (OBJ_Door_Iron) obj[currentMap][i];
-						
-						
-						int plateIndex = door.controllingPlateID;
-						if (plateIndex >= 0 && plateIndex < iTile[currentMap].length
-								&& iTile[currentMap][plateIndex] instanceof IT_MetalPlate) {
-							// Obtém a placa de pressão pelo ID
-							IT_MetalPlate plate = (IT_MetalPlate) iTile[currentMap][plateIndex];
-							if (plate.isActivated()) {
-								if (!door.messageShown) { // Verifica se a mensagem já foi mostrada
+
+						if (door.option.equals(IT_LogicalPort.itName)) {
+							// faz nada
+						} else {
+							int plateIndex = door.controllingPlateID;
+							if (plateIndex >= 0 && plateIndex < iTile[currentMap].length
+									&& iTile[currentMap][plateIndex] instanceof IT_MetalPlate) {
+								// Obtém a placa de pressão pelo ID
+								IT_MetalPlate plate = (IT_MetalPlate) iTile[currentMap][plateIndex];
+								if (plate.isActivated()) {
+									if (!door.messageShown) { // Verifica se a mensagem já foi mostrada
+										door.openDoor();
+										ui.showMessage("Você abriu a porta!");
+										door.messageShown = true; // Define a flag para true
+									}
 									door.openDoor();
-									ui.showMessage("Você abriu a porta!");
-									door.messageShown = true; // Define a flag para true
+								} else {
+									door.closeDoor();
+									door.messageShown = false; // Reseta a flag quando a porta é fechada
 								}
-								door.openDoor();
-							} else {
-								door.closeDoor();
-								door.messageShown = false; // Reseta a flag quando a porta é fechada
 							}
 						}
-						
-						
+
 						for (IT_LogicalPort port : box.logicalPortList) {
 							if (port.id == door.controllingPortID) {
 								if (port.outputState) {
@@ -381,25 +382,29 @@ public class GamePanel extends JPanel implements Runnable {
 						}
 					} else if (obj[currentMap][i] instanceof OBJ_Door && obj[currentMap][i] != null) {
 						OBJ_Door door = (OBJ_Door) obj[currentMap][i];
-						
-						int plateIndex = door.controllingPlateID;
-						if (plateIndex >= 0 && plateIndex < iTile[currentMap].length
-								&& iTile[currentMap][plateIndex] instanceof IT_MetalPlate) {
-							// Obtém a placa de pressão pelo ID
-							IT_MetalPlate plate = (IT_MetalPlate) iTile[currentMap][plateIndex];
-							if (plate.isActivated()) {
-								if (!door.messageShown) { // Verifica se a mensagem já foi mostrada
+
+						if (door.option.equals(IT_LogicalPort.itName)) {
+							// faz nada
+						} else {
+							int plateIndex = door.controllingPlateID;
+							if (plateIndex >= 0 && plateIndex < iTile[currentMap].length
+									&& iTile[currentMap][plateIndex] instanceof IT_MetalPlate) {
+								// Obtém a placa de pressão pelo ID
+								IT_MetalPlate plate = (IT_MetalPlate) iTile[currentMap][plateIndex];
+								if (plate.isActivated()) {
+									if (!door.messageShown) { // Verifica se a mensagem já foi mostrada
+										door.openDoor();
+										ui.showMessage("Você abriu a porta!");
+										door.messageShown = true; // Define a flag para true
+									}
 									door.openDoor();
-									ui.showMessage("Você abriu a porta!");
-									door.messageShown = true; // Define a flag para true
+								} else {
+									door.closeDoor();
+									door.messageShown = false; // Reseta a flag quando a porta é fechada
 								}
-								door.openDoor();
-							} else {
-								door.closeDoor();
-								door.messageShown = false; // Reseta a flag quando a porta é fechada
 							}
 						}
-						
+
 						for (IT_LogicalPort port : box.logicalPortList) {
 							if (port.id == door.controllingPortID) {
 								if (port.outputState) {
@@ -430,7 +435,7 @@ public class GamePanel extends JPanel implements Runnable {
 		if (gameState == optionState) {
 
 		}
-		
+
 		if (gameState == nextPhaseState) {
 			btnMenu.update();
 		}
@@ -468,13 +473,12 @@ public class GamePanel extends JPanel implements Runnable {
 					entityList.add(iTile[currentMap][i]);
 				}
 			}
-			
+
 			for (int i = 0; i < obj[1].length; i++) {
 				if (obj[currentMap][i] != null) {
 					entityList.add(obj[currentMap][i]);
 				}
 			}
-
 
 			// ADD ENTITIES TO THE LIST
 			entityList.add(player);
@@ -505,7 +509,7 @@ public class GamePanel extends JPanel implements Runnable {
 			entityList.clear();
 
 			eHandler.draw(g2); // debug
-			
+
 			// CUTSCENE
 			csManager.draw(g2);
 
@@ -530,7 +534,7 @@ public class GamePanel extends JPanel implements Runnable {
 			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 30F));
 			g2.setColor(Color.white);
 			int x = 10;
-			int y = screenHeight - (int)(tileSize * 3.5);
+			int y = screenHeight - (int) (tileSize * 3.5);
 			int lineHeigth = 30;
 
 			// lado esquerdo
@@ -548,18 +552,18 @@ public class GamePanel extends JPanel implements Runnable {
 
 			// lado direito
 			x = screenWidth - tileSize * 5;
-			y = screenHeight - (int)(tileSize * 5.5);
+			y = screenHeight - (int) (tileSize * 5.5);
 			lineHeigth = 30;
-		
+
 			int count = 0;
 			if (gameState == playState) {
 				// lista de placas
 				for (int i = 0; i < iTile[1].length; i++) {
 					if (iTile[currentMap][i] != null && iTile[currentMap][i].name != null
 							&& iTile[currentMap][i].name.equals(IT_MetalPlate.itName)) {
-						
+
 						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 20F));
-						drawStringWithOpacity(g2, "id[" +count + "]", iTile[currentMap][i].worldX+7,
+						drawStringWithOpacity(g2, "id[" + count + "]", iTile[currentMap][i].worldX + 7,
 								iTile[currentMap][i].worldY, 1.0f);
 						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 30F));
 						drawStringWithOpacity(g2, iTile[currentMap][i].estadoLogico + "",
@@ -582,8 +586,8 @@ public class GamePanel extends JPanel implements Runnable {
 					if (npc[currentMap][i] instanceof NPC_Box) {
 						npcBox = (NPC_Box) npc[currentMap][i];
 						g2.setFont(g2.getFont().deriveFont(Font.BOLD, 20F));
-						drawStringWithOpacity(g2, "id[" + i + "]", npc[currentMap][i].worldX-(int)(tileSize/1.2), npc[currentMap][i].worldY+(int)(tileSize/1.5),
-								1.0f);
+						drawStringWithOpacity(g2, "id[" + i + "]", npc[currentMap][i].worldX - (int) (tileSize / 1.2),
+								npc[currentMap][i].worldY + (int) (tileSize / 1.5), 1.0f);
 					}
 				}
 
@@ -638,62 +642,32 @@ public class GamePanel extends JPanel implements Runnable {
 
 	}
 
-    // Método para reproduzir música
-    public void playMusic(int i) {
-        music.setFile(i);
-        music.play(i);
-        music.loop(i);
-    }
+	// Método para reproduzir música
+	public void playMusic(int i) {
+		music.setFile(i);
+		music.play(i);
+		music.loop(i);
+	}
 
-    // Método para parar a música
-    public void stopMusic() {
-        music.stop();
-    }
-    
-    public void stopSFX() {
-        sfx.stop(); // Para todos os Clips de efeitos sonoros
-    }
-    
-    // Método para reproduzir efeitos sonoros
-    public void playSFX(int i) {
-        sfx.setFile(i);
-        sfx.play(i);
-    }
+	// Método para parar a música
+	public void stopMusic() {
+		music.stop();
+	}
 
+	public void stopSFX() {
+		sfx.stop(); // Para todos os Clips de efeitos sonoros
+	}
+
+	// Método para reproduzir efeitos sonoros
+	public void playSFX(int i) {
+		sfx.setFile(i);
+		sfx.play(i);
+	}
 
 	public void changeArea() {
-		music.closeAllClips(); // Fecha todos os Clips de música
-        sfx.closeAllClips();   // Fecha todos os Clips de efeitos sonoros
-		// Garante que proxima_fase está atualizado
-		player.speedMultiplicator = 0;
-		proxima_fase = faseMap[currentMap];
+		csManager.scenePhase = 0;
+		csManager.sceneNum = csManager.loading;
+		gameState = cutsceneState;
 
-		if (proxima_fase != fase_atual) {
-			stopMusic();
-
-			// Switch para música baseado no currentMap
-			switch (currentMap) { // Mais eficiente que vários if-else
-			case 0:
-				playMusic(0);
-				break;
-			case 1:
-				playMusic(9);
-				break;
-			case 2:
-				playMusic(10);
-				break;
-			case 3:
-				playMusic(9);
-				break;
-			case 4:
-				playMusic(10);
-				break;
-			}
-
-			eHandler.newWorldX = player.worldX;
-			eHandler.newWorldY = player.worldY;
-		}
-
-		fase_atual = proxima_fase;
 	}
 }

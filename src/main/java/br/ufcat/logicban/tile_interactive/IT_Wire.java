@@ -40,6 +40,26 @@ public class IT_Wire extends InteractiveTile {
 
 		color = Color.red;
 	}
+	
+	public IT_Wire(GamePanel gp, String direction, String wireColor) {
+		super(gp);
+		this.gp = gp;
+		this.direction = direction;
+
+		name = wireColor;
+
+		carregarTextura();
+
+		solidArea.x = 0;
+		solidArea.y = 0;
+		solidArea.width = 0;
+		solidArea.height = 0;
+		solidAreaDefaultX = solidArea.x;
+		solidAreaDefaultY = solidArea.y;
+
+		color = Color.red;
+	}
+	
 
 	@Override
 	public void update() {

@@ -87,11 +87,15 @@ public class AssetSetter {
 		gp.obj[mapNum][i].worldY = 6 * gp.tileSize;
 		i++;
 
-		// FASE 4
+		// FASE 5
 		mapNum = 4;
 		gp.obj[mapNum][i] = new OBJ_Flag(gp, OBJ_Flag.YELLOW);
 		gp.obj[mapNum][i].worldX = 14 * gp.tileSize;
 		gp.obj[mapNum][i].worldY = 14 * gp.tileSize;
+		i++;
+		gp.obj[mapNum][i] = new OBJ_Door_Iron(gp, 10, IT_LogicalPort.itName); // Porta de ferro 3 controlada pela placa
+		gp.obj[mapNum][i].worldX = 12 * gp.tileSize;
+		gp.obj[mapNum][i].worldY = 12 * gp.tileSize;
 		i++;
 	}
 
@@ -177,6 +181,10 @@ public class AssetSetter {
 		gp.npc[mapNum][i] = new NPC_OldPlayer(gp);
 		gp.npc[mapNum][i].worldX = 19 * gp.tileSize;
 		gp.npc[mapNum][i].worldY = 3 * gp.tileSize;
+		i++;
+		gp.npc[mapNum][i] = new NPC_Box(gp);
+		gp.npc[mapNum][i].worldX = 9 * gp.tileSize;
+		gp.npc[mapNum][i].worldY = 10 * gp.tileSize;
 		i++;
 	}
 
@@ -273,34 +281,24 @@ public class AssetSetter {
 		portaLogica.inputPortIDs.add(7);
 		gp.iTile[mapNum][i] = portaLogica;
 		i++;
-
-		// Gp, coluna, linha, tipo de porta, tile sheet, ID
-
-//		IT_LogicalPort notPort = new IT_LogicalPort(gp, 14, 2, "not", "left", 1);
-//		notPort.addPlateIndex(2); // Conectado à placa 2
-//		gp.iTile[mapNum][i] = notPort;
-//		i++;
-//
-//		IT_LogicalPort xorPort = new IT_LogicalPort(gp, 10, 4, "and", "down", 2);
-//		xorPort.addPlateIndex(0);
-//		xorPort.addPlateIndex(1);
-//		xorPort.inputPortIDs.add(0);
-//		gp.iTile[mapNum][i] = xorPort;
-//		i++;
-
-//		IT_LogicalPort andPort = new IT_LogicalPort(gp, 10, 4, "and", "down", 2);
-//		andPort.addPlateIndex(0); // Conecta a placa diretamente
-//		andPort.inputPortIDs.add(0); // Recebe a saída da porta NOT (ID 0)
-//		andPort.inputPortIDs.add(1); // Recebe a saida da porta OR (ID 1)
-//		gp.iTile[mapNum][i] = andPort;
-//		i++;
-
-//		IT_LogicalPort orPort = new IT_LogicalPort(gp, 10, 4, "and", "down", 2);
-//		orPort.addPlateIndex(0); // Conecta a placa diretamente
-//		orPort.inputPortIDs.add(0); // Recebe a saída da porta NOT (ID 0)
-//		orPort.inputPortIDs.add(1); // Recebe a saida da porta OR (ID 1)
-//		gp.iTile[mapNum][i] = orPort;
-//		i++;
+		
+		// FASE 5
+		mapNum = 4;
+		gp.iTile[mapNum][i] = new IT_MetalPlate(gp, 7, 11);
+		i++;
+		gp.iTile[mapNum][i] = new IT_MetalPlate(gp, 7, 13);
+		i++;
+		portaLogica = new IT_LogicalPort(gp, 9, 11, IT_LogicalPort.AND, "right", IT_LogicalPort.GRAY, 9);
+		portaLogica.addPlateIndex(0);
+		portaLogica.inputPortIDs.add(10); // Adiciona o ID da porta OR como entrada da porta AND
+		gp.iTile[mapNum][i] = portaLogica;
+		i++;
+		portaLogica = new IT_LogicalPort(gp, 9, 13, IT_LogicalPort.OR, "right", IT_LogicalPort.GRAY, 10);
+		portaLogica.addPlateIndex(1);
+		portaLogica.inputPortIDs.add(9); // Aqui está adicionando o ID da porta AND na porta OR, cuidado com isso.
+		gp.iTile[mapNum][i] = portaLogica;
+		i++;
+	
 	}
 
 	public void setWires() {
@@ -309,7 +307,7 @@ public class AssetSetter {
 
 		// FASE 1
 		// entradas
-		String cor = IT_Wire.RED;
+		String cor = IT_Wire.BLACK;
 		// Primeiro conjunto de fios (rosa)
 		// gp | Coluna X | Linha Y | Imagem | Cor
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 5, "horizontal_down", cor);
@@ -318,21 +316,21 @@ public class AssetSetter {
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 4, "vertical_left", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 3, "curve_right_up3", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 3, "curve_right_up2", cor);
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 13, 3, "horizontal_down", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 3, "curve_left_up3", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 3, "curve_left_up2", cor);
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 5, "vertical_right", cor);
 		i++;
 
-		cor = IT_Wire.GREEN;
+		cor = IT_Wire.BLACK;
 		// Primeiro conjunto de fios (vermelho)
 		// gp | Coluna X | Linha Y | Imagem | Cor
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 5, "horizontal_down", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 5, "curve_left_up3", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 5, "curve_left_up2", cor);
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 7, "curve_right_down1", cor);
 		i++;
@@ -387,7 +385,7 @@ public class AssetSetter {
 		i++;
 
 		// FASE 3
-		cor = IT_Wire.BLUE;
+		cor = IT_Wire.BLACK;
 		mapNum = 2;
 		// Primeiro conjunto de fios (rosa)
 		// gp | Coluna X | Linha Y | Imagem | Cor
@@ -399,7 +397,7 @@ public class AssetSetter {
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 13, 5, "horizontal_down", cor);
 		i++;
-		cor = IT_Wire.RED;
+		cor = IT_Wire.BLACK;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 16, 5, "horizontal_up", cor);
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 5, "horizontal_up", cor);
@@ -408,32 +406,32 @@ public class AssetSetter {
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 6, "vertical_right", cor);
 		i++;
 
-		cor = IT_Wire.RED;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 16, 10, "curve_left_down3", cor);
+		cor = IT_Wire.BLACK;
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 16, 10, "curve_left_down1", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 17, 10, "horizontal_up", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 17, 10, "horizontal_down", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 18, 10, "horizontal_up", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 18, 10, "horizontal_down", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 19, 10, "horizontal_up", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 19, 10, "horizontal_down", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 20, 10, "curve_right_down3", cor);
-		i++;
-
-		cor = IT_Wire.BLUE;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 18, 10, "curve_left_down2", cor);
-		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 19, 10, "horizontal_up", cor);
-		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 20, 10, "curve_right_down2", cor);
-		i++;
-
 		cor = IT_Wire.WHITE;
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 20, 10, "curve_right_down1", cor);
+		i++;
+
+		cor = IT_Wire.BLACK;
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 18, 10, "curve_left_down1", cor);
+		i++;
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 19, 10, "horizontal_down", cor);
+		i++;
+		cor = IT_Wire.WHITE;
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 20, 10, "curve_right_down1", cor);
+		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 20, 8, "vertical_left", cor);
 		i++;
 
 		// FASE 4
-		cor = IT_Wire.BLUE;
+		cor = IT_Wire.BLACK;
 		mapNum = 3;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 11, "vertical_right", cor);
 		i++;
@@ -464,22 +462,22 @@ public class AssetSetter {
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 18, 10, "vertical_right", cor);
 		i++;
-		cor = IT_Wire.RED;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 8, 11, "curve_left_down3", cor);
+		cor = IT_Wire.BLACK;
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 8, 11, "curve_left_down2", cor);
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 9, 11, "curve_right_up1", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 9, 12, "curve_left_down3", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 9, 12, "curve_left_down2", cor);
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 10, 12, "horizontal_up", cor);
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 11, 12, "horizontal_up", cor);
 		i++;
 
-		cor = IT_Wire.GREEN;
+		cor = IT_Wire.BLACK;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 11, "vertical_right", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 12, "curve_left_down3", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 12, 12, "curve_left_down2", cor);
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 13, 12, "horizontal_up", cor);
 		i++;
@@ -487,12 +485,12 @@ public class AssetSetter {
 		i++;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 12, "horizontal_up", cor);
 		i++;
-		cor = IT_Wire.BLUE;
+		cor = IT_Wire.BLACK;
 		gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 11, "vertical_left", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 12, "curve_left_down1", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 14, 12, "curve_left_down2", cor);
 		i++;
-		gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 12, "horizontal_down", cor);
+		gp.wire[mapNum][i] = new IT_RedWire(gp, 15, 12, "horizontal_up", cor);
 		i++;
 
 		cor = IT_Wire.BLACK;

@@ -28,6 +28,8 @@ public class Sound {
         soundURL[9] = getClass().getResource("/assets/sound/Dungeon.wav");
         soundURL[10] = getClass().getResource("/assets/sound/desert.wav");
         soundURL[11] = getClass().getResource("/assets/sound/Merchant.wav");
+        soundURL[12] = getClass().getResource("/assets/sound/sf1.wav");
+        soundURL[13] = getClass().getResource("/assets/sound/sf6.wav");
     }
 
     public void setFile(int i) {

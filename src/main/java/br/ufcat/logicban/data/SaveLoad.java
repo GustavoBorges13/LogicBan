@@ -34,7 +34,7 @@ public class SaveLoad {
                 DataStorage ds = new DataStorage();
                 ds.highestUnlockedFase = gp.highestUnlockedFase; // Salva a fase mais alta
                 oos.writeObject(ds);
-                System.out.println("HighestUnlockedFase SAVE: " + gp.highestUnlockedFase);
+               // System.out.println("HighestUnlockedFase SAVE: " + gp.highestUnlockedFase);
             }
         } catch (Exception e) {
             System.out.println("Save Exception!");
@@ -48,7 +48,7 @@ public class SaveLoad {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(saveFile))) {
                 DataStorage ds = (DataStorage) ois.readObject();
                 gp.highestUnlockedFase = ds.highestUnlockedFase;
-                System.out.println("HighestUnlockedFase LOAD: " + gp.highestUnlockedFase);
+                //System.out.println("HighestUnlockedFase LOAD: " + gp.highestUnlockedFase);
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("Erro ao carregar o jogo: " + e.getMessage());
                 gp.highestUnlockedFase = 0; // Inicia do zero se falhar

@@ -37,6 +37,18 @@ public class Player extends Entity {
 		getPlayerImage();
 
 	}
+	
+	public Player(GamePanel gp) {
+		super(gp);
+
+		walkType = stepWalk;
+
+		color = Color.magenta;
+
+		// setDefaultValues();
+		getPlayerImage();
+
+	}
 
 	public void setDefaultValues() {
 		standCounter = 0;
@@ -171,7 +183,7 @@ public class Player extends Entity {
 				collisionOn = false;
 				collisionEndWorld = false;
 				gp.cChecker.checkEnd(this);
-				gp.cChecker.checkTile(this);
+				//gp.cChecker.checkTile(this);
 
 				// CHECK OBJECT COLLISION
 				int objIndex = gp.cChecker.checkObject(this, true);

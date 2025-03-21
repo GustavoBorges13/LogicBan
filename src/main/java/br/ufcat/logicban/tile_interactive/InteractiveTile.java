@@ -15,6 +15,11 @@ public class InteractiveTile extends Entity {
 		this.gp = gp;
 	}
 	
+	public InteractiveTile(GamePanel gp) {
+		super(gp);
+		this.gp = gp;
+	}
+	
 	public void playSFX() {
 		
 	}

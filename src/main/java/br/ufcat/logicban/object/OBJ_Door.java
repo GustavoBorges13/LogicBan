@@ -16,10 +16,12 @@ public class OBJ_Door extends Entity {
 	public String originalImage; // Adicione esta linha para salvar o caminho da imagem original
 	public boolean messageShown = false; // Nova flag
 	public static final String objName = "Door";
-
+	public String option;
+	
 	public OBJ_Door(GamePanel gp, int controllingPortID, String option)  {
 		super(gp);
 		this.gp = gp;
+		this.option = option;
 		switch (option) {
 		case IT_LogicalPort.itName:
 			this.controllingPortID = controllingPortID;
@@ -34,6 +36,17 @@ public class OBJ_Door extends Entity {
 		collision = true;
 		originalCollision = true; // Salva o estado original da colisão
 
+		color = Color.WHITE;
+	}
+	
+	public OBJ_Door(GamePanel gp)  {
+		super(gp);
+		this.gp = gp;
+		
+		name = objName;
+		down1 = setup("/assets/objects/door", gp.tileSize, gp.tileSize);
+		originalImage = "/assets/objects/door"; // Salva o caminho da imagem original
+		
 		color = Color.WHITE;
 	}
 

@@ -18,7 +18,11 @@ public class NPC_OldMan extends Entity {
 
 		direction = "down";
 		speed = 1;
-		walkType = gp.player.stepWalk;
+		
+		if (gp.player != null && gp.player.walkType != null) {
+		    walkType = gp.player.walkType;
+		}
+		
 		name = npcName;
 
 		getImage();
