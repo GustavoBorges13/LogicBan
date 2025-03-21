@@ -120,35 +120,50 @@ jobs:
              --icon src/resources/assets/logos/icone.png
 
              
-      - name: Clean up dependencies in control file
-        run: |
-          # Encontra o arquivo .deb no diretório jpackage-output
-          DEB_FILE=$(find ./jpackage-output/ -name "logicban_*.deb")
+       - name: Clean up dependencies in control file and Rename
+      run: |
+        # Encontra o arquivo .deb no diretório jpackage-output
+        DEB_FILE=$(find ./jpackage-output/ -name "logicban_*.deb")
 
-          # Verifica se o arquivo foi encontrado
-          if [ -z "$DEB_FILE" ]; then
-            echo "Erro: Arquivo .deb não encontrado em ./jpackage-output/"
-            exit 1
-          fi
+        # Verifica se o arquivo foi encontrado
+        if [ -z "$DEB_FILE" ]; then
+          echo "Erro: Arquivo .deb não encontrado em ./jpackage-output/"
+          exit 1
+        fi
 
-          # Extrai a versão do nome do arquivo (opcional, se precisar usar a versão)
-          # VERSION=$(echo "$DEB_FILE" | sed -E 's/.*logicban_([0-9.]+).*/\1/')
-          # echo "Versão extraída: $VERSION"
+        # Extraindo o conteúdo do pacote .deb
+        dpkg-deb -x "$DEB_FILE" /tmp/logicban
+        dpkg-deb -e "$DEB_FILE" /tmp/logicban/DEBIAN
 
-          # Extraindo o conteúdo do pacote .deb
-          dpkg-deb -x "$DEB_FILE" /tmp/logicban
-          dpkg-deb -e "$DEB_FILE" /tmp/logicban/DEBIAN
+        # Removendo as dependências desnecessárias do arquivo control
+        sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
+        sed -i '/libmd0/d' /tmp/logicban/DEBIAN/control
+        sed -i '/libx11-6/d' /tmp/logicban/DEBIAN/control
 
-          # Removendo as dependências desnecessárias do arquivo control
-          sed -i '/libasound2t64/d' /tmp/logicban/DEBIAN/control
-          sed -i '/libmd0/d' /tmp/logicban/DEBIAN/control
-          sed -i '/libx11-6/d' /tmp/logicban/DEBIAN/control
+        # Removendo o campo "Depends" se não for necessário
+        sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
 
-          # Removendo o campo "Depends" se não for necessário
-          sed -i '/^Depends:/d' /tmp/logicban/DEBIAN/control
+        # Recriar o pacote .deb com o arquivo control modificado
+        dpkg-deb -b /tmp/logicban ./jpackage-output/$(basename "$DEB_FILE")
+        if [ $? -ne 0 ]; then
+          echo "Cleaning dependencies failed!"
+          exit 1
+        fi
 
-          # Recriar o pacote .deb com o arquivo control modificado
-          dpkg-deb -b /tmp/logicban ./jpackage-output/$(basename "$DEB_FILE")
+        # Extrai a versão original (com o sufixo -1)
+        ORIGINAL_VERSION=$(echo "$DEB_FILE" | sed -E 's/.*logicban_([0-9.]+-[0-9]+)_amd64\.deb/\1/')
+
+        # Calcula o novo nome do arquivo
+        NEW_NAME="logicban_${ORIGINAL_VERSION}_amd64.deb"
+
+        # Renomeia o arquivo
+        mv "./jpackage-output/$(basename "$DEB_FILE")" "./jpackage-output/$NEW_NAME"
+        if [ $? -ne 0 ]; then
+          echo "Renaming the file failed!"
+          exit 1
+        fi
+
+        echo "Renamed to $NEW_NAME"
           
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
