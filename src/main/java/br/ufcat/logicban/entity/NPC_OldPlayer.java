@@ -2,7 +2,8 @@ package br.ufcat.logicban.entity;
 
 import java.awt.Color;
 import java.util.Random;
-import br.ufcat.logicban.ui.GamePanel;
+
+import br.ufcat.logicban.main.GamePanel;
 
 public class NPC_OldPlayer extends Entity {
 

@@ -1,4 +1,4 @@
-package br.ufcat.logicban.ui;
+package br.ufcat.logicban.main;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -15,7 +15,7 @@ import java.util.Comparator;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import ai.PathFinder;
+import br.ufcat.logicban.ai.PathFinder;
 import br.ufcat.logicban.button.Button_Continuar;
 import br.ufcat.logicban.button.Button_Creditos;
 import br.ufcat.logicban.button.Button_Fechar;
@@ -89,6 +89,7 @@ public class GamePanel extends JPanel implements Runnable {
 	Button_ProximaFase btnProximaFase = new Button_ProximaFase(this);
 	Button_Continuar btnContinuar = new Button_Continuar(this);
 	public PathFinder pFinder = new PathFinder(this);
+	public CutsceneManager csManager = new CutsceneManager(this);
 	Thread gameThread;
 
 	// ENTITY AND OBJECT
@@ -113,7 +114,8 @@ public class GamePanel extends JPanel implements Runnable {
 	public final int optionState = 4;
 	public final int transitionState = 5;
 	public final int nextPhaseState = 6;
-
+	public final int cutsceneState = 7;
+	
 	// AREA Change
 	public int fase_atual;
 	public int proxima_fase;
@@ -190,14 +192,19 @@ public class GamePanel extends JPanel implements Runnable {
 
 		player.speed = player.speedAux;
 		limpeza();
+		playerPositions();
+		player.direction = "down";
 		aSetter.setWires();
 		aSetter.setObject(); // Garante que os objetos sejam redefinido
 		aSetter.setInteractiveTile();
 		aSetter.setNPC();
 
-		playerPositions();
+
 		// Restaura o estado inicial da porta
 		doorIndex = -1;
+		
+//		music.closeAllClips(); // Fecha todos os Clips de música
+//        sfx.closeAllClips();   // Fecha todos os Clips de efeitos sonoros
 	}
 
 	public void playerPositions() {
@@ -498,6 +505,9 @@ public class GamePanel extends JPanel implements Runnable {
 			entityList.clear();
 
 			eHandler.draw(g2); // debug
+			
+			// CUTSCENE
+			csManager.draw(g2);
 
 			ui.draw(g2);
 
@@ -628,29 +638,32 @@ public class GamePanel extends JPanel implements Runnable {
 
 	}
 
-	public void playMusic(int i) {
+    // Método para reproduzir música
+    public void playMusic(int i) {
+        music.setFile(i);
+        music.play(i);
+        music.loop(i);
+    }
 
-		music.setFile(i);
-		music.play();
-		music.loop();
-	}
-	
+    // Método para parar a música
+    public void stopMusic() {
+        music.stop();
+    }
+    
+    public void stopSFX() {
+        sfx.stop(); // Para todos os Clips de efeitos sonoros
+    }
+    
+    // Método para reproduzir efeitos sonoros
+    public void playSFX(int i) {
+        sfx.setFile(i);
+        sfx.play(i);
+    }
 
-	public void stopMusic() {
-		music.stop();
-	}
-
-	public void stopSFX() {
-		sfx.stop();
-	}
-
-	public void playSFX(int i) {
-
-		sfx.setFile(i);
-		sfx.play();
-	}
 
 	public void changeArea() {
+		music.closeAllClips(); // Fecha todos os Clips de música
+        sfx.closeAllClips();   // Fecha todos os Clips de efeitos sonoros
 		// Garante que proxima_fase está atualizado
 		player.speedMultiplicator = 0;
 		proxima_fase = faseMap[currentMap];

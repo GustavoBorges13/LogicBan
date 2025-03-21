@@ -2,7 +2,8 @@ package br.ufcat.logicban.entity;
 
 import java.awt.Color;
 import java.util.Random;
-import br.ufcat.logicban.ui.GamePanel;
+
+import br.ufcat.logicban.main.GamePanel;
 
 public class NPC_OldMan extends Entity {
 
@@ -82,11 +83,6 @@ public class NPC_OldMan extends Entity {
 						direction = "right";
 					}
 
-					// Verifica colisão antes de mover
-					collisionOn = false;
-					gp.cChecker.checkTile(this);
-					gp.cChecker.checkObject(this, false);
-					gp.cChecker.checkPlayer(this);
 
 					if (!collisionOn) {
 						isMoving = true; // Inicia o movimento
@@ -166,11 +162,6 @@ public class NPC_OldMan extends Entity {
 							direction = "right";
 						}
 
-						// Verifica colisão antes de mover
-						collisionOn = false;
-						gp.cChecker.checkTile(this);
-						gp.cChecker.checkObject(this, false);
-						gp.cChecker.checkPlayer(this);
 
 						if (!collisionOn) {
 							isMoving = true; // Inicia o movimento
@@ -250,11 +241,6 @@ public class NPC_OldMan extends Entity {
 							direction = "right";
 						}
 
-						// Verifica colisão antes de mover
-						collisionOn = false;
-						gp.cChecker.checkTile(this);
-						gp.cChecker.checkObject(this, false);
-						gp.cChecker.checkPlayer(this);
 
 						if (!collisionOn) {
 							isMoving = true; // Inicia o movimento

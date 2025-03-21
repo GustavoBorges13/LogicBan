@@ -1,8 +1,8 @@
-package ai;
+package br.ufcat.logicban.ai;
 
 import java.util.ArrayList;
 
-import br.ufcat.logicban.ui.GamePanel;
+import br.ufcat.logicban.main.GamePanel;
 
 public class PathFinder {
 

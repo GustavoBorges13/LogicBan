@@ -2,7 +2,8 @@ package br.ufcat.logicban.tile_interactive;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import br.ufcat.logicban.ui.GamePanel;
+
+import br.ufcat.logicban.main.GamePanel;
 
 public class IT_Wire extends InteractiveTile {
 	GamePanel gp;

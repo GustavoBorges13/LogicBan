@@ -1,4 +1,4 @@
-package br.ufcat.logicban.ui;
+package br.ufcat.logicban.main;
 
 import javax.swing.*;
 import com.formdev.flatlaf.FlatDarkLaf;

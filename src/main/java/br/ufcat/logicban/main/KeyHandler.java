@@ -1,4 +1,4 @@
-package br.ufcat.logicban.ui;
+package br.ufcat.logicban.main;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -64,6 +64,12 @@ public class KeyHandler implements KeyListener {
 		else if (gp.gameState == gp.optionState) {
 			optionsState(code, e);
 		}
+
+		// CUTSCENE STATE
+		else if (gp.gameState == gp.cutsceneState) {
+			// pauseState(code);
+			cutsceneState(code, e);
+		}
 	}
 
 	public void titleState(int code, KeyEvent e) {
@@ -75,6 +81,7 @@ public class KeyHandler implements KeyListener {
 				if (gp.ui.commandNum < 0) {
 					gp.ui.commandNum = 3;
 				}
+				gp.stopSFX();
 				gp.playSFX(6);
 			}
 			if (code == KeyEvent.VK_S) {
@@ -83,6 +90,7 @@ public class KeyHandler implements KeyListener {
 				if (gp.ui.commandNum > 3) {
 					gp.ui.commandNum = 0;
 				}
+				gp.stopSFX();
 				gp.playSFX(6);
 			}
 			if (code == KeyEvent.VK_A) {
@@ -99,7 +107,7 @@ public class KeyHandler implements KeyListener {
 					gp.ui.commandNum = 2;
 					break;
 				}
-
+				gp.stopSFX();
 				gp.playSFX(6);
 			}
 			if (code == KeyEvent.VK_D) {
@@ -118,6 +126,7 @@ public class KeyHandler implements KeyListener {
 					gp.ui.commandNum = 0;
 					break;
 				}
+				gp.stopSFX();
 				gp.playSFX(6);
 			}
 			if (code == KeyEvent.VK_ENTER) {
@@ -128,6 +137,7 @@ public class KeyHandler implements KeyListener {
 					gp.btnStart.animation = true; // Inicia a animação
 					gp.btnStart.spriteNum = 0; // Reseta a animação para o início
 					gp.btnStart.spriteCounter = 0; // Reseta o contador de frames
+					gp.stopSFX();
 					gp.playSFX(6);
 					gp.ui.commandNum = 0;
 					gp.saveLoad.load(); // carrega aqui o ultimo save pra preencher a grid
@@ -140,6 +150,7 @@ public class KeyHandler implements KeyListener {
 					gp.btnCreditos.animation = true; // Inicia a animação
 					gp.btnCreditos.spriteNum = 0; // Reseta a animação para o início
 					gp.btnCreditos.spriteCounter = 0; // Reseta o contador de frames
+					gp.stopSFX();
 					gp.playSFX(6);
 				}
 
@@ -149,6 +160,7 @@ public class KeyHandler implements KeyListener {
 					gp.btnFechar.animation = true; // Inicia a animação
 					gp.btnFechar.spriteNum = 0; // Reseta a animação para o início
 					gp.btnFechar.spriteCounter = 0; // Reseta o contador de frames
+					gp.stopSFX();
 					gp.playSFX(6);
 				}
 
@@ -204,6 +216,7 @@ public class KeyHandler implements KeyListener {
 					break;
 				}
 				// System.out.println("cmd: " + gp.ui.commandNum);
+				gp.stopSFX();
 				gp.playSFX(6);
 			} else if (code == KeyEvent.VK_D) { // Direita
 				if (gp.ui.commandNum < 12) { // Máximo de 10 fases (0-9)
@@ -215,6 +228,7 @@ public class KeyHandler implements KeyListener {
 					break;
 				}
 				// System.out.println("cmd: " + gp.ui.commandNum);
+				gp.stopSFX();
 				gp.playSFX(6);
 			} else if (code == KeyEvent.VK_W) { // Cima
 				if (gp.ui.commandNum >= 5 && gp.ui.commandNum < 10) {
@@ -223,6 +237,7 @@ public class KeyHandler implements KeyListener {
 					gp.ui.commandNum = 5; // Volta para a linha de cima
 				}
 				// System.out.println("cmd: " + gp.ui.commandNum);
+				gp.stopSFX();
 				gp.playSFX(6);
 
 			} else if (code == KeyEvent.VK_S) { // Baixo
@@ -236,6 +251,7 @@ public class KeyHandler implements KeyListener {
 					gp.ui.commandNum = 11; // Vai para "Novo Jogo"
 				}
 				// System.out.println("cmd: " + gp.ui.commandNum);
+				gp.stopSFX();
 				gp.playSFX(6);
 			}
 
@@ -258,14 +274,8 @@ public class KeyHandler implements KeyListener {
 					gp.ui.commandNum = 0;
 
 				} else if (gp.ui.commandNum == 11) { // "Novo Jogo"
-					gp.ui.titleScreenState = 1;
-					gp.gameState = gp.playState;
-					gp.currentMap = 0;
-					gp.playerPositions();
-					gp.highestUnlockedFase = 0; // Reset para fase inicial
-					gp.saveLoad.save();
-					gp.stopMusic();
-					gp.playMusic(0);
+					gp.gameState = gp.cutsceneState;
+					gp.csManager.sceneNum = gp.csManager.init;
 				} else {
 					for (int i = 0; i <= gp.highestUnlockedFase; i++) {
 						if (gp.ui.commandNum < gp.highestUnlockedFase || gp.ui.commandNum == i) {
@@ -295,6 +305,7 @@ public class KeyHandler implements KeyListener {
 				if (gp.ui.commandNum < 0) {
 					gp.ui.commandNum = 1;
 				}
+				gp.stopSFX();
 				gp.playSFX(6);
 			}
 			if (code == KeyEvent.VK_S) {
@@ -302,6 +313,7 @@ public class KeyHandler implements KeyListener {
 				if (gp.ui.commandNum > 1) {
 					gp.ui.commandNum = 0;
 				}
+				gp.stopSFX();
 				gp.playSFX(6);
 			}
 			if (code == KeyEvent.VK_A) {
@@ -309,6 +321,7 @@ public class KeyHandler implements KeyListener {
 				if (gp.ui.commandNum > 1) {
 					gp.ui.commandNum = 0;
 				}
+				gp.stopSFX();
 				gp.playSFX(6);
 			}
 			if (code == KeyEvent.VK_D) {
@@ -316,6 +329,7 @@ public class KeyHandler implements KeyListener {
 				if (gp.ui.commandNum > 1) {
 					gp.ui.commandNum = 0;
 				}
+				gp.stopSFX();
 				gp.playSFX(6);
 			}
 			if (code == KeyEvent.VK_ENTER) {
@@ -325,6 +339,7 @@ public class KeyHandler implements KeyListener {
 					gp.ui.titleScreenState = 0;
 					gp.gameState = gp.titleState;
 					gp.ui.commandNum = 0;
+					gp.stopSFX();
 					gp.playSFX(6);
 					gp.ui.creditY = (int) (gp.screenHeight * 2.5); // Resetando a posição de creditY
 				}
@@ -377,6 +392,7 @@ public class KeyHandler implements KeyListener {
 			rightPressed = true;
 		}
 		if (code == KeyEvent.VK_P) {
+			gp.stopSFX();
 			gp.playSFX(6);
 			gp.gameState = gp.pauseState;
 		}
@@ -422,15 +438,18 @@ public class KeyHandler implements KeyListener {
 
 		if (code == KeyEvent.VK_ESCAPE) {
 			gp.gameState = gp.playState;
+			gp.stopSFX();
 			gp.playSFX(6);
 		}
 		if (code == KeyEvent.VK_ENTER) {
 			enterPressed = true;
 			gp.gameState = gp.playState;
+			gp.stopSFX();
 			gp.playSFX(6);
 		}
 		if (code == KeyEvent.VK_P) {
 			gp.gameState = gp.playState;
+			gp.stopSFX();
 			gp.playSFX(6);
 		}
 
@@ -470,7 +489,7 @@ public class KeyHandler implements KeyListener {
 			if (gp.ui.commandNum < 0) {
 				gp.ui.commandNum = maxCommandNum;
 			}
-
+			gp.stopSFX();
 			gp.playSFX(6);
 		}
 		if (code == KeyEvent.VK_S) {
@@ -479,6 +498,7 @@ public class KeyHandler implements KeyListener {
 			if (gp.ui.commandNum > maxCommandNum) {
 				gp.ui.commandNum = 0;
 			}
+			gp.stopSFX();
 			gp.playSFX(6);
 		}
 		if (code == KeyEvent.VK_A) {
@@ -494,6 +514,7 @@ public class KeyHandler implements KeyListener {
 					handleWalkTypeChange();
 				}
 			}
+			gp.stopSFX();
 			gp.playSFX(6);
 		}
 		if (code == KeyEvent.VK_D) {
@@ -509,8 +530,8 @@ public class KeyHandler implements KeyListener {
 					handleWalkTypeChange();
 				}
 			}
+			gp.stopSFX();
 			gp.playSFX(6);
-
 		}
 
 		// DEBUG MODE
@@ -536,6 +557,7 @@ public class KeyHandler implements KeyListener {
 			if (gp.ui.commandNum < 0) {
 				gp.ui.commandNum = 1;
 			}
+			gp.stopSFX();
 			gp.playSFX(6);
 		}
 		if (code == KeyEvent.VK_S) {
@@ -543,6 +565,7 @@ public class KeyHandler implements KeyListener {
 			if (gp.ui.commandNum > 1) {
 				gp.ui.commandNum = 0;
 			}
+			gp.stopSFX();
 			gp.playSFX(6);
 		}
 		if (code == KeyEvent.VK_A) {
@@ -550,6 +573,7 @@ public class KeyHandler implements KeyListener {
 			if (gp.ui.commandNum > 1) {
 				gp.ui.commandNum = 0;
 			}
+			gp.stopSFX();
 			gp.playSFX(6);
 		}
 		if (code == KeyEvent.VK_D) {
@@ -557,6 +581,7 @@ public class KeyHandler implements KeyListener {
 			if (gp.ui.commandNum > 1) {
 				gp.ui.commandNum = 0;
 			}
+			gp.stopSFX();
 			gp.playSFX(6);
 		}
 		if (code == KeyEvent.VK_ENTER) {
@@ -571,6 +596,7 @@ public class KeyHandler implements KeyListener {
 					gp.ui.animationFinished = false;
 					gp.ui.titleScreenState = 2;
 					gp.gameState = gp.ui.creditScreenState;
+					gp.stopMusic();
 					gp.playMusic(5);
 				}
 			}
@@ -582,7 +608,7 @@ public class KeyHandler implements KeyListener {
 				gp.btnMenu.spriteNum = 0; // Reseta a animação para o início
 				gp.btnMenu.spriteCounter = 0; // Reseta o contador de frames
 			}
-
+			gp.stopSFX();
 			gp.playSFX(6);
 		}
 
@@ -592,6 +618,12 @@ public class KeyHandler implements KeyListener {
 			TileManager.debugModeOn = showDebug;
 			Entity.debugModeOn = showDebug;
 			EventHandler.debugModeOn = showDebug;
+		}
+	}
+	
+	public void cutsceneState(int code, KeyEvent e) {
+		if (code == KeyEvent.VK_ENTER) {
+			gp.keyH.enterPressed = true;
 		}
 	}
 

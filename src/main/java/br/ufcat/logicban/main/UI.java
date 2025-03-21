@@ -1,4 +1,4 @@
-package br.ufcat.logicban.ui;
+package br.ufcat.logicban.main;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -949,7 +949,7 @@ public class UI {
 					"Projeto da disciplina de Engenharia de Software 1", "", "Agradecimentos Especiais:",
 					"Agradecemos a RyiSnow pela playlist", "de tutoriais que foram essenciais",
 					"para o desenvolvimento!", "", "Efeitos Sonoros:", "freesound.org (Vários Artistas)", "",
-					"Testadores Beta:", "Gabriel e Lucas", "", "Agradecemos por jogar LogicBan!",
+					"Testadores Beta:", "Gabriel, Marcelo, Lucas", "", "Agradecemos por jogar LogicBan!",
 					"Obrigado pelo seu apoio!" };
 
 			int lineSpacing = 80;

@@ -1,4 +1,4 @@
-package br.ufcat.logicban.ui;
+package br.ufcat.logicban.main;
 
 public class TeleportEvent {
 	int currentMap, col, row;

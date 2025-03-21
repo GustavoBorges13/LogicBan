@@ -1,7 +1,7 @@
 package br.ufcat.logicban.object;
 
 import br.ufcat.logicban.entity.Entity;
-import br.ufcat.logicban.ui.GamePanel;
+import br.ufcat.logicban.main.GamePanel;
 
 public class OBJ_LogoUfcat extends Entity {
 	

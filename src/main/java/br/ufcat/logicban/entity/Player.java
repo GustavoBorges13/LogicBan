@@ -3,6 +3,8 @@ package br.ufcat.logicban.entity;
 import java.awt.Color;
 import java.awt.Rectangle;
 
+import br.ufcat.logicban.main.GamePanel;
+import br.ufcat.logicban.main.KeyHandler;
 import br.ufcat.logicban.object.OBJ_Boots;
 import br.ufcat.logicban.object.OBJ_Chest;
 import br.ufcat.logicban.object.OBJ_Door;
@@ -10,8 +12,6 @@ import br.ufcat.logicban.object.OBJ_Door_Iron;
 import br.ufcat.logicban.object.OBJ_Key;
 import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
 import br.ufcat.logicban.tile_interactive.InteractiveTile;
-import br.ufcat.logicban.ui.GamePanel;
-import br.ufcat.logicban.ui.KeyHandler;
 
 public class Player extends Entity {
 	KeyHandler keyH;

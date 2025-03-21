@@ -1,4 +1,4 @@
-package br.ufcat.logicban.ui;
+package br.ufcat.logicban.main;
 
 import br.ufcat.logicban.entity.NPC_Box;
 import br.ufcat.logicban.entity.NPC_OldMan;

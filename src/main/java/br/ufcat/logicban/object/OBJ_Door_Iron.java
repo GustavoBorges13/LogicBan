@@ -4,9 +4,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import br.ufcat.logicban.entity.Entity;
+import br.ufcat.logicban.main.GamePanel;
 import br.ufcat.logicban.tile_interactive.IT_LogicalPort;
 import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
-import br.ufcat.logicban.ui.GamePanel;
 
 public class OBJ_Door_Iron extends Entity {
 	GamePanel gp;

@@ -1,4 +1,4 @@
-package ai;
+package br.ufcat.logicban.ai;
 
 public class Node {
 	Node parent;

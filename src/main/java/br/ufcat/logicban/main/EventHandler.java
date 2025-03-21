@@ -1,4 +1,4 @@
-package br.ufcat.logicban.ui;
+package br.ufcat.logicban.main;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

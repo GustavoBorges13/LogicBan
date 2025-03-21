@@ -3,9 +3,9 @@ package br.ufcat.logicban.object;
 import java.awt.Color;
 
 import br.ufcat.logicban.entity.Entity;
+import br.ufcat.logicban.main.GamePanel;
 import br.ufcat.logicban.tile_interactive.IT_LogicalPort;
 import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
-import br.ufcat.logicban.ui.GamePanel;
 
 public class OBJ_Door extends Entity {
 	GamePanel gp;

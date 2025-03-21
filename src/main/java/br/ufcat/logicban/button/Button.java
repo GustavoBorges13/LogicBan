@@ -3,7 +3,8 @@ package br.ufcat.logicban.button;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
-import br.ufcat.logicban.ui.GamePanel;
+
+import br.ufcat.logicban.main.GamePanel;
 
 public class Button {
 
