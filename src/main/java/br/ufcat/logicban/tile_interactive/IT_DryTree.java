@@ -1,6 +1,6 @@
 package br.ufcat.logicban.tile_interactive;
 
-import br.ufcat.logicban.ui.GamePanel;
+import br.ufcat.logicban.main.GamePanel;
 
 public class IT_DryTree extends InteractiveTile{
 	

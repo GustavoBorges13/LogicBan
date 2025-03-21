@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
-import br.ufcat.logicban.ui.GamePanel;
+import br.ufcat.logicban.main.GamePanel;
 
 public class IT_LogicalPort extends InteractiveTile {
 	public static final String itName = "Porta Logica";
@@ -36,6 +36,51 @@ public class IT_LogicalPort extends InteractiveTile {
 		this.tipo = tipo;
 		this.direction = direction;
 		this.id = id;
+		this.cor = cor;
+		
+		solidArea = new Rectangle();
+		solidArea.x = 0;
+		solidArea.y = 0;
+		solidArea.width = 48;
+		solidArea.height = 48;
+		solidAreaDefaultX = solidArea.x;
+		solidAreaDefaultY = solidArea.y;
+		
+		name = itName;
+		
+		switch (tipo) {
+		case NOT:
+
+			color = Color.black;
+			break;
+		case AND:
+			color = Color.black;
+			break;
+		case OR:
+			color = Color.black;
+			break;
+		case NOR:
+			color = Color.black;
+			break;
+		case XOR:
+			color = Color.black;
+			break;
+		case NAND:
+			color = Color.black;
+			break;
+		case XNOR:
+			color = Color.black;
+			break;
+		}
+
+		getImage(tipo);
+	}
+	
+	public IT_LogicalPort(GamePanel gp, String tipo, String direction, String cor) {
+		super(gp);
+		this.gp = gp;
+		this.tipo = tipo;
+		this.direction = direction;
 		this.cor = cor;
 		
 		solidArea = new Rectangle();

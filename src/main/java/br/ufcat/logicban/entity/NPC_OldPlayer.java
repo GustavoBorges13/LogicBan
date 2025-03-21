@@ -2,7 +2,8 @@ package br.ufcat.logicban.entity;
 
 import java.awt.Color;
 import java.util.Random;
-import br.ufcat.logicban.ui.GamePanel;
+
+import br.ufcat.logicban.main.GamePanel;
 
 public class NPC_OldPlayer extends Entity {
 
@@ -17,7 +18,9 @@ public class NPC_OldPlayer extends Entity {
 
 		direction = "down";
 		speed = 1;
-		walkType = gp.player.stepWalk;
+		if (gp.player != null && gp.player.walkType != null) {
+		    walkType = gp.player.walkType;
+		}
 		name = npcName;
 
 		getImage();

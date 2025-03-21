@@ -3,7 +3,7 @@ package br.ufcat.logicban.object;
 import java.awt.Color;
 
 import br.ufcat.logicban.entity.Entity;
-import br.ufcat.logicban.ui.GamePanel;
+import br.ufcat.logicban.main.GamePanel;
 
 public class OBJ_Key extends Entity {
 	

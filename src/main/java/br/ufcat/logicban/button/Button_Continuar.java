@@ -3,7 +3,7 @@ package br.ufcat.logicban.button;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import br.ufcat.logicban.ui.GamePanel;
+import br.ufcat.logicban.main.GamePanel;
 
 public class Button_Continuar extends Button {
 
@@ -46,7 +46,7 @@ public class Button_Continuar extends Button {
 	public void animation() {
 		if (!animation) {
 			return; // Se a animação não estiver ativada, não faz nada
-		}
+		}		
 	}
 
 	public void draw(Graphics2D g2, int imgX, int imgY, int imgW, int imgH) {

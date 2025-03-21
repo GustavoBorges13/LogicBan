@@ -4,9 +4,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import br.ufcat.logicban.entity.Entity;
+import br.ufcat.logicban.main.GamePanel;
 import br.ufcat.logicban.tile_interactive.IT_LogicalPort;
 import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
-import br.ufcat.logicban.ui.GamePanel;
 
 public class OBJ_Door_Iron extends Entity {
 	GamePanel gp;
@@ -17,10 +17,12 @@ public class OBJ_Door_Iron extends Entity {
 	public String originalImage; // Adicione esta linha para salvar o caminho da imagem original
 	public static final String objName = "Iron Door";
 	public boolean messageShown = false; // Nova flag
-
+	public String option;
+	
 	public OBJ_Door_Iron(GamePanel gp, int controllingPortID, String option) {
 		super(gp);
 		this.gp = gp;
+		this.option = option;
 		switch (option) {
 		case IT_LogicalPort.itName:
 			this.controllingPortID = controllingPortID;
@@ -36,6 +38,16 @@ public class OBJ_Door_Iron extends Entity {
 		collision = true;
 		originalCollision = true; // Salva o estado original da colisão
 
+		color = Color.white;
+	}
+	
+	public OBJ_Door_Iron(GamePanel gp) {
+		super(gp);
+		this.gp = gp;
+
+		name = objName;
+		down1 = setup("/assets/objects/door_iron", gp.tileSize, gp.tileSize);
+		originalImage = "/assets/objects/door_iron"; // Salva o caminho da imagem original
 		color = Color.white;
 	}
 

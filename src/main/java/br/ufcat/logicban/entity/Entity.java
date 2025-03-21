@@ -7,8 +7,8 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
+import br.ufcat.logicban.main.GamePanel;
 import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
-import br.ufcat.logicban.ui.GamePanel;
 import br.ufcat.logicban.util.UtilityTool;
 
 public class Entity {

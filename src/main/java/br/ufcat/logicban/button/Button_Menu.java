@@ -3,7 +3,7 @@ package br.ufcat.logicban.button;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import br.ufcat.logicban.ui.GamePanel;
+import br.ufcat.logicban.main.GamePanel;
 
 public class Button_Menu extends Button {
 
@@ -58,15 +58,16 @@ public class Button_Menu extends Button {
 				spriteNum = 0; // Reinicia a animação
 				animation = false; // Para a animação após completar
 				if(gp.currentMap >= gp.highestUnlockedFase) {
-					System.out.println("gp.currentmap "+gp.currentMap+" gp.highestUnlockfase "+gp.highestUnlockedFase);
+					//System.out.println("gp.currentmap "+gp.currentMap+" gp.highestUnlockfase "+gp.highestUnlockedFase);
 					gp.highestUnlockedFase = gp.currentMap + 1;
 					gp.saveLoad.save();
-					System.out.println("gp.currentmap "+gp.currentMap+" gp.highestUnlockfase "+gp.highestUnlockedFase);
+					//System.out.println("gp.currentmap "+gp.currentMap+" gp.highestUnlockfase "+gp.highestUnlockedFase);
 				}
 				gp.ui.commandNum = gp.currentMap;
 				gp.gameState = gp.titleState;
 				gp.ui.titleScreenState = 0;
 				gp.stopMusic();
+				gp.stopSFX();
 				gp.playMusic(5);
 				gp.restart();
 			}

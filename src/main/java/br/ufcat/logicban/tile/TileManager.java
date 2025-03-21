@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import br.ufcat.logicban.ui.GamePanel;
+import br.ufcat.logicban.main.GamePanel;
 import br.ufcat.logicban.util.UtilityTool;
 
 public class TileManager {

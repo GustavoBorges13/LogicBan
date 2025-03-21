@@ -3,7 +3,7 @@ package br.ufcat.logicban.button;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import br.ufcat.logicban.ui.GamePanel;
+import br.ufcat.logicban.main.GamePanel;
 
 public class Button_Creditos extends Button {
 

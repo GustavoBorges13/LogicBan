@@ -3,10 +3,11 @@ package br.ufcat.logicban.entity;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+
+import br.ufcat.logicban.main.GamePanel;
 import br.ufcat.logicban.tile_interactive.IT_LogicalPort;
 import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
 import br.ufcat.logicban.tile_interactive.InteractiveTile;
-import br.ufcat.logicban.ui.GamePanel;
 
 public class NPC_Box extends Entity {
 
@@ -25,7 +26,10 @@ public class NPC_Box extends Entity {
 		name = npcName;
 		direction = "down";
 		speed = 3;
-		walkType = gp.player.walkType;
+	
+		if (gp.player != null && gp.player.walkType != null) {
+		    walkType = gp.player.walkType;
+		}
 
 		color = Color.ORANGE;
 		solidArea.x = 6;

@@ -3,6 +3,8 @@ package br.ufcat.logicban.entity;
 import java.awt.Color;
 import java.awt.Rectangle;
 
+import br.ufcat.logicban.main.GamePanel;
+import br.ufcat.logicban.main.KeyHandler;
 import br.ufcat.logicban.object.OBJ_Boots;
 import br.ufcat.logicban.object.OBJ_Chest;
 import br.ufcat.logicban.object.OBJ_Door;
@@ -10,8 +12,6 @@ import br.ufcat.logicban.object.OBJ_Door_Iron;
 import br.ufcat.logicban.object.OBJ_Key;
 import br.ufcat.logicban.tile_interactive.IT_MetalPlate;
 import br.ufcat.logicban.tile_interactive.InteractiveTile;
-import br.ufcat.logicban.ui.GamePanel;
-import br.ufcat.logicban.ui.KeyHandler;
 
 public class Player extends Entity {
 	KeyHandler keyH;
@@ -29,6 +29,18 @@ public class Player extends Entity {
 		super(gp);
 
 		this.keyH = keyH;
+		walkType = stepWalk;
+
+		color = Color.magenta;
+
+		// setDefaultValues();
+		getPlayerImage();
+
+	}
+	
+	public Player(GamePanel gp) {
+		super(gp);
+
 		walkType = stepWalk;
 
 		color = Color.magenta;
@@ -171,7 +183,7 @@ public class Player extends Entity {
 				collisionOn = false;
 				collisionEndWorld = false;
 				gp.cChecker.checkEnd(this);
-				gp.cChecker.checkTile(this);
+				//gp.cChecker.checkTile(this);
 
 				// CHECK OBJECT COLLISION
 				int objIndex = gp.cChecker.checkObject(this, true);

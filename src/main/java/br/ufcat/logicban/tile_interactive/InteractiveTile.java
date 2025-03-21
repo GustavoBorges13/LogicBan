@@ -1,7 +1,7 @@
 package br.ufcat.logicban.tile_interactive;
 
 import br.ufcat.logicban.entity.Entity;
-import br.ufcat.logicban.ui.GamePanel;
+import br.ufcat.logicban.main.GamePanel;
 
 public class InteractiveTile extends Entity {
 
@@ -11,6 +11,11 @@ public class InteractiveTile extends Entity {
 	public boolean placaConectada;
 	
 	public InteractiveTile(GamePanel gp, int col, int row) {
+		super(gp);
+		this.gp = gp;
+	}
+	
+	public InteractiveTile(GamePanel gp) {
 		super(gp);
 		this.gp = gp;
 	}
