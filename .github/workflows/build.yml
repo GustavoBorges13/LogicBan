@@ -118,6 +118,8 @@ jobs:
              --vendor "Bug Hunters" \
              --copyright "Copyright (C) 2025" \
              --icon src/resources/assets/logos/icone.png
+
+             
       - name: Clean up dependencies in control file
         run: |
           # Extraindo o conteúdo do pacote .deb
