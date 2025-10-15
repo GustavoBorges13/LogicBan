@@ -2,6 +2,21 @@
 
 LogicBan é um jogo 2D desenvolvido em Java como projeto acadêmico. O objetivo do jogo é desafiar os jogadores com quebra-cabeças lógicos envolventes.
 
+#### Menu Inicial
+![inicio](https://github.com/user-attachments/assets/b789d57e-9893-4c0b-928e-6bd6e5637377)
+
+#### Fase 1
+![fase_1](https://github.com/user-attachments/assets/a807fae7-53b9-4a01-b767-b328de6be8be)
+
+#### Fase 2
+![fase_2](https://github.com/user-attachments/assets/0cf7a3fd-a135-475c-a9e7-07f0410e5cf3)
+
+#### Fase 3
+![fase_3](https://github.com/user-attachments/assets/325f573b-de61-4836-b7b9-d91da098cf7f)
+
+#### Fase 4
+![fase_4](https://github.com/user-attachments/assets/384d654f-fd15-4d61-9567-d50a938381b6)
+
 ## 📥 Instalação
 
 ### Requisitos Mínimos
