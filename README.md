@@ -111,12 +111,12 @@ Este jogo foi desenvolvido usando:
 
 ## 👥 Colaboradores
 Desenvolvido por:
-- Gustavo Silva ([GitHub](https://github.com/GustavoBorges13))
+- [Gustavo Silva](https://github.com/GustavoBorges13)
 - Davi Marques
 - Marcos Sousa
 - Luís Lopes
 - Michael Silva
-- Rafael Andrade
+- [Rafael Andrade](https://github.com/rafaelmartins0216-del) 
 
 ## 👥 Inspiração
 Este projeto foi inspirado no trabalho desenvolvido pelo [RyiSnow](https://www.youtube.com/@RyiSnow).
